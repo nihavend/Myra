@@ -1,1 +1,0 @@
-java -cp TlosLite_V1.7.0.jar com.likya.tlos.TlosRemoteManager -port 3001 -host localhost -terminate
