@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-9" standalone="no"?>
+<eclipse-userlibraries version="2">
+    <library name="TlosLite1.8.0.Libs" systemlibrary="false">
+        <archive path="/SharedLibs/javamail/activation.jar"/>
+        <archive path="/SharedLibs/javamail/dsn.jar"/>
+        <archive path="/SharedLibs/javamail/imap.jar"/>
+        <archive path="/SharedLibs/javamail/mailapi.jar"/>
+        <archive path="/SharedLibs/javamail/pop3.jar"/>
+        <archive path="/SharedLibs/javamail/smtp.jar"/>
+        <archive path="/SharedLibs/jmx/jmxremote_optional.jar"/>
+        <archive path="/SharedLibs/log4j/log4j-1.2.15.jar"/>
+        <archive path="/SharedLibs/tomcatlib/servlet-api.jar"/>
+        <archive path="/SharedLibs/apache/commons-codec-1.4.jar"/>
+        <archive path="/SharedLibs/apache-cxf-2.6.0/commons-lang-2.6.jar"/>
+        <archive path="/SharedLibs/icefaces_2.x/compat/jxl.jar"/>
+    </library>
+</eclipse-userlibraries>

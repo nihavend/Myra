@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+
+<comment>
+
+Senaryo bilgilerini bulunduran dosya
+
+jobname= 
+	command,
+	type,
+	log_file_path,
+	dependencylist,
+	result,
+	time (gg:aa:yyyy hh:mm:ss) veya (hh:mm:ss başladığı günü kabul edip çalışır)  
+	,timeout(sn)
+	,autorestart (evet, hayır)
+	,uyarı kodu listesi : Buraya listelenen ve | ile ayrılan kodlarla biten işler başarılı sayılacak.
+
+</comment>
+
+	<entry key="job1">tlos_v1.11_test\job1.bat,system,D:\likyateknoloji\likyaWorkspace\Tlos_V1.11\TlosTrace.log,yok,S,22/05/2008 12:04:00,20,hayır,0</entry>
+	<entry key="job2">tlos_v1.11_test\job1.bat,system,D:\\likyateknoloji\\likyaWorkspace\\TlosTest_V1.11\\tests\\TlosTrace2.log,job1,S,22/05/2008 12:04:00,20,hayır,0</entry>
+	<entry key="job3">tlos_v1.11_test\job1.bat,system,D:\\likyateknoloji\\likyaWorkspace\\TlosTest_V1.11\\tests\\TlosTrace3.log,job2,S,22/05/2008 12:04:00,20,hayır,1|2</entry>
+	<entry key="job4">tlos_v1.11_test\job1.bat,system,D:\\likyateknoloji\\likyaWorkspace\\TlosTest_V1.11\\tests\\TlosTrace4.log,job3,S,22/05/2008 12:04:00,20,hayır,1|2</entry>
+	<entry key="job5">tlos_v1.11_test\job1.bat,system,D:\\likyateknoloji\\likyaWorkspace\\TlosTest_V1.11\\tests\\TlosTrace5.log,job4,S,22/05/2008 12:04:00,20,hayır,1|2</entry>
+	<entry key="job6">tlos_v1.11_test\job1.bat,system,D:\\likyateknoloji\\likyaWorkspace\\TlosTest_V1.11\\tests\\TlosTrace6.log,job5,S,22/05/2008 12:04:00,20,hayır,1|2</entry>
+	<entry key="job7">tlos_v1.11_test\job1.bat,system,D:\\likyateknoloji\\likyaWorkspace\\TlosTest_V1.11\\tests\\TlosTrace7.log,job6,S,22/05/2008 12:04:00,20,hayır,1|2</entry>
+
+</properties>

@@ -1,0 +1,11 @@
+<jobList xmlns="http://www.likyateknoloji.com/myra-jobprops" xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+	xmlns:myra="http://www.likyateknoloji.com/myra-stateinfo" xmlns:wla="http://www.likyateknoloji.com/wla-gen">
+	<jobSimpleProperties>
+		<jsdl:JobDescription />
+		<baseJobInfos />
+		<myra:stateInfos />
+		<DependencyList />
+		<wla:timeManagement />
+		<wla:cascadingConditions />
+	</jobSimpleProperties>
+</jobList>

@@ -1,0 +1,263 @@
+package com.likya.myra.jef.jobs;
+
+import java.util.Calendar;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+import com.likya.myra.commons.utils.LiveStateInfoUtils;
+import com.likya.myra.jef.core.CoreFactory;
+import com.likya.myra.jef.model.JobRuntimeInterface;
+import com.likya.myra.jef.utils.DateUtils;
+import com.likya.xsd.myra.model.xbeans.jobprops.RemoteSchProperties;
+import com.likya.xsd.myra.model.xbeans.jobprops.SimpleProperties;
+import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
+import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
+import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
+import com.likya.xsd.myra.model.xbeans.stateinfo.SubstateNameDocument.SubstateName;
+import com.likyateknoloji.rs.ExecuteRShellParamsDocument.ExecuteRShellParams;
+
+public abstract class ExecuteSchComponent extends CommonShell {
+
+	private static final long serialVersionUID = 7931558555995487881L;
+	
+	private final String logLabel = " ExecuteSchComponent ";
+
+	public ExecuteSchComponent(SimpleProperties simpleProperties, JobRuntimeInterface jobRuntimeProperties) {
+		super(simpleProperties, jobRuntimeProperties);
+	}
+
+	public void startSchProcess(String jobPath, String jobCommand, Map<String, String> environmentVariables, String logClassName, Logger myLogger) throws Exception {
+
+		// JobRuntimeInterface jobRuntimeInterface = getJobRuntimeProperties();
+
+		SimpleProperties simpleProperties = getJobSimpleProperties();
+
+		String jobId = simpleProperties.getId();
+
+		StringBuilder stringBufferForERROR = new StringBuilder();
+		StringBuilder stringBufferForOUTPUT = new StringBuilder();
+
+		JSch jsch = new JSch();
+
+		ExecuteRShellParams executeRShellParams = ((RemoteSchProperties) simpleProperties).getExecuteRShellParams();
+
+		String host = executeRShellParams.getIpAddress(); // "192.168.1.39";
+		String user = executeRShellParams.getUserName(); // "likya";
+		String password = executeRShellParams.getUserPassword(); // "likya";
+		int port = executeRShellParams.getPort(); // "22";
+		String fileSeperator = executeRShellParams.getFileSeperator();
+
+		jobCommand = jobPath + fileSeperator + jobCommand; // "/home/likya/murat/Agent/jobs/job1.sh";
+
+		Session session = jsch.getSession(user, host, port);
+
+		/*
+		 * String xhost="127.0.0.1"; int xport=0;
+		 * String display=JOptionPane.showInputDialog("Enter display name", xhost+":"+xport);
+		 * xhost=display.substring(0, display.indexOf(':'));
+		 * xport=Integer.parseInt(display.substring(display .indexOf(':')+1));
+		 * session.setX11Host(xhost);
+		 * session.setX11Port(xport+6000);
+		 */
+
+		java.util.Properties config = new java.util.Properties();
+		config.put("StrictHostKeyChecking", "no");
+		session.setConfig(config);
+
+		session.setPassword(password);
+		session.connect();
+
+		Channel channel = session.openChannel("exec");
+		((ChannelExec) channel).setCommand(jobCommand);
+
+		// X Forwarding
+		// channel.setXForwarding(true);
+
+		channel.setInputStream(System.in);
+		// channel.setInputStream(null);
+
+		// channel.setOutputStream(System.out);
+
+		// FileOutputStream fos=new FileOutputStream("/tmp/stderr");
+		// ((ChannelExec)channel).setErrStream(fos);
+		((ChannelExec) channel).setErrStream(System.err);
+
+		channel.connect();
+
+		initGrabbers(channel, jobId,  myLogger, temporaryConfig.getLogBufferSize());
+
+		try {
+
+			while (true) {
+
+				if (channel.isClosed()) {
+					break;
+				}
+
+				Thread.sleep(1000);
+			}
+
+			channel.disconnect();
+			session.disconnect();
+
+			int processExitValue = channel.getExitStatus();
+
+			myLogger.info(" >>" + " ExecuteSchComponent " + jobId + " islemi sonlandi, islem bitis degeri : " + processExitValue);
+
+			StringBuffer descStr = new StringBuffer();
+
+			StatusName.Enum statusName = JobHelper.searchReturnCodeInStates(simpleProperties, processExitValue, descStr);
+
+			JobHelper.updateDescStr(descStr, stringBufferForOUTPUT, stringBufferForERROR);
+
+			JobHelper.writetErrorLogFromOutputs(myLogger, logClassName, stringBufferForOUTPUT, stringBufferForERROR);
+
+			JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, statusName.intValue());
+
+		} catch (InterruptedException e) {
+
+			myLogger.warn(" >>" + " ExecuteSchComponent " + ">> " + logClassName + " : Job timed-out terminating " + simpleProperties.getBaseJobInfos().getJsName());
+
+			channel.disconnect();
+			session.disconnect();
+
+		}
+	}
+
+	@Override
+	public void localRun() {
+		
+		Calendar startTime = Calendar.getInstance();
+		
+		//initStartUp(myLogger);
+
+		SimpleProperties simpleProperties = getJobSimpleProperties();
+
+		while (true) {
+
+			try {
+
+				startWathcDogTimer();
+
+				String jobPath = simpleProperties.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
+				String jobCommand = simpleProperties.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand();
+
+				JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_IN);
+
+				startSchProcess(jobPath, jobCommand, null, this.getClass().getName(), CoreFactory.getLogger());
+
+			} catch (Exception err) {
+				handleException(err, CoreFactory.getLogger());
+			}
+
+			if (processJobResult(true, CoreFactory.getLogger())) {
+				//retryFlag = false;
+				continue;
+			}
+
+			break;
+		}
+
+		cleanUp(process, startTime);
+
+	}
+	
+	public void handleException(Exception err, Logger myLogger) {
+
+		SimpleProperties simpleProperties = getJobSimpleProperties();
+
+		LiveStateInfo liveStateInfo = simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
+		
+		/* FINISHED state i yoksa ekle */
+		if (!LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED)) {
+			JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, err.getMessage());
+		}
+
+		myLogger.error(err.getMessage());
+
+		myLogger.error(" >>" + logLabel + ">> " + err.getMessage());
+		err.printStackTrace();
+
+	}
+	
+	public boolean processJobResult(boolean retryFlag, Logger myLogger) {
+
+		SimpleProperties simpleProperties = getJobSimpleProperties();
+
+		if (simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0).getStateName().equals(StateName.FINISHED)) {
+
+			//sendStatusChangeInfo();
+
+			String logStr = "islem bitirildi : " + simpleProperties.getId() + " => ";
+			logStr += StateName.FINISHED.toString() + ":" + simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0).getSubstateName().toString() + ":" + simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0).getStatusName().toString();
+			myLogger.info(" >>>>" + logStr + "<<<<");
+
+		} else {
+
+			// TODO Hoşuma gitmedi ama tip dönüşümü yaptım
+			if (Boolean.parseBoolean(simpleProperties.getCascadingConditions().getJobAutoRetry().toString()) && retryFlag) {
+
+				myLogger.info(" >> " + "ExecuteInShell : Job Failed ! Restarting " + simpleProperties.getBaseJobInfos().getJsName());
+
+				JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_IN);
+
+				return true;
+
+			} else {
+
+				myLogger.info(" >>" + logLabel + ">> " + simpleProperties.getId() + ":Job Failed ! ");
+				myLogger.debug(" >>" + logLabel + ">> " + simpleProperties.getId() + "ExecuteInShell : Job Failed !");
+
+			}
+		}
+
+		return false;
+	}
+	
+	protected void cleanUp(Process process, Calendar startTime) {
+
+		SimpleProperties simpleProperties = getJobSimpleProperties();
+
+		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Error for " + simpleProperties.getBaseJobInfos().getJsName());
+		stopErrorGobbler(CoreFactory.getLogger());
+
+		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Output for " + simpleProperties.getBaseJobInfos().getJsName());
+		stopOutputGobbler(CoreFactory.getLogger());
+
+		Calendar endTime = Calendar.getInstance();
+
+		long timeDiff = endTime.getTime().getTime() - startTime.getTime().getTime();
+
+		String endLog = simpleProperties.getBaseJobInfos().getJsName() + ":Bitis zamani : " + DateUtils.getDate(endTime.getTime());
+		String duration = simpleProperties.getBaseJobInfos().getJsName() + ": islem suresi : " + DateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
+		getJobRuntimeProperties().setCompletionDate(endTime);
+		getJobRuntimeProperties().setWorkDuration(DateUtils.getUnFormattedElapsedTime((int) timeDiff / 1000));
+		
+		JobHelper.setJsRealTimeForStop(simpleProperties, endTime);
+		
+		// getJobRuntimeProperties().getJobProperties().getTimeManagement().setJsRealTime(jobRealTime);
+
+		// sendEndInfo(jobRuntimeProperties.getNativeFullJobPath().getFullPath(), jobProperties);
+
+		// GlobalRegistery.getSpaceWideLogger().info(logLabel + endLog);
+		// GlobalRegistery.getSpaceWideLogger().info(logLabel + duration);
+		CoreFactory.getLogger().info(" >>" + logLabel + ">> " + endLog);
+		CoreFactory.getLogger().info(" >>" + logLabel + ">> " + duration);
+
+		if (watchDogTimer != null) {
+			CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Watchdog for " + simpleProperties.getBaseJobInfos().getJsName());
+			stopMyDogBarking();
+		}
+
+		process = null;
+		// isExecuterOver = true;
+		CoreFactory.getLogger().info(" >>" + logLabel + ">> ExecuterThread:" + Thread.currentThread().getName() + " is over");
+
+	}
+
+}

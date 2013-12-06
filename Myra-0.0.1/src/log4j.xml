@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
+<log4j:configuration>
+
+	<appender name="ekran" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601}|%c{1}|%m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="info" />
+			<param name="LevelMax" value="fatal" />
+		</filter>
+	</appender>
+
+	<appender name="dosya" class="org.apache.log4j.RollingFileAppender">
+		<param name="maxFileSize" value="1000KB" />
+		<param name="maxBackupIndex" value="5" />
+		<param name="File" value="TlosEkran.log" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601}|%c{1}|%m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="info" />
+			<param name="LevelMax" value="fatal" />
+		</filter>
+	</appender>
+
+	<!-- appender name="file" class="org.apache.log4j.RollingFileAppender"> 
+		<param name="maxFileSize" value="1000KB" /> <param name="maxBackupIndex" 
+		value="5" /> <param name="File" value="LikyaScheduler.log" /> <param name="threshold" 
+		value="info" /> <layout class="org.apache.log4j.PatternLayout"> <param name="ConversionPattern" 
+		value="%d{ABSOLUTE} %5p %c{1}:%L - %m%n" /> </layout> </appender -->
+
+	<appender name="tracefile" class="org.apache.log4j.RollingFileAppender">
+		<param name="maxFileSize" value="1000KB" />
+		<param name="maxBackupIndex" value="5" />
+		<param name="File" value="TlosTrace.log" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{DATE} %5p %c{1}:%L - %m%n" />
+			<!-- value="%d{ABSOLUTE} %5p %c{1}:%L - %m%n" / -->
+		</layout>
+		<!-- filter class="org.apache.log4j.varia.LevelRangeFilter"> <param name="LevelMin" 
+			value="trace" /> <param name="LevelMax" value="trace" /> </filter -->
+	</appender>
+
+	<!-- appender name="stdout" class="org.apache.log4j.ConsoleAppender"> <layout 
+		class="org.apache.log4j.PatternLayout"> <param name="ConversionPattern" value="%d{ABSOLUTE} 
+		%5p %c{1}:%L - %m%n"/> </layout> <layout class="org.apache.log4j.xml.XMLLayout"> 
+		<param name="ConversionPattern" value="%d{ABSOLUTE} %5p %c{1}:%L - %m%n"/> 
+		</layout> </appender -->
+
+	<appender name="oracledb" class="org.apache.log4j.jdbc.JDBCAppender">
+		<param name="driver" value="oracle.jdbc.driver.OracleDriver" />
+		<param name="user" value="TLOS_LITE" />
+		<param name="password" value="TLOS_LITE" />
+		<param name="URL" value="jdbc:oracle:thin:@192.168.1.67:1523:orcl" />
+		<!-- param name="sql" value="INSERT INTO LOGS VALUES('%x','%d{yyyy-MM-dd 
+			HH:mm:ss.SSS}','%C','%p','%m')" / -->
+		<layout class="org.apache.log4j.PatternLayout">
+			<!-- param name="ConversionPattern" value="%d{DATE} %5p %c{1}:%L - %m%n" 
+				/ -->
+			<!-- param name="ConversionPattern" value="INSERT INTO LOGGING_SAMPLES_TEST 
+				(log_date, log_level, location, message) VALUES ( '%d{ISO8601}','%p', '%C;%L', 
+				'%m' )"/ -->
+			<!-- param name="ConversionPattern" value="INSERT INTO TLOS_LITE.LOGS 
+				VALUES('TLOSLITE',sysdate,'ME','1','Hello world!')" / -->
+			<param name="ConversionPattern"
+				value="INSERT INTO TLOS_LITE.LOGS VALUES ('TLOSLITE', sysdate,'%p','%L','%m')" />
+		</layout>
+		<!-- CREATE TABLE logs (user_id VARCHAR(20) NOT NULL, dated DATETIME NOT 
+			NULL, logger VARCHAR(50) NOT NULL, "level" VARCHAR(10) NOT NULL, message 
+			VARCHAR(1000) NOT NULL); -->
+	</appender>
+	<!-- logger name="com.likya.tlos.dblogger"> <appender-ref ref="oracledb" 
+		/> </logger -->
+
+	<root>
+		<priority value="trace"></priority>
+		<appender-ref ref="ekran" />
+		<appender-ref ref="dosya" />
+		<appender-ref ref="tracefile" />
+	</root>
+
+</log4j:configuration>

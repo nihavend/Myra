@@ -1,0 +1,97 @@
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+
+<comment>
+<!-- 
+Senaryo bilgilerini bulunduran dosya
+        job ID
+        	() parantez içinde instance sayısı verilebilir. Örnek job1(10)|5    => job1 den 10 iisntance aç, öncelikleri 5 olsun.
+        	 | işareti ile yanına öncelik girilebilir. Örnek : <entry key="job1|5"> gibi.
+        job group
+		job command
+        job type
+        log_file_path
+        dependencylist
+        	Bağılılık tanımım yapılırken, jobların fail mi yoksa success tipinde mi bağımlı olacakları tanım sırasında belirlenebilir.
+        	Örnek : 
+        		job1(1) :success
+        		job1(0)  :fail
+        		
+        		Önemli Not : Bir job'a fail tipinde bağlama yapıldığında, fail tipinde bağlanılan job otomatik olarak non-blocker yapılır
+        	
+        execution type : S : Standart : yanına | ile ayırıp (isblocker(true/false)) eklenebilir : bu işi fail edince senaryo bloklansın mı ?  default ya da verilmezse true olacak Diğer iş türlerinde anlamı yok.
+        				 M : Manuel
+        				 DELAY(ms) : Tekrarlı
+        				 
+        start date/time (gg:aa:yyyy hh:mm:ss) veya (hh:mm:ss basladigi gunu kabul edip calisir)
+        timeout(sn)
+        autorestart
+        	(true,false), 
+        	true ise; 
+        		iş fail ettiğinde;
+        			| delay(ms) | count(sayı) : eğer true ise ve başka bilgi verilmezse ya da delay < 1000 ise veya sayı < 1 ise; delay = 1000; sayı = 1 kabul edilir
+        			verilen sayı kadar verilen aralıklarla tekrar çalıştırır.
+        	false ise;
+        		fail edince hiç bir şey yapmaz
+        bitis uyari kodu; Buraya listelenen ve | ile ayrilan kodlarla biten isler basarili sayilacak
+        restartable (0,1)
+        hata kelimesi (\null, HATA)
+-->
+</comment>
+<entry key="version">V1.8.0</entry>
+<!-- entry key="job1">0,A,java -jar D:\dev\likyateknoloji\likyaWorkspace2011\Tlos_V1.7\tlos_v1.7_test\TlosInterComm.jar -configpath D:\dev\likyateknoloji\likyaWorkspace2011\Tlos_V1.7\tlos_v1.7_test\ -configfile TlosInterComm.xml> job1.log,java,yok,yok,S,01/01/2009 07:00:00,3600,false,0,1,\null</entry -->
+<!-- entry key="job1">A,tlos_v1.7_test\job1.bat,system,yok,yok,S,01/01/2009 00:00:00,100,false,0,1,\null</entry -->
+<!-- entry key="job0">B,tlos_v1.8.0_test/job1.sh,system,,yok,10,01/01/2009 00:15:00-04:01:00,100,false,0,1,\null</entry-->
+<!-- entry key="job1">A,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log1.log,yok,S,01/01/2009 23:05:10,5,false,0,1,\null</entry-->
+<!-- entry key="job2">A,tlos_v1.8.0_test/job2.sh,system,tlos_v1.8.0_test/log1.log,yok,S|false,01/01/2009 23:05:30,3600,false,0,1,\null</entry-->
+<!-- entry key="job2|2">A,tlos_v1.8.0_test/job2.sh,system,tlos_v1.8.0_test/log1.log,yok,S|false,01/01/2009 07:00:00,3600,false,0,1,\null</entry-->
+<!-- entry key="job3|23">B,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log2.log,yok,M,null,100,true,0,1,\null</entry-->
+<!-- entry key="job4|4">C,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log2.log,yok,20,01/01/2009 07:00:00,100,false,0,1,\null</entry-->
+<!-- entry key="job2">B,tlos_v1.7_test\job1.bat,system,yok,job1,S,01/01/2009 07:00:00,100,false,0,1,\null</entry -->
+<!-- entry key="job3">B,tlos_v1.7_test\job2.bat,system,yok,yok,20,01/01/2009 07:00:00,100,false,0,1,\null</entry -->
+
+<!-- entry key="job1">A,tlos_v1.8.0_test/job2.sh,system,yok,yok,S|false,08/03/2013 18:06:00,300,true|10000|5,0,1,\null</entry--> 
+<!-- entry key="job2">A,tlos_v1.8.0_test/job1.sh,system,yok,job1,20,08/03/2013 18:02:00,300,false,0,1,\null</entry-->
+
+<!-- entry key="job2">A,tlos_v1.8.0_test/job2.sh,system,yok,yok,20,00:15:00-23:01:00,300,true,0,1,\null</entry-->  
+<!-- 
+<entry key="job1|3">A,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log1.log,yok,S,01/01/2009 07:00:00,3600,false,0,1,\null</entry>
+<entry key="job2|2">A,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log1.log,yok,S,01/01/2009 07:00:00,3600,false,0,1,\null</entry>
+<entry key="job3|1">A,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log1.log,yok,S,01/01/2009 07:00:00,3600,false,0,1,\null</entry>
+-->
+<!-- 
+<entry key="job1|3">A,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log1.log,yok,60,00:00:00-23:59:59,300,false,0,1,\null</entry>
+<entry key="job2|2">A,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log1.log,yok,60,00:00:00-23:59:59,300,false,0,1,\null</entry>
+<entry key="job3|1">A,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log1.log,yok,60,00:00:00-23:59:59,300,false,0,1,\null</entry>
+
+<entry key="job1|3">A,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log1.log,yok,60,10/03/2013 14:42:00-15:45:00,300,false,0,1,\null</entry>
+
+<entry key="job1(50)">B,tlos_v1.8.0_test/job11.sh,system,yok,yok,S,01/01/2009 16:34:00,100,false,0,1,\null</entry>
+
+<entry key="job3">B,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log2.log,yok,M,null,100,true,0,1,\null</entry>
+
+<entry key="job1">B,tlos_v1.8.0_test/job11.sh,system,yok,yok,S,11/03/2013 15:22:00,100,false,0,1,\null</entry>
+
+<entry key="job1|3">A,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log1.log,yok,60,00:00:00-23:59:59,300,false,0,1,\null</entry>
+
+<entry key="job3|23">B,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log2.log,yok,M,null,100,true,0,1,\null</entry>
+
+<entry key="job1">A,tlos_v1.8.0_test/job2.sh,system,yok,yok,S|false,13/03/2013 01:01:00,300,false,0,1,\null</entry>
+<entry key="job2">A,tlos_v1.8.0_test/job1.sh,system,yok,yok,S,13/03/2013 01:01:20,300,false,0,1,\null</entry>
+
+<entry key="job2">A,tlos_v1.8.0_test/job1.sh,system,yok,yok,S,13/03/2013 01:01:20,300,false,0,1,\null</entry>
+<entry key="job3">B,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log2.log,yok,M,null,100,true,0,1,\null</entry>
+
+<entry key="job1|3">A,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log1.log,yok,60,10/03/2013 14:42:00-15:45:00,300,false,0,1,\null</entry>
+
+<entry key="job2">A,tlos_v1.8.0_test/job1.sh,system,yok,yok,S,13/03/2013 01:01:20-15:45:00,300,false,0,1,\null</entry>
+
+<entry key="job1|3">A,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log1.log,yok,20,00:00:00-23:59:59,300,false,0,1,\null</entry>
+<entry key="job2|2">A,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log1.log,yok,30,00:00:00-23:59:59,300,false,0,1,\null</entry>
+<entry key="job3|1">A,tlos_v1.8.0_test/job1.sh,system,tlos_v1.8.0_test/log1.log,yok,55,00:00:00-23:59:59,300,false,0,1,\null</entry>
+<entry key="job1">A,tlos_v1.8.0_test/job1.sh serkan,system,tlos_v1.8.0_test/log1.log,yok,20,00:00:00-23:59:59,300,false,0,1,\null</entry>
+-->
+
+<entry key="job1(99999)">Ğ,tlos_v1.8.0_test/job1.sh odi=true,system,yok,yok,S,16/03/2013 00:58:20,300,false,0,1,\null</entry>
+</properties>
