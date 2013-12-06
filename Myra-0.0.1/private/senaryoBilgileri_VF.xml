@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+	<comment>
+</comment>
+	<entry key="job201">/home/sasadm/tlos_v1.11/bin/contents/AVT_Load_icerik_v1_0.sh,system,/home/sasadm/tlos_v1.11/logs/contents,yok,S,20/01/2009 15:10:00,3600,hayır,0</entry>
+	<entry key="job202">/home/sasadm/tlos_v1.11/bin/contents/AVT_Tran_Pay_Icerik_v1_0.sh,system,/home/sasadm/tlos_v1.11/logs/contents,job201,S,20/01/2009 15:10:00,3600,hayır,0</entry>
+	<entry key="job1">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/auditlog_load_v_1_0_plus.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,20/01/2009 10:00:00,3600,hayır,0</entry>
+	<entry key="job2">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/auditlog_load_day_v_1_0.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job1,S,20/01/2009 10:00:00,3600,hayır,0</entry>
+	<entry key="job3">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/auditlog_join_v_1_0.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job2,S,20/01/2009 10:00:00,3600,hayır,0</entry>
+	<entry key="job21">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/auditlog_join_day_v_1_0.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job3,S,20/01/2009 10:00:00:00,3600,hayır,0</entry>
+	<entry key="job4">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/auditlog_filter_sort_v_1_0.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job3,S,20/01/2009 10:00:00,3600,hayır,0</entry>
+	<entry key="job5">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/auditlog_filter_sort_day_v_1_0_plus.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job21,S,20/01/2009 10:00:00,3600,hayır,0</entry>
+	<entry key="job9">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/av_auditlog_write_dates_v_1_0.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,20/01/2009 10:00:00,3600,hayır,0</entry>
+	<entry key="job10">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/auditlog_find_token_v_1_0.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,20/01/2009 10:00:00,3600,hayır,0</entry>
+	<entry key="job11">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/auditlog_find_count2_v_1_0.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,20/01/2009 10:00:00,3600,hayır,0</entry>
+	<entry key="job12">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/av_auditlog_pay_dates_v_1_0.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,20/01/2009 10:00:00,3600,hayır,0</entry>
+	<entry key="job14">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/av_audit_gunluk_v_1_2.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job9|job10|job11|job12|job 21,S,20/01/2009 10:00:00,3600,hayır,0</entry>
+	<entry key="job20">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/av_csh_duzeltme.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job14,S,20/01/2009 10:00:00,3600,hayır,0</entry>
+	<entry key="job21">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/csh_filtre.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job14|job20,S,30/01/2009 06:00:00,3600,hayır,0</entry> 
+	<entry key="job15">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/av_Tran_PayType_Prod_v10f.sh,system,/home/sasadm/tlos_v1.11/logs/avt,AYHAN,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job16">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/csh_formats.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job17">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/av_mo_mt_kapali_v1_3f.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job13|job14|job21,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job18">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/av_auditlog_last_process_v_1_2f.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job13|job14|job21,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job19">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/av_birlestir_v_1_5.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job15|job17|job18|AYHAN,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job51">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Pay_Invoice_Prod_v11.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job52">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Pay_Invoice_Aysonu_v11.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job53">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Pay_Invoice2_v10.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job54">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Pay_Advance_v10.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job55">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Pay_Advance_Aysonu_v10.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job56">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Pay_Advance2_v10.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job53|job54,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job57">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Payment_All_v16.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job52|job53|job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job58">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/AVT_Load_Ledger_Vars_v11.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job59">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Pay_Ledger_Vars_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job58|job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job60">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/AVT_Load_Pay_Detail_v11.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job61">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Pay_Detail_v11.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job60|job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job62">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Pay_Detail2_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job61,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job63">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Max_Paid_Invoices_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job64">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Max_Lastyear_Invoices_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job63,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job65">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Interim_Amt_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job56|job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job67">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Payment_Vars_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job57|job59|job62|job65|job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job70">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/AVT_Load_Subscriber_v21.sh,system,/home/sasadm/tlos_v1.11/logs/avt,yok,S,20/01/2009 06:00:00,18000,hayır,0</entry>
+	<entry key="job71">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/AVT_Load_Address_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job72">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Tenure_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job73">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/AVT_Load_BasicServices_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job74">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/AVT_Load_Supplementary_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job75">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/AVT_Load_CBL_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job76">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/AVT_Load_MNP_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job77">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Target_v16.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job70|job53,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job78">/home/sasadm/tlos_v1.11/bin/avt/01_ODD/AVT_Load_Vipcode_v11.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job79">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Old_Counts_v16.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job70,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job80">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_DEM_Set1_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job64|job71|job72|job73|job74|job75|job76|job77|job78|job79,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+	<entry key="job100">/home/sasadm/tlos_v1.11/bin/avt/02_TRN/AVT_Tran_Merge_DataSet_v15.sh,system,/home/sasadm/tlos_v1.11/logs/avt,job67|job80|HAKAN,S,30/01/2009 06:00:00,3600,hayır,0</entry>
+</properties>
