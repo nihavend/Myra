@@ -14,11 +14,12 @@ import com.likya.myra.LocaleMessages;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactoryInterface;
 import com.likya.myra.jef.jobs.JobImpl;
-import com.likya.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
-import com.likya.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
-import com.likya.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
-import com.likya.myra.model.xbeans.stateinfo.SubstateNameDocument.SubstateName;
-import com.likya.myra.model.xbeans.wlagen.ItemDocument.Item;
+import com.likya.xsd.myra.model.xbeans.jobprops.DependencyListDocument.DependencyList;
+import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
+import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
+import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
+import com.likya.xsd.myra.model.xbeans.stateinfo.SubstateNameDocument.SubstateName;
+import com.likya.xsd.myra.model.xbeans.wlagen.ItemDocument.Item;
 
 public class BaseSchedulerController {
 
@@ -192,7 +193,7 @@ public class BaseSchedulerController {
 			// Cyclic dependency shoud be checked !!!
 			// cleanCyclecDeps(meJob, jobProperties, ?);
 			
-			LiveStateInfo liveStateInfo = jobQueue.get(item.getJsId()).getJobSimpleProperties().getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
+			LiveStateInfo liveStateInfo = jobQueue.get(item.getJsId()).getJobAbstractJobType().getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
 			
 			boolean compResult = LiveStateInfoUtils.compareDepencyRule(variables, item, liveStateInfo);
 			
@@ -254,7 +255,7 @@ public class BaseSchedulerController {
 		logger.debug(LocaleMessages.getString("TlosServer.66")); //$NON-NLS-1$
 //		logger.debug(scheduledJob.getJobProperties().toString());
 		
-		LiveStateInfoUtils.insertNewLiveStateInfo(scheduledJob.getJobSimpleProperties(), StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_IN);
+		LiveStateInfoUtils.insertNewLiveStateInfo(scheduledJob.getJobAbstractJobType(), StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_IN);
 		
 		Thread starterThread = new Thread(scheduledJob);
 //		if (scheduledJob.getJobProperties().isManuel()) {
@@ -345,7 +346,7 @@ public class BaseSchedulerController {
 		Iterator<JobImpl> jobsIterator = jobQueue.values().iterator();
 
 		while (jobsIterator.hasNext()) {
-			JobImpl scheduledJob = jobsIterator.next();
+//			JobImpl scheduledJob = jobsIterator.next();
 //			if (scheduledJob.getJobProperties().getStatus() == status) {
 //				counter += 1;
 //			}
