@@ -2,7 +2,6 @@ package com.likya.myra.jef.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.StringTokenizer;
@@ -10,8 +9,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.likya.myra.LocaleMessages;
-import com.likya.myra.jef.core.CoreFactory;
-import com.likya.xsd.myra.model.xbeans.jobprops.SimpleProperties;
 
 public class DateUtils {
 	public static String getDate(Date executionTime) {
@@ -70,27 +67,27 @@ public class DateUtils {
 	 * Eğer çalışma saati de geçmiş ise o zaman bir gün sonraya öteliyor
 	 * dailyIterator.next()
 	 */
-	public static void iterateNextDate(SimpleProperties simpleProperties) {
-		
-		// Date tmpDate = jobProperties.getTime();
-		Date scenarioDate = jobProperties.getScenarioTime();
-		Date executionDate = jobProperties.getTime();
-		Calendar tmpCal = Calendar.getInstance();
-		CoreFactory.getLogger().info(LocaleMessages.getString("DateUtils.10") + DateUtils.getDate(tmpCal.getTime())); //$NON-NLS-1$
-		tmpCal.setTime(scenarioDate);
-		CoreFactory.getLogger().info(LocaleMessages.getString("DateUtils.11") + DateUtils.getDate(tmpCal.getTime())); //$NON-NLS-1$
-		CoreFactory.getLogger().debug(LocaleMessages.getString("DateUtils.12") + DateUtils.getDate(executionDate)); //$NON-NLS-1$
-		/**
-		 * Haftanın hangi günlerinde çalışacağı artık tanımalanabilir olduğundan aşağıdaki kısım
-		 * değişecek
-		 */
-		// DailyIterator dailyIterator = new DailyIterator(tmpCal.get(Calendar.HOUR_OF_DAY), tmpCal.get(Calendar.MINUTE), tmpCal.get(Calendar.SECOND));
-		RestrictedDailyIterator restrictedDailyIterator = new RestrictedDailyIterator(tmpCal.get(Calendar.HOUR_OF_DAY), tmpCal.get(Calendar.MINUTE), tmpCal.get(Calendar.SECOND), CoreFactory.getTlosParameters().getScheduledDays());
-		jobProperties.setPreviousTime(DateUtils.getDate(executionDate));
-		jobProperties.setTime(restrictedDailyIterator.next());	
-		CoreFactory.getLogger().debug(LocaleMessages.getString("DateUtils.13") + DateUtils.getDate(jobProperties.getTime())); //$NON-NLS-1$
-		CoreFactory.getLogger().info(LocaleMessages.getString("DateUtils.14") + DateUtils.getDate(jobProperties.getTime())); //$NON-NLS-1$
-	}
+//	public static void iterateNextDate(SimpleProperties simpleProperties) {
+//		
+//		// Date tmpDate = jobProperties.getTime();
+//		Date scenarioDate = jobProperties.getScenarioTime();
+//		Date executionDate = jobProperties.getTime();
+//		Calendar tmpCal = Calendar.getInstance();
+//		CoreFactory.getLogger().info(LocaleMessages.getString("DateUtils.10") + DateUtils.getDate(tmpCal.getTime())); //$NON-NLS-1$
+//		tmpCal.setTime(scenarioDate);
+//		CoreFactory.getLogger().info(LocaleMessages.getString("DateUtils.11") + DateUtils.getDate(tmpCal.getTime())); //$NON-NLS-1$
+//		CoreFactory.getLogger().debug(LocaleMessages.getString("DateUtils.12") + DateUtils.getDate(executionDate)); //$NON-NLS-1$
+//		/**
+//		 * Haftanın hangi günlerinde çalışacağı artık tanımalanabilir olduğundan aşağıdaki kısım
+//		 * değişecek
+//		 */
+//		// DailyIterator dailyIterator = new DailyIterator(tmpCal.get(Calendar.HOUR_OF_DAY), tmpCal.get(Calendar.MINUTE), tmpCal.get(Calendar.SECOND));
+//		RestrictedDailyIterator restrictedDailyIterator = new RestrictedDailyIterator(tmpCal.get(Calendar.HOUR_OF_DAY), tmpCal.get(Calendar.MINUTE), tmpCal.get(Calendar.SECOND), CoreFactory.getTlosParameters().getScheduledDays());
+//		jobProperties.setPreviousTime(DateUtils.getDate(executionDate));
+//		jobProperties.setTime(restrictedDailyIterator.next());	
+//		CoreFactory.getLogger().debug(LocaleMessages.getString("DateUtils.13") + DateUtils.getDate(jobProperties.getTime())); //$NON-NLS-1$
+//		CoreFactory.getLogger().info(LocaleMessages.getString("DateUtils.14") + DateUtils.getDate(jobProperties.getTime())); //$NON-NLS-1$
+//	}
 	
 	public static String getDuration(Date sDate) {
 		Date now = Calendar.getInstance().getTime();
@@ -170,22 +167,22 @@ public class DateUtils {
 		return calendarSecond.getTime();
 	}
 	
-	public static Date findRangedNextPeriod(JobProperties jobProperties) {
-		
-		Date myDate = findNextPeriod(jobProperties.getTime(), jobProperties.getPeriodTime());
-		
-		jobProperties.setJobPlannedEndTime(changeDateValue(myDate, jobProperties.getJobPlannedEndTime()));
-		jobProperties.setJobPlannedStartTime(changeDateValue(myDate, jobProperties.getJobPlannedStartTime()));
-		
-		boolean notInScheduledDays = Arrays.binarySearch(CoreFactory.getTlosParameters().getScheduledDays(), Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) < 0;
-		
-		if (!checkStayInDay(myDate) || myDate.after(jobProperties.getJobPlannedEndTime()) || myDate.before(jobProperties.getJobPlannedStartTime()) || notInScheduledDays) {
-			iterateNextDate(jobProperties);
-			myDate = jobProperties.getTime();
-		}
-		
-		return myDate;
-	}
+//	public static Date findRangedNextPeriod(JobProperties jobProperties) {
+//		
+//		Date myDate = findNextPeriod(jobProperties.getTime(), jobProperties.getPeriodTime());
+//		
+//		jobProperties.setJobPlannedEndTime(changeDateValue(myDate, jobProperties.getJobPlannedEndTime()));
+//		jobProperties.setJobPlannedStartTime(changeDateValue(myDate, jobProperties.getJobPlannedStartTime()));
+//		
+//		boolean notInScheduledDays = Arrays.binarySearch(CoreFactory.getTlosParameters().getScheduledDays(), Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) < 0;
+//		
+//		if (!checkStayInDay(myDate) || myDate.after(jobProperties.getJobPlannedEndTime()) || myDate.before(jobProperties.getJobPlannedStartTime()) || notInScheduledDays) {
+//			iterateNextDate(jobProperties);
+//			myDate = jobProperties.getTime();
+//		}
+//		
+//		return myDate;
+//	}
 	
 	private static boolean checkStayInDay(Date date) {
 		

@@ -14,15 +14,13 @@ import com.likya.myra.commons.utils.CommonDateUtils;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
-import com.likya.myra.jef.utils.DateUtils;
 import com.likya.xsd.myra.model.xbeans.generics.JobTypeDefDocument.JobTypeDef;
-import com.likya.xsd.myra.model.xbeans.jobprops.SimpleProperties;
+import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.xbeans.stateinfo.SubstateNameDocument.SubstateName;
 import com.likya.xsd.myra.model.xbeans.wlagen.JobAutoRetryDocument.JobAutoRetry;
-import com.likyateknoloji.myraJoblist.AbstractJobType;
 
 public class ExecuteInShell extends CommonShell {
 
@@ -53,12 +51,12 @@ public class ExecuteInShell extends CommonShell {
 		
 		JobRuntimeInterface jobRuntimeInterface = getJobRuntimeProperties();
 		
-		SimpleProperties simpleProperties = getJobAbstractJobType();
-		String jobId = simpleProperties.getId();
+		AbstractJobType abstractJobType = getJobAbstractJobType();
+		String jobId = abstractJobType.getId();
 		
-		String startLog = simpleProperties.getId() + LocaleMessages.getString("ExternalProgram.0") + CommonDateUtils.getDate(startTime.getTime());
+		String startLog = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.0") + CommonDateUtils.getDate(startTime.getTime());
 		
-		JobHelper.setJsRealTimeForStart(simpleProperties, startTime);
+		JobHelper.setJsRealTimeForStart(abstractJobType, startTime);
 
 		CoreFactory.getLogger().info(startLog);
 
@@ -76,10 +74,10 @@ public class ExecuteInShell extends CommonShell {
 
 				ProcessBuilder processBuilder = null;
 				
-				String jobPath = simpleProperties.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
-				String jobCommand = simpleProperties.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand();
+				String jobPath = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
+				String jobCommand = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand();
 				
-				jobCommand = JobHelper.removeSlashAtTheEnd(simpleProperties, jobPath, jobCommand);
+				jobCommand = JobHelper.removeSlashAtTheEnd(abstractJobType, jobPath, jobCommand);
 
 				CoreFactory.getLogger().info(" >>" + " ExecuteInShell " + jobId + " Çalıştırılacak komut : " + jobCommand);
 				
@@ -151,14 +149,14 @@ public class ExecuteInShell extends CommonShell {
 					
 					JobHelper.updateDescStr(jobRuntimeInterface.getMessageBuffer(), stringBufferForOUTPUT, stringBufferForERROR);
 					
-					StatusName.Enum statusName = JobHelper.searchReturnCodeInStates(simpleProperties, processExitValue, jobRuntimeInterface.getMessageBuffer());
+					StatusName.Enum statusName = JobHelper.searchReturnCodeInStates(abstractJobType, processExitValue, jobRuntimeInterface.getMessageBuffer());
 
 					JobHelper.writetErrorLogFromOutputs(CoreFactory.getLogger(), this.getClass().getName(), stringBufferForOUTPUT, stringBufferForERROR);
 					
 					if (errStr != null && hasErrorInLog) {
-						JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, "Log yüzünden !");
+						JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, "Log yüzünden !");
 					} else {
-						JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, statusName.intValue(), jobRuntimeInterface.getMessageBuffer().toString());
+						JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, statusName.intValue(), jobRuntimeInterface.getMessageBuffer().toString());
 					}
 
 				} catch (InterruptedException e) {
@@ -183,7 +181,7 @@ public class ExecuteInShell extends CommonShell {
 					Thread.interrupted();
 
 					process.destroy();
-					JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, e.getMessage());
+					JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, e.getMessage());
 
 				}
 
@@ -198,28 +196,28 @@ public class ExecuteInShell extends CommonShell {
 					watchDogTimer.interrupt();
 					watchDogTimer = null;
 				}
-				JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, err.getMessage());
+				JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, err.getMessage());
 				err.printStackTrace();
 			}
 
-			LiveStateInfo liveStateInfo = simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
+			LiveStateInfo liveStateInfo = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
 			
 			if(/*if not in dependency chain kontrolü eklenecek !!!*/LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS)) {
 				
 				JobHelper.setWorkDurations(this, startTime);
 
-				int jobType = simpleProperties.getBaseJobInfos().getJobInfos().getJobTypeDef().intValue();
+				int jobType = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDef().intValue();
 				
 				switch (jobType) {
 				case JobTypeDef.INT_EVENT_BASED:
 					// Not implemented yet
 					break;
 				case JobTypeDef.INT_TIME_BASED:
-					DateUtils.iterateNextDate(simpleProperties);
-					JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME);
+					// DateUtils.iterateNextDate(abstractJobType);
+					JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME);
 					break;
 				case JobTypeDef.INT_USER_BASED:
-					JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYUSER);
+					JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYUSER);
 					break;
 
 				default:
@@ -234,7 +232,7 @@ public class ExecuteInShell extends CommonShell {
 				
 				boolean stateCond = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.STOPPED, StatusName.BYUSER); 
 				
-				if(simpleProperties.getCascadingConditions().getJobAutoRetry() == JobAutoRetry.YES && retryFlag && stateCond) {
+				if(abstractJobType.getCascadingConditions().getJobAutoRetry() == JobAutoRetry.YES && retryFlag && stateCond) {
 					CoreFactory.getLogger().info(LocaleMessages.getString("ExternalProgram.11") + jobId);
 					
 					if(retryCounter < jobRuntimeInterface.getAutoRetryCount()) {
@@ -246,9 +244,9 @@ public class ExecuteInShell extends CommonShell {
 						}
 
 						startTime = Calendar.getInstance();
-						JobHelper.setJsRealTimeForStart(simpleProperties, startTime);
+						JobHelper.setJsRealTimeForStart(abstractJobType, startTime);
 
-						JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME);
+						JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME);
 
 						continue;
 					}

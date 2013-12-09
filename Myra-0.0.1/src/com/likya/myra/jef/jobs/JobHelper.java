@@ -9,8 +9,9 @@ import com.likya.myra.commons.utils.CommonDateUtils;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.StateUtils;
 import com.likya.myra.jef.core.CoreFactory;
-import com.likya.myra.model.xbeans.jsdl.OperatingSystemTypeEnumeration;
+import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.jobprops.SimpleProperties;
+import com.likya.xsd.myra.model.xbeans.jsdl.OperatingSystemTypeEnumeration;
 import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.xbeans.stateinfo.Status;
@@ -37,19 +38,19 @@ public class JobHelper {
 	
 	protected static void setWorkDurations(JobImpl jobClassName, Calendar startTime) {
 
-		SimpleProperties simpleProperties = jobClassName.getJobSimpleProperties();
+		AbstractJobType abstractJobType = jobClassName.getJobAbstractJobType();
 		
 		Calendar endTime = Calendar.getInstance();
 		long timeDiff = endTime.getTime().getTime() - startTime.getTime().getTime();
 
-		String endLog = simpleProperties.getId() + LocaleMessages.getString("ExternalProgram.14") + CommonDateUtils.getDate(endTime.getTime());
-		String duration = simpleProperties.getId() + LocaleMessages.getString("ExternalProgram.15") + CommonDateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
+		String endLog = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.14") + CommonDateUtils.getDate(endTime.getTime());
+		String duration = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.15") + CommonDateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
 
 		
 		StopTime stopTimeTemp = StopTime.Factory.newInstance();
 		stopTimeTemp.setTime(endTime);
 		stopTimeTemp.setDate(endTime);
-		simpleProperties.getTimeManagement().getJsRealTime().setStopTime(stopTimeTemp);
+		abstractJobType.getTimeManagement().getJsRealTime().setStopTime(stopTimeTemp);
 		
 		jobClassName.getJobRuntimeProperties().setCompletionDate(endTime);
 		// getJobProperties().setCompletionDateTime(endTime);
@@ -137,12 +138,12 @@ public class JobHelper {
 		
 	}
 	
-	public static StatusName.Enum searchReturnCodeInStates(SimpleProperties simpleProperties, int processExitValue, StringBuffer descStr) {
+	public static StatusName.Enum searchReturnCodeInStates(AbstractJobType abstractJobType, int processExitValue, StringBuffer descStr) {
 		
 		Status localStateCheck = null;
 		StatusName.Enum statusName = null;
 
-		if ((simpleProperties.getStateInfos().getJobStatusList() != null) && (localStateCheck = StateUtils.contains(simpleProperties.getStateInfos().getJobStatusList(), processExitValue)) != null) {
+		if ((abstractJobType.getStateInfos().getJobStatusList() != null) && (localStateCheck = StateUtils.contains(abstractJobType.getStateInfos().getJobStatusList(), processExitValue)) != null) {
 			statusName = localStateCheck.getStatusName();
 		} else {
 			Status mySubStateStatuses = StateUtils.globalContains(StateName.FINISHED, SubstateName.COMPLETED, processExitValue);

@@ -10,6 +10,8 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
 import com.likya.myra.LocaleMessages;
+import com.likya.myra.jef.core.CoreFactory;
+import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.tlos.lite.model.DependencyInfo;
 
 public class DependencyOperations {
@@ -63,16 +65,16 @@ public class DependencyOperations {
 		return myList;
 	}
 	
-	public static boolean hasDependentWithStatus(HashMap<String, JobInterface> jobQueue, String jobKey, int status) {
+	public static boolean hasDependentWithStatus(HashMap<String, JobImpl> jobQueue, String jobKey, int status) {
 
 		// remove myself
 		jobQueue.remove(jobKey);
 
-		Iterator<JobInterface> jobListIterator = jobQueue.values().iterator();
+		Iterator<JobImpl> jobListIterator = jobQueue.values().iterator();
 
 		while (jobListIterator.hasNext()) {
 
-			JobInterface tmpJob = jobListIterator.next();
+			JobImpl tmpJob = jobListIterator.next();
 
 			Iterator<DependencyInfo> dependentToMeListIterator = tmpJob.getSimpleJobProperties().getJobDependencyInfoList().iterator();
 
@@ -91,14 +93,14 @@ public class DependencyOperations {
 		return false;
 	}
 
-	public static ArrayList<JobInterface> getDependencyList(HashMap<String, JobInterface> jobQueue, Object jobKey) {
+	public static ArrayList<JobImpl> getDependencyList(HashMap<String, JobImpl> jobQueue, Object jobKey) {
 
-		ArrayList<JobInterface> jobList = new ArrayList<JobInterface>();
+		ArrayList<JobImpl> jobList = new ArrayList<JobImpl>();
 
 		try {
-			Iterator<JobInterface> jobsIterator = jobQueue.values().iterator();
+			Iterator<JobImpl> jobsIterator = jobQueue.values().iterator();
 			while (jobsIterator.hasNext()) {
-				JobInterface scheduledJob = jobsIterator.next();
+				JobImpl scheduledJob = jobsIterator.next();
 				ArrayList<String> dependentJobList = DependencyOperations.getDependencyJobKeys(scheduledJob.getSimpleJobProperties().getJobDependencyInfoList());
 				int indexOfJob = dependentJobList.indexOf(jobKey);
 				if (indexOfJob > -1) {
@@ -114,15 +116,15 @@ public class DependencyOperations {
 	
 	public static boolean checkCyclicDependency() {
 		
-		HashMap<String, Job> jobQueue = TlosServer.getJobQueue();
+		HashMap<String, JobImpl> jobQueue = CoreFactory.getJobQueue();
 		
 		try {
-			Iterator<Job> jobsIterator = jobQueue.values().iterator();
+			Iterator<JobImpl> jobsIterator = jobQueue.values().iterator();
 			
 			while (jobsIterator.hasNext()) {
-				Job scheduledJob = jobsIterator.next();
+				JobImpl scheduledJob = jobsIterator.next();
 				ArrayList<String> dependentToJobList = DependencyOperations.getDependencyJobKeys(scheduledJob.getSimpleJobProperties().getJobDependencyInfoList());
-				TlosServer.getLogger().warn("         >> " + scheduledJob.getSimpleJobProperties().getKey());
+				CoreFactory.getLogger().warn("         >> " + scheduledJob.getJobAbstractJobType().getId());
 				if(recurseInToCycle(scheduledJob, dependentToJobList)) {
 					return true;
 				}
@@ -135,9 +137,9 @@ public class DependencyOperations {
 		return false;
 	}
 	
-	private static boolean recurseInToCycle(JobInterface scheduledJob, ArrayList<String> dependentToJobList) {
+	private static boolean recurseInToCycle(JobImpl scheduledJob, ArrayList<String> dependentToJobList) {
 		 
-		if(dependentToJobList.indexOf(scheduledJob.getJobProperties().getKey().toString()) >= 0) {
+		if(dependentToJobList.indexOf(scheduledJob.getJobAbstractJobType().getId().toString()) >= 0) {
 			return true;
 		} else {
 			Iterator<String> jobsIterator = dependentToJobList.iterator();
@@ -146,9 +148,9 @@ public class DependencyOperations {
 				if(recurJobKey != null && recurJobKey.equals(ScenarioLoader.UNDEFINED_VALUE)) {
 					continue;
 				}
-				JobInterface recurJob = 	TlosServer.getJobQueue().get(recurJobKey);
+				JobImpl recurJob = 	CoreFactory.getJobQueue().get(recurJobKey);
 				ArrayList<String> tmpDependentToJobList = DependencyOperations.getDependencyJobKeys(recurJob.getJobProperties().getJobDependencyInfoList());
-				TlosServer.getLogger().warn("  Analyzing dependency list of          >> " + recurJob.getJobProperties().getKey());
+				CoreFactory.getLogger().warn("  Analyzing dependency list of          >> " + recurJob.getJobAbstractJobType().getId());
 				if(recurseInToCycle(scheduledJob, tmpDependentToJobList)) {
 					return true;
 				}
@@ -158,23 +160,23 @@ public class DependencyOperations {
 		return false;
 	}
 	
-	public static boolean validateDependencyList(Logger schedulerLogger, HashMap<String, JobInterface> jobQueue) {
+	public static boolean validateDependencyList(Logger schedulerLogger, HashMap<String, JobImpl> jobQueue) {
 
 		// For Test
 		Date startTime = Calendar.getInstance().getTime();
 		boolean cyclCheck = checkCyclicDependency();
 		String duration = "" + DateUtils.getDurationNumeric(startTime);
-		TlosServer.getLogger().warn("Cyclicdependency checkduration : " + duration);
+		CoreFactory.getLogger().warn("Cyclicdependency checkduration : " + duration);
 		
 		if(cyclCheck) {
 			schedulerLogger.info("Cyclic dependency resloved !");/*LocaleMessages.getString("ScenarioLoader.441")); //$NON-NLS-1$*/
 			return false;
 		}
-		Iterator<JobInterface> jobsIterator = jobQueue.values().iterator();
+		Iterator<JobImpl> jobsIterator = jobQueue.values().iterator();
 
 		while (jobsIterator.hasNext()) {
 			
-			Job scheduledJob = jobsIterator.next();
+			JobImpl scheduledJob = jobsIterator.next();
 			
 			ArrayList<DependencyInfo> dependentJobList = scheduledJob.getJobProperties().getJobDependencyInfoList();
 
@@ -197,12 +199,12 @@ public class DependencyOperations {
 					return false;
 				}
 				if (jobQueue.get(key) instanceof RepetitiveExternalProgram) {
-					schedulerLogger.info(scheduledJob.getJobProperties().getKey() + LocaleMessages.getString("ScenarioLoader.19") + key); //$NON-NLS-1$
+					schedulerLogger.info(scheduledJob.getJobAbstractJobType().getId() + LocaleMessages.getString("ScenarioLoader.19") + key); //$NON-NLS-1$
 					return false;
 				}
 				
 				if (jobQueue.get(key) .getJobProperties().isManuel()) {
-					schedulerLogger.info(scheduledJob.getJobProperties().getKey() + LocaleMessages.getString("ScenarioLoader.191") + key); //$NON-NLS-1$
+					schedulerLogger.info(scheduledJob.getJobAbstractJobType().getId() + LocaleMessages.getString("ScenarioLoader.191") + key); //$NON-NLS-1$
 					return false;
 				}
 				

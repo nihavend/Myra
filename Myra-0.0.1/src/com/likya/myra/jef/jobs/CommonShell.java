@@ -9,9 +9,9 @@ import com.jcraft.jsch.ChannelExec;
 import com.likya.myra.commons.grabber.StreamGrabber;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
+import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.jobprops.SimpleProperties;
 import com.likya.xsd.myra.model.xbeans.wlagen.JobAutoRetryDocument.JobAutoRetry;
-import com.likyateknoloji.myraJoblist.AbstractJobType;
 
 public abstract class CommonShell extends JobImpl {
 

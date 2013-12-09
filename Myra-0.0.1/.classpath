@@ -11,14 +11,11 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/SharedLibs/log4j/log4j-1.2.15.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/TlosLiteModel_V2.0.0"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/TlosLite1.8.0.Libs"/>
-	<classpathentry kind="lib" path="/SharedLibs/winp/winp.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/myra-commons-0.0.1"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

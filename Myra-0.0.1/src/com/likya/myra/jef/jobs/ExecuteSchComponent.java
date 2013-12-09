@@ -13,38 +13,39 @@ import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.utils.DateUtils;
-import com.likya.xsd.myra.model.xbeans.jobprops.RemoteSchProperties;
+import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
+import com.likya.xsd.myra.model.xbeans.joblist.RemoteSchProperties;
 import com.likya.xsd.myra.model.xbeans.jobprops.SimpleProperties;
+import com.likya.xsd.myra.model.xbeans.rs.ExecuteRShellParamsDocument.ExecuteRShellParams;
 import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.xbeans.stateinfo.SubstateNameDocument.SubstateName;
-import com.likyateknoloji.rs.ExecuteRShellParamsDocument.ExecuteRShellParams;
 
-public abstract class ExecuteSchComponent extends CommonShell {
+public class ExecuteSchComponent extends CommonShell {
 
 	private static final long serialVersionUID = 7931558555995487881L;
 	
 	private final String logLabel = " ExecuteSchComponent ";
 
-	public ExecuteSchComponent(SimpleProperties simpleProperties, JobRuntimeInterface jobRuntimeProperties) {
-		super(simpleProperties, jobRuntimeProperties);
+	public ExecuteSchComponent(AbstractJobType abstractJobType, JobRuntimeInterface jobRuntimeProperties) {
+		super(abstractJobType, jobRuntimeProperties);
 	}
 
 	public void startSchProcess(String jobPath, String jobCommand, Map<String, String> environmentVariables, String logClassName, Logger myLogger) throws Exception {
 
 		// JobRuntimeInterface jobRuntimeInterface = getJobRuntimeProperties();
 
-		SimpleProperties simpleProperties = getJobSimpleProperties();
+		AbstractJobType abstractJobType = getJobAbstractJobType();
 
-		String jobId = simpleProperties.getId();
+		String jobId = abstractJobType.getId();
 
 		StringBuilder stringBufferForERROR = new StringBuilder();
 		StringBuilder stringBufferForOUTPUT = new StringBuilder();
 
 		JSch jsch = new JSch();
 
-		ExecuteRShellParams executeRShellParams = ((RemoteSchProperties) simpleProperties).getExecuteRShellParams();
+		ExecuteRShellParams executeRShellParams = ((RemoteSchProperties) abstractJobType).getExecuteRShellParams();
 
 		String host = executeRShellParams.getIpAddress(); // "192.168.1.39";
 		String user = executeRShellParams.getUserName(); // "likya";
@@ -111,17 +112,17 @@ public abstract class ExecuteSchComponent extends CommonShell {
 
 			StringBuffer descStr = new StringBuffer();
 
-			StatusName.Enum statusName = JobHelper.searchReturnCodeInStates(simpleProperties, processExitValue, descStr);
+			StatusName.Enum statusName = JobHelper.searchReturnCodeInStates(abstractJobType, processExitValue, descStr);
 
 			JobHelper.updateDescStr(descStr, stringBufferForOUTPUT, stringBufferForERROR);
 
 			JobHelper.writetErrorLogFromOutputs(myLogger, logClassName, stringBufferForOUTPUT, stringBufferForERROR);
 
-			JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, statusName.intValue());
+			JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, statusName.intValue());
 
 		} catch (InterruptedException e) {
 
-			myLogger.warn(" >>" + " ExecuteSchComponent " + ">> " + logClassName + " : Job timed-out terminating " + simpleProperties.getBaseJobInfos().getJsName());
+			myLogger.warn(" >>" + " ExecuteSchComponent " + ">> " + logClassName + " : Job timed-out terminating " + abstractJobType.getBaseJobInfos().getJsName());
 
 			channel.disconnect();
 			session.disconnect();
@@ -136,7 +137,7 @@ public abstract class ExecuteSchComponent extends CommonShell {
 		
 		//initStartUp(myLogger);
 
-		SimpleProperties simpleProperties = getJobSimpleProperties();
+		SimpleProperties simpleProperties = getJobAbstractJobType();
 
 		while (true) {
 
@@ -169,7 +170,7 @@ public abstract class ExecuteSchComponent extends CommonShell {
 	
 	public void handleException(Exception err, Logger myLogger) {
 
-		SimpleProperties simpleProperties = getJobSimpleProperties();
+		SimpleProperties simpleProperties = getJobAbstractJobType();
 
 		LiveStateInfo liveStateInfo = simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
 		
@@ -187,7 +188,7 @@ public abstract class ExecuteSchComponent extends CommonShell {
 	
 	public boolean processJobResult(boolean retryFlag, Logger myLogger) {
 
-		SimpleProperties simpleProperties = getJobSimpleProperties();
+		SimpleProperties simpleProperties = getJobAbstractJobType();
 
 		if (simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0).getStateName().equals(StateName.FINISHED)) {
 
@@ -221,7 +222,7 @@ public abstract class ExecuteSchComponent extends CommonShell {
 	
 	protected void cleanUp(Process process, Calendar startTime) {
 
-		SimpleProperties simpleProperties = getJobSimpleProperties();
+		SimpleProperties simpleProperties = getJobAbstractJobType();
 
 		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Error for " + simpleProperties.getBaseJobInfos().getJsName());
 		stopErrorGobbler(CoreFactory.getLogger());
@@ -258,6 +259,12 @@ public abstract class ExecuteSchComponent extends CommonShell {
 		// isExecuterOver = true;
 		CoreFactory.getLogger().info(" >>" + logLabel + ">> ExecuterThread:" + Thread.currentThread().getName() + " is over");
 
+	}
+
+	@Override
+	public void stopMyDogBarking() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

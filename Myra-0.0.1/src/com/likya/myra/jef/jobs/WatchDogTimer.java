@@ -54,11 +54,11 @@ public class WatchDogTimer extends Thread {
 	public void run() {
 		try {
 			Thread.sleep(timeout);
-			if (jobImpl.getJobSimpleProperties().getCascadingConditions().getJobAutoRetry() != JobAutoRetry.YES) {
-				LiveStateInfoUtils.insertNewLiveStateInfo(jobImpl.getJobSimpleProperties(), StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_OUT);
+			if (jobImpl.getJobAbstractJobType().getCascadingConditions().getJobAutoRetry() != JobAutoRetry.YES) {
+				LiveStateInfoUtils.insertNewLiveStateInfo(jobImpl.getJobAbstractJobType(), StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_OUT);
 				CoreFactory.getLogger().info(LocaleMessages.getString("WatchDogTimer.0")); //$NON-NLS-1$
 			} else {
-				CoreFactory.getLogger().info(LocaleMessages.getString("WatchDogTimer.1") + jobImpl.getJobSimpleProperties().getId()); //$NON-NLS-1$
+				CoreFactory.getLogger().info(LocaleMessages.getString("WatchDogTimer.1") + jobImpl.getJobAbstractJobType().getId()); //$NON-NLS-1$
 				ownerOfTimer.interrupt();
 			}
 		} catch (InterruptedException e) {

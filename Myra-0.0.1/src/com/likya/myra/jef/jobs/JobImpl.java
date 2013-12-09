@@ -3,16 +3,20 @@ package com.likya.myra.jef.jobs;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.InstanceNotFoundException;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.model.TemporaryConfig;
-import com.likyateknoloji.myraJoblist.AbstractJobType;
+import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 
 public abstract class JobImpl implements Runnable, Serializable {
 
 	private static final long serialVersionUID = 2540934879831919506L;
 
+	private Logger myLogger = Logger.getLogger(JobImpl.class);
+	
 	// transient private HashMap<String, JobInterface> jobQueue;
 
 	transient private Thread myExecuter;
@@ -30,6 +34,9 @@ public abstract class JobImpl implements Runnable, Serializable {
 		this.abstractJobType = abstractJobType;
 		this.jobRuntimeProperties = jobRuntimeProperties;
 		
+		if(jobRuntimeProperties.getLogger() != null) {
+			myLogger = jobRuntimeProperties.getLogger();
+		}
 		
 		try {
 			temporaryConfig = CoreFactory.getInstance().getConfigurationManager().getTemporaryConfig();
@@ -93,6 +100,10 @@ public abstract class JobImpl implements Runnable, Serializable {
 		//		}
 
 		return cmd;
+	}
+
+	public Logger getMyLogger() {
+		return myLogger;
 	}
 
 }

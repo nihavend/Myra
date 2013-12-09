@@ -4,8 +4,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import org.apache.log4j.Logger;
+
 public class JobRuntimeProperties implements JobRuntimeInterface {
 	
+	private Logger myLogger;
 	
 	private ArrayList<Integer> previousStatusList = new ArrayList<Integer>();
 	
@@ -132,6 +135,14 @@ public class JobRuntimeProperties implements JobRuntimeInterface {
 
 	public void setAutoRetryDelay(int autoRetryDelay) {
 		this.autoRetryDelay = autoRetryDelay;
+	}
+
+	public Logger getLogger() {
+		return myLogger;
+	}
+
+	public void setLogger(Logger myLogger) {
+		this.myLogger = myLogger;
 	}
 
 }

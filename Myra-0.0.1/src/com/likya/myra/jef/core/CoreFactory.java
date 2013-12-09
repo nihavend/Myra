@@ -10,7 +10,7 @@ import com.likya.myra.jef.controller.ControllerInterface;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.InstanceNotFoundException;
 import com.likya.myra.jef.model.MyraException;
-import com.likyateknoloji.myraJoblist.JobListDocument;
+import com.likya.xsd.myra.model.xbeans.joblist.JobListDocument;
 
 public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface {
 
