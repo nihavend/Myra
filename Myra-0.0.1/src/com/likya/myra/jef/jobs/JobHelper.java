@@ -11,8 +11,8 @@ import com.likya.myra.commons.utils.StateUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.jobprops.SimpleProperties;
-import com.likya.xsd.myra.model.xbeans.jsdl.OperatingSystemTypeEnumeration;
 import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
+import com.likya.xsd.myra.model.xbeans.stateinfo.ReturnCodeListDocument.ReturnCodeList.OsType;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.xbeans.stateinfo.Status;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
@@ -90,15 +90,15 @@ public class JobHelper {
 		String pathSeperator;
 		
 		switch (simpleProperties.getBaseJobInfos().getOSystem().intValue()) {
-		case OperatingSystemTypeEnumeration.INT_WIN_3_X:
-		case OperatingSystemTypeEnumeration.INT_WIN_95:
-		case OperatingSystemTypeEnumeration.INT_WIN_98:
-		case OperatingSystemTypeEnumeration.INT_WINCE:
-		case OperatingSystemTypeEnumeration.INT_WINDOWS:
-		case OperatingSystemTypeEnumeration.INT_WINDOWS_2000:
-		case OperatingSystemTypeEnumeration.INT_WINDOWS_R_ME:
-		case OperatingSystemTypeEnumeration.INT_WINDOWS_XP:
-		case OperatingSystemTypeEnumeration.INT_WINNT:
+		case OsType.INT_WIN_3_X:
+		case OsType.INT_WIN_95:
+		case OsType.INT_WIN_98:
+		case OsType.INT_WINCE:
+		case OsType.INT_WINDOWS:
+		case OsType.INT_WINDOWS_2000:
+		case OsType.INT_WINDOWS_R_ME:
+		case OsType.INT_WINDOWS_XP:
+		case OsType.INT_WINNT:
 			pathSeperator = "\\";
 			break;
 

@@ -207,10 +207,13 @@ public class JobQueueOperations {
 		while (jobArrayIterator.hasNext()) {
 
 			AbstractJobType abstractJobType = (AbstractJobType) jobArrayIterator.next();
+			
+			String handlerUri = abstractJobType.getHandlerURI();
 
 			Class<?> abstractClass;
 			try {
-				abstractClass = Class.forName("com.likya.myra.jef.jobs.ExecuteInShell");
+				// abstractClass = Class.forName("com.likya.myra.jef.jobs.ExecuteInShell");
+				abstractClass = Class.forName(handlerUri);
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 				return null;
