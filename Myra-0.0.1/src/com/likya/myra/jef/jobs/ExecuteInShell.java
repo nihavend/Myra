@@ -27,12 +27,12 @@ public class ExecuteInShell extends CommonShell {
 	private static final long serialVersionUID = 1L;
 
 	boolean isShell = true;
-	
+
 	private boolean retryFlag = true;
 	private int retryCounter = 1;
 
 	transient private WatchDogTimer watchDogTimer = null;
-	
+
 	public ExecuteInShell(AbstractJobType abstractJobType, JobRuntimeInterface jobRuntimeProperties) {
 		super(abstractJobType, jobRuntimeProperties);
 	}
@@ -48,22 +48,22 @@ public class ExecuteInShell extends CommonShell {
 	protected void localRun() {
 
 		Calendar startTime = Calendar.getInstance();
-		
+
 		JobRuntimeInterface jobRuntimeInterface = getJobRuntimeProperties();
-		
+
 		AbstractJobType abstractJobType = getJobAbstractJobType();
 		String jobId = abstractJobType.getId();
-		
+
 		String startLog = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.0") + CommonDateUtils.getDate(startTime.getTime());
-		
+
 		JobHelper.setJsRealTimeForStart(abstractJobType, startTime);
 
 		CoreFactory.getLogger().info(startLog);
 
 		while (true) {
-			
+
 			try {
-				
+
 				StringBuilder stringBufferForERROR = new StringBuilder();
 				StringBuilder stringBufferForOUTPUT = new StringBuilder();
 
@@ -73,27 +73,28 @@ public class ExecuteInShell extends CommonShell {
 				startWathcDogTimer();
 
 				ProcessBuilder processBuilder = null;
-				
-				String jobPath = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
+
 				String jobCommand = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand();
-				
-				jobCommand = JobHelper.removeSlashAtTheEnd(abstractJobType, jobPath, jobCommand);
 
 				CoreFactory.getLogger().info(" >>" + " ExecuteInShell " + jobId + " Çalıştırılacak komut : " + jobCommand);
-				
+
 				if (isShell) {
 					String[] cmd = ValidPlatforms.getCommand(jobCommand);
 					processBuilder = new ProcessBuilder(cmd);
 				} else {
 					processBuilder = JobHelper.parsJobCmdArgs(jobCommand);
 				}
-				
-				processBuilder.directory(new File(jobPath));
+
+				String jobPath = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
+				if (jobPath != null) {
+					jobCommand = JobHelper.removeSlashAtTheEnd(abstractJobType, jobPath, jobCommand);
+					processBuilder.directory(new File(jobPath));
+				}
 
 				Map<String, String> tempEnv = new HashMap<String, String>();
 
-				 Map<String, String> environmentVariables = new HashMap<String, String>();
-				 
+				Map<String, String> environmentVariables = new HashMap<String, String>();
+
 				if (environmentVariables != null && environmentVariables.size() > 0) {
 					tempEnv.putAll(environmentVariables);
 				}
@@ -105,19 +106,19 @@ public class ExecuteInShell extends CommonShell {
 				process = processBuilder.start();
 
 				jobRuntimeInterface.getMessageBuffer().delete(0, jobRuntimeInterface.getMessageBuffer().capacity());
-				
+
 				initGrabbers(process, jobId, CoreFactory.getLogger(), temporaryConfig.getLogBufferSize());
-//				// any error message?
-//				StreamGrabber errorGobbler = new StreamGrabber(process.getErrorStream(), "ERROR", CoreFactory.getLogger(), temporaryConfig.getLogBufferSize()); //$NON-NLS-1$
-//				errorGobbler.setName(jobId + ".ErrorGobbler.id." + errorGobbler.getId()); //$NON-NLS-1$
-//
-//				// any output?
-//				StreamGrabber outputGobbler = new StreamGrabber(process.getInputStream(), "OUTPUT", CoreFactory.getLogger(), temporaryConfig.getLogBufferSize()); //$NON-NLS-1$
-//				outputGobbler.setName(jobId + ".OutputGobbler.id." + outputGobbler.getId()); //$NON-NLS-1$
-//
-//				// kick them off
-//				errorGobbler.start();
-//				outputGobbler.start();
+				//				// any error message?
+				//				StreamGrabber errorGobbler = new StreamGrabber(process.getErrorStream(), "ERROR", CoreFactory.getLogger(), temporaryConfig.getLogBufferSize()); //$NON-NLS-1$
+				//				errorGobbler.setName(jobId + ".ErrorGobbler.id." + errorGobbler.getId()); //$NON-NLS-1$
+				//
+				//				// any output?
+				//				StreamGrabber outputGobbler = new StreamGrabber(process.getInputStream(), "OUTPUT", CoreFactory.getLogger(), temporaryConfig.getLogBufferSize()); //$NON-NLS-1$
+				//				outputGobbler.setName(jobId + ".OutputGobbler.id." + outputGobbler.getId()); //$NON-NLS-1$
+				//
+				//				// kick them off
+				//				errorGobbler.start();
+				//				outputGobbler.start();
 
 				try {
 
@@ -128,14 +129,14 @@ public class ExecuteInShell extends CommonShell {
 
 					String errStr = jobRuntimeInterface.getLogAnalyzeString();
 					boolean hasErrorInLog = false;
-//					
-//					if (!getJobProperties().getLogFilePath().equals(ScenarioLoader.UNDEFINED_VALUE)) {
-//						if (errStr != null) {
-//							hasErrorInLog = FileUtils.analyzeFileForString(getJobProperties().getLogFilePath(), errStr);
-//						}
-//					} else if (errStr != null) {
-//						CoreFactory.getLogger().error("jobFailString: \"" + errStr + "\" " + LocaleMessages.getString("ExternalProgram.1") + " !");
-//					}
+					//					
+					//					if (!getJobProperties().getLogFilePath().equals(ScenarioLoader.UNDEFINED_VALUE)) {
+					//						if (errStr != null) {
+					//							hasErrorInLog = FileUtils.analyzeFileForString(getJobProperties().getLogFilePath(), errStr);
+					//						}
+					//					} else if (errStr != null) {
+					//						CoreFactory.getLogger().error("jobFailString: \"" + errStr + "\" " + LocaleMessages.getString("ExternalProgram.1") + " !");
+					//					}
 
 					if (watchDogTimer != null) {
 						watchDogTimer.interrupt();
@@ -146,13 +147,13 @@ public class ExecuteInShell extends CommonShell {
 
 					stringBufferForERROR = errorGobbler.getOutputBuffer();
 					stringBufferForOUTPUT = outputGobbler.getOutputBuffer();
-					
+
 					JobHelper.updateDescStr(jobRuntimeInterface.getMessageBuffer(), stringBufferForOUTPUT, stringBufferForERROR);
-					
+
 					StatusName.Enum statusName = JobHelper.searchReturnCodeInStates(abstractJobType, processExitValue, jobRuntimeInterface.getMessageBuffer());
 
 					JobHelper.writetErrorLogFromOutputs(CoreFactory.getLogger(), this.getClass().getName(), stringBufferForOUTPUT, stringBufferForERROR);
-					
+
 					if (errStr != null && hasErrorInLog) {
 						JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, "Log yüzünden !");
 					} else {
@@ -201,13 +202,13 @@ public class ExecuteInShell extends CommonShell {
 			}
 
 			LiveStateInfo liveStateInfo = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
-			
-			if(/*if not in dependency chain kontrolü eklenecek !!!*/LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS)) {
-				
+
+			if (/* if not in dependency chain kontrolü eklenecek !!! */LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS)) {
+
 				JobHelper.setWorkDurations(this, startTime);
 
 				int jobType = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDef().intValue();
-				
+
 				switch (jobType) {
 				case JobTypeDef.INT_EVENT_BASED:
 					// Not implemented yet
@@ -229,13 +230,13 @@ public class ExecuteInShell extends CommonShell {
 			} else {
 
 				JobHelper.setWorkDurations(this, startTime);
-				
-				boolean stateCond = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.STOPPED, StatusName.BYUSER); 
-				
-				if(abstractJobType.getCascadingConditions().getJobAutoRetry() == JobAutoRetry.YES && retryFlag && stateCond) {
+
+				boolean stateCond = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.STOPPED, StatusName.BYUSER);
+
+				if (abstractJobType.getCascadingConditions().getJobAutoRetry() == JobAutoRetry.YES && retryFlag && stateCond) {
 					CoreFactory.getLogger().info(LocaleMessages.getString("ExternalProgram.11") + jobId);
-					
-					if(retryCounter < jobRuntimeInterface.getAutoRetryCount()) {
+
+					if (retryCounter < jobRuntimeInterface.getAutoRetryCount()) {
 						retryCounter++;
 						try {
 							Thread.sleep(jobRuntimeInterface.getAutoRetryDelay());
@@ -258,7 +259,7 @@ public class ExecuteInShell extends CommonShell {
 			}
 
 			// restore to the value derived from sernayobilgileri file.
-//			getJobProperties().setJobParamList(getJobProperties().getJobParamListPerm());
+			//			getJobProperties().setJobParamList(getJobProperties().getJobParamListPerm());
 
 			retryFlag = false;
 
