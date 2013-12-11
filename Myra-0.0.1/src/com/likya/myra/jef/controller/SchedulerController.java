@@ -15,7 +15,7 @@ import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.model.SortType;
 import com.likya.myra.jef.utils.JobQueueOperations;
 import com.likya.xsd.myra.model.xbeans.jobprops.DependencyListDocument.DependencyList;
-import com.likya.xsd.myra.model.xbeans.jobprops.SimpleProperties;
+import com.likya.xsd.myra.model.xbeans.jobprops.SimplePropertiesType;
 import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
@@ -55,7 +55,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 					SortType mySortType = indexIterator.next();
 					JobImpl scheduledJob = jobQueue.get(mySortType.getJobKey());
 
-					SimpleProperties simpleProperties = scheduledJob.getJobAbstractJobType();
+					SimplePropertiesType simpleProperties = scheduledJob.getJobAbstractJobType();
 					
 					DependencyList dependencyList = simpleProperties.getDependencyList();
 

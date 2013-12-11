@@ -15,7 +15,7 @@ import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.utils.DateUtils;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.joblist.RemoteSchProperties;
-import com.likya.xsd.myra.model.xbeans.jobprops.SimpleProperties;
+import com.likya.xsd.myra.model.xbeans.jobprops.SimplePropertiesType;
 import com.likya.xsd.myra.model.xbeans.rs.ExecuteRShellParamsDocument.ExecuteRShellParams;
 import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
@@ -137,7 +137,7 @@ public class ExecuteSchComponent extends CommonShell {
 		
 		//initStartUp(myLogger);
 
-		SimpleProperties simpleProperties = getJobAbstractJobType();
+		SimplePropertiesType simpleProperties = getJobAbstractJobType();
 
 		while (true) {
 
@@ -170,7 +170,7 @@ public class ExecuteSchComponent extends CommonShell {
 	
 	public void handleException(Exception err, Logger myLogger) {
 
-		SimpleProperties simpleProperties = getJobAbstractJobType();
+		SimplePropertiesType simpleProperties = getJobAbstractJobType();
 
 		LiveStateInfo liveStateInfo = simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
 		
@@ -188,7 +188,7 @@ public class ExecuteSchComponent extends CommonShell {
 	
 	public boolean processJobResult(boolean retryFlag, Logger myLogger) {
 
-		SimpleProperties simpleProperties = getJobAbstractJobType();
+		SimplePropertiesType simpleProperties = getJobAbstractJobType();
 
 		if (simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0).getStateName().equals(StateName.FINISHED)) {
 
@@ -222,7 +222,7 @@ public class ExecuteSchComponent extends CommonShell {
 	
 	protected void cleanUp(Process process, Calendar startTime) {
 
-		SimpleProperties simpleProperties = getJobAbstractJobType();
+		SimplePropertiesType simpleProperties = getJobAbstractJobType();
 
 		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Error for " + simpleProperties.getBaseJobInfos().getJsName());
 		stopErrorGobbler(CoreFactory.getLogger());

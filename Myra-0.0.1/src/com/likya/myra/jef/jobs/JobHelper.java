@@ -10,7 +10,7 @@ import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.StateUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
-import com.likya.xsd.myra.model.xbeans.jobprops.SimpleProperties;
+import com.likya.xsd.myra.model.xbeans.jobprops.SimplePropertiesType;
 import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.xbeans.stateinfo.ReturnCodeListDocument.ReturnCodeList.OsType;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
@@ -65,7 +65,7 @@ public class JobHelper {
 
 	}
 	
-	protected static void setJsRealTimeForStart(SimpleProperties simpleProperties, Calendar startTime) {
+	protected static void setJsRealTimeForStart(SimplePropertiesType simpleProperties, Calendar startTime) {
 
 		JsRealTime jobRealTime;
 		
@@ -76,7 +76,7 @@ public class JobHelper {
 		simpleProperties.getTimeManagement().setJsRealTime(jobRealTime);
 	}
 	
-	protected static void setJsRealTimeForStop(SimpleProperties simpleProperties, Calendar stopTime) {
+	protected static void setJsRealTimeForStop(SimplePropertiesType simpleProperties, Calendar stopTime) {
 
 		StopTime stopTimeTemp = StopTime.Factory.newInstance();
 		stopTimeTemp.setTime(stopTime);
@@ -85,7 +85,7 @@ public class JobHelper {
 		simpleProperties.getTimeManagement().getJsRealTime().setStopTime(stopTimeTemp);;
 	}
 	
-	public static String removeSlashAtTheEnd(SimpleProperties simpleProperties, String jobPath, String jobCommand) {
+	public static String removeSlashAtTheEnd(SimplePropertiesType simpleProperties, String jobPath, String jobCommand) {
 
 		String pathSeperator;
 		
@@ -173,13 +173,13 @@ public class JobHelper {
 		
 	}
 	
-	public static LiveStateInfo insertNewLiveStateInfo(SimpleProperties simpleProperties, int enumStateName, int enumSubstateName, int enumStatusName) {
+	public static LiveStateInfo insertNewLiveStateInfo(SimplePropertiesType simpleProperties, int enumStateName, int enumSubstateName, int enumStatusName) {
 		LiveStateInfo liveStateInfo = LiveStateInfoUtils.insertNewLiveStateInfo(simpleProperties, enumStateName, enumSubstateName, enumStatusName);
 		//sendStatusChangeInfo();
 		return liveStateInfo;
 	}
 	
-	public static LiveStateInfo insertNewLiveStateInfo(SimpleProperties simpleProperties, int enumStateName, int enumSubstateName, int enumStatusName, String retCodeDesc) {
+	public static LiveStateInfo insertNewLiveStateInfo(SimplePropertiesType simpleProperties, int enumStateName, int enumSubstateName, int enumStatusName, String retCodeDesc) {
 		LiveStateInfo liveStateInfo = LiveStateInfoUtils.insertNewLiveStateInfo(simpleProperties, enumStateName, enumSubstateName, enumStatusName);
 		liveStateInfo.addNewReturnCode().setDesc(retCodeDesc);
 		//sendStatusChangeInfo();

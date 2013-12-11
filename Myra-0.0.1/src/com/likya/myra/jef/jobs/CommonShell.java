@@ -10,7 +10,7 @@ import com.likya.myra.commons.grabber.StreamGrabber;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
-import com.likya.xsd.myra.model.xbeans.jobprops.SimpleProperties;
+import com.likya.xsd.myra.model.xbeans.joblist.SimpleProperties;
 import com.likya.xsd.myra.model.xbeans.wlagen.JobAutoRetryDocument.JobAutoRetry;
 
 public abstract class CommonShell extends JobImpl {
@@ -35,7 +35,7 @@ public abstract class CommonShell extends JobImpl {
 	protected void startWathcDogTimer() {
 		// TL deki 
 		
-		SimpleProperties simpleProperties = getJobAbstractJobType();
+		SimpleProperties simpleProperties = (SimpleProperties) getJobAbstractJobType();
 		long timeout = simpleProperties.getTimeManagement().getJsTimeOut().getValueInteger().longValue();
 		
 		if(!(simpleProperties.getCascadingConditions().getJobAutoRetry() == JobAutoRetry.YES && wdtCounter > 0)) {

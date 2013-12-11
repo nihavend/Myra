@@ -21,7 +21,7 @@ import com.likya.myra.jef.model.PersistObject;
 import com.likya.myra.jef.model.SortType;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.joblist.JobListDocument;
-import com.likya.xsd.myra.model.xbeans.jobprops.SimpleProperties;
+import com.likya.xsd.myra.model.xbeans.jobprops.SimplePropertiesType;
 
 public class JobQueueOperations {
 
@@ -51,7 +51,7 @@ public class JobQueueOperations {
 
 			job = jobsIterator.next();
 
-			SimpleProperties simpleProperties = job.getJobAbstractJobType();
+			SimplePropertiesType simpleProperties = job.getJobAbstractJobType();
 
 			SortType mySortType = new SortType(simpleProperties.getId(), simpleProperties.getBaseJobInfos().getJobPriority().intValue());
 			jobQueueArray.add(mySortType);
