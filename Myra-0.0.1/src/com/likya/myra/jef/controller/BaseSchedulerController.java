@@ -14,6 +14,7 @@ import com.likya.myra.LocaleMessages;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactoryInterface;
 import com.likya.myra.jef.jobs.JobImpl;
+import com.likya.myra.jef.model.TemporaryConfig;
 import com.likya.xsd.myra.model.xbeans.jobprops.DependencyListDocument.DependencyList;
 import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
@@ -31,13 +32,10 @@ public class BaseSchedulerController {
 
 	protected boolean executionPermission = true;
 	
-	protected int cycleFrequency = 1000;
+	protected int cycleFrequency = 500;
 	
 	private boolean thresholdOverflow = false;
 
-	private int lowerLimit;
-	private int higherLimit;
-	
 	protected CoreFactoryInterface coreFactoryInterface;
 
 	public BaseSchedulerController(CoreFactoryInterface coreFactoryInterface, HashMap<String, JobImpl> jobQueue) {
@@ -310,8 +308,14 @@ public class BaseSchedulerController {
 
 	public synchronized boolean checkThresholdOverflow() {
 
-		//		int lowerLimit = tlosParameters.getSchedulerLowerThreshold();
-		//		int higherLimit = tlosParameters.getSchedulerHigherThreshold();
+		TemporaryConfig temporaryConfig = coreFactoryInterface.getConfigurationManager().getTemporaryConfig();
+		
+		int lowerLimit = temporaryConfig.getLowerLimit();
+		int higherLimit = temporaryConfig.getHigherLimit();
+		
+		if(lowerLimit >= higherLimit) {
+			return false;
+		}
 
 		int numOfActiveJobs = getNumOfActiveJobs();
 
