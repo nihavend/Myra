@@ -15,6 +15,26 @@
  ******************************************************************************/
 package com.likya.myra.jef;
 
+import com.likya.xsd.myra.model.xbeans.joblist.JobListDocument;
+
 public class InputStrategyBean implements InputStrategy {
 
+	private JobListDocument jobListDocument;
+	private ConfigurationManagerBean configurationManagerBean;
+
+	public JobListDocument getJobListDocument() {
+		return jobListDocument;
+	}
+
+	public void setJobListDocument(JobListDocument jobListDocument) {
+		this.jobListDocument = jobListDocument;
+	}
+
+	public ConfigurationManagerBean getConfigurationManagerBean() {
+		return configurationManagerBean;
+	}
+
+	public void setConfigurationManagerBean(ConfigurationManagerBean configurationManagerBean) {
+		this.configurationManagerBean = configurationManagerBean;
+	}
 }

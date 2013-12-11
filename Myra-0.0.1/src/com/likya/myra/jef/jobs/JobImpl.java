@@ -20,6 +20,7 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
+import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.InstanceNotFoundException;
 import com.likya.myra.jef.model.JobRuntimeInterface;
@@ -41,6 +42,8 @@ public abstract class JobImpl implements Runnable, Serializable {
 	
 	protected TemporaryConfig temporaryConfig;
 	
+	private OutputStrategy outputStrategy;
+	
 	public abstract void stopMyDogBarking();
 	
 	protected abstract void localRun();
@@ -56,6 +59,7 @@ public abstract class JobImpl implements Runnable, Serializable {
 		}
 		
 		try {
+			outputStrategy = CoreFactory.getInstance().getOutputStrategy();
 			temporaryConfig = CoreFactory.getInstance().getConfigurationManager().getTemporaryConfig();
 		} catch (InstanceNotFoundException e2) {
 			e2.printStackTrace();
@@ -100,6 +104,10 @@ public abstract class JobImpl implements Runnable, Serializable {
 		//		}
 		//
 		//		TlosServer.getLogger().info(jobClassName + "|" + TlosServer.getTlosParameters().getScenarioName().toString() + "|" + getJobProperties().getGroupName().toString() + "|" + getJobProperties().getKey().toString() + "|" + DateUtils.getDate(startTime) + "|" + DateUtils.getDate(endTime) + "|" + getJobProperties().getStatusString(getJobProperties().getStatus(), getJobProperties().getProcessExitValue()).toString()); //$NON-NLS-1$
+	}
+	
+	protected void sendOutputData(Object object) {
+		outputStrategy.sendDataObject(object);
 	}
 
 	public String[] parseParameter() {

@@ -15,6 +15,13 @@
  ******************************************************************************/
 package com.likya.myra.jef;
 
+
 public class OutputStrategyBean implements OutputStrategy {
+
+	@Override
+	public void sendDataObject(Object dataObject) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

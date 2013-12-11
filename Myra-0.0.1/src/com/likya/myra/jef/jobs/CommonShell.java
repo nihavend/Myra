@@ -24,6 +24,7 @@ import com.jcraft.jsch.ChannelExec;
 import com.likya.myra.commons.grabber.StreamGrabber;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
+import com.likya.myra.jef.model.OutputData;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.wlagen.JobAutoRetryDocument.JobAutoRetry;
 
@@ -132,6 +133,21 @@ public abstract class CommonShell extends JobImpl {
 			logger.debug("  > ExternalProgram -> outputGobbler.isAlive ->" + outputGobbler.isAlive());
 			outputGobbler = null;
 		}
+	}
+	
+	protected void sendOutputData() {
+		
+		OutputData outputData = new OutputData();
+		
+		outputData.setGroupName("");
+		outputData.setHandleUri(getJobAbstractJobType().getHandlerURI());
+		outputData.setJobId(getJobAbstractJobType().getId2());
+		outputData.setStartTime(getJobAbstractJobType().getTimeManagement().getJsRealTime().getStartTime());
+		outputData.setStopTime(getJobAbstractJobType().getTimeManagement().getJsRealTime().getStopTime());
+		outputData.setTreeId("treeId");
+		outputData.setStateInfos(getJobAbstractJobType().getStateInfos());
+		
+		super.sendOutputData(outputData);
 	}
 }
 

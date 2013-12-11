@@ -20,12 +20,12 @@ import java.util.HashMap;
 
 import com.likya.myra.LocaleMessages;
 import com.likya.myra.jef.ConfigurationManager;
-import com.likya.myra.jef.ConfigurationManagerBean;
+import com.likya.myra.jef.InputStrategy;
+import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.controller.ControllerInterface;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.InstanceNotFoundException;
 import com.likya.myra.jef.model.MyraException;
-import com.likya.xsd.myra.model.xbeans.joblist.JobListDocument;
 
 public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface {
 
@@ -36,14 +36,19 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 	private ManagementOperations managementOperations;
 	
 	private JobOperations jobOperations;
+	
+	private OutputStrategy outputStrategy;
 
-	private CoreFactory(JobListDocument jobListDocument, ConfigurationManagerBean configurationManagerBean) {
+	private CoreFactory(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
+		
 		super();
 		controllerContainer = new HashMap<String, ControllerInterface>();
 		
-		this.configurationManager = configurationManagerBean;
+		this.configurationManager = inputStrategy.getConfigurationManagerBean();
 		this.managementOperations= new ManagementOperationsBean(this);
-		this.jobListDocument = jobListDocument;
+		this.jobListDocument = inputStrategy.getJobListDocument();
+		
+		this.outputStrategy = outputStrategy;
 		
 	}
 
@@ -54,9 +59,9 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		return (CoreFactoryInterface) coreFactory;
 	}
 	
-	public static CoreFactoryInterface getInstance(JobListDocument jobListDocument, ConfigurationManagerBean configurationManagerBean) {
+	public static CoreFactoryInterface getInstance(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
 		if (coreFactory == null) {
-			coreFactory = new CoreFactory(jobListDocument, configurationManagerBean);
+			coreFactory = new CoreFactory(inputStrategy, outputStrategy);
 		}
 		return (CoreFactoryInterface) coreFactory;
 	}
@@ -118,6 +123,10 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 
 	public JobOperations getJobOperations() {
 		return jobOperations;
+	}
+
+	public OutputStrategy getOutputStrategy() {
+		return outputStrategy;
 	}
 
 }

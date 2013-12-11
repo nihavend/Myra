@@ -170,7 +170,7 @@ public class ExecuteInShell extends CommonShell {
 					JobHelper.writetErrorLogFromOutputs(CoreFactory.getLogger(), this.getClass().getName(), stringBufferForOUTPUT, stringBufferForERROR);
 
 					if (errStr != null && hasErrorInLog) {
-						JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, "Log yüzünden !");
+						JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, "Log da bulunan kelime yüzünden !");
 					} else {
 						JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, statusName.intValue(), jobRuntimeInterface.getMessageBuffer().toString());
 					}
@@ -281,6 +281,8 @@ public class ExecuteInShell extends CommonShell {
 			break;
 		}
 
+		sendOutputData();
+		
 		setMyExecuter(null);
 		process = null;
 

@@ -178,7 +178,7 @@ public class ExecuteSchComponent extends CommonShell {
 
 			break;
 		}
-
+		sendOutputData();
 		cleanUp(process, startTime);
 
 	}
