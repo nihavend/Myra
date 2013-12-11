@@ -47,7 +47,7 @@ public class ExecuteSchComponent extends CommonShell {
 
 		ExecuteRShellParams executeRShellParams = ((RemoteSchProperties) abstractJobType).getExecuteRShellParams();
 
-		String host = executeRShellParams.getIpAddress(); // "192.168.1.39";
+		String host = executeRShellParams.getIpAddress() != null ? executeRShellParams.getIpAddress() : executeRShellParams.getHostName(); // "192.168.1.39";
 		String user = executeRShellParams.getUserName(); // "likya";
 		String password = executeRShellParams.getUserPassword(); // "likya";
 		int port = executeRShellParams.getPort(); // "22";
@@ -222,24 +222,24 @@ public class ExecuteSchComponent extends CommonShell {
 	
 	protected void cleanUp(Process process, Calendar startTime) {
 
-		SimplePropertiesType simpleProperties = getJobAbstractJobType();
+		AbstractJobType abstractJobType = getJobAbstractJobType();
 
-		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Error for " + simpleProperties.getBaseJobInfos().getJsName());
+		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Error for " + abstractJobType.getBaseJobInfos().getJsName());
 		stopErrorGobbler(CoreFactory.getLogger());
 
-		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Output for " + simpleProperties.getBaseJobInfos().getJsName());
+		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Output for " + abstractJobType.getBaseJobInfos().getJsName());
 		stopOutputGobbler(CoreFactory.getLogger());
 
 		Calendar endTime = Calendar.getInstance();
 
 		long timeDiff = endTime.getTime().getTime() - startTime.getTime().getTime();
 
-		String endLog = simpleProperties.getBaseJobInfos().getJsName() + ":Bitis zamani : " + DateUtils.getDate(endTime.getTime());
-		String duration = simpleProperties.getBaseJobInfos().getJsName() + ": islem suresi : " + DateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
+		String endLog = abstractJobType.getBaseJobInfos().getJsName() + ":Bitis zamani : " + DateUtils.getDate(endTime.getTime());
+		String duration = abstractJobType.getBaseJobInfos().getJsName() + ": islem suresi : " + DateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
 		getJobRuntimeProperties().setCompletionDate(endTime);
 		getJobRuntimeProperties().setWorkDuration(DateUtils.getUnFormattedElapsedTime((int) timeDiff / 1000));
 		
-		JobHelper.setJsRealTimeForStop(simpleProperties, endTime);
+		JobHelper.setJsRealTimeForStop(abstractJobType, endTime);
 		
 		// getJobRuntimeProperties().getJobProperties().getTimeManagement().setJsRealTime(jobRealTime);
 
@@ -251,7 +251,7 @@ public class ExecuteSchComponent extends CommonShell {
 		CoreFactory.getLogger().info(" >>" + logLabel + ">> " + duration);
 
 		if (watchDogTimer != null) {
-			CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Watchdog for " + simpleProperties.getBaseJobInfos().getJsName());
+			CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Watchdog for " + abstractJobType.getBaseJobInfos().getJsName());
 			stopMyDogBarking();
 		}
 
