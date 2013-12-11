@@ -14,6 +14,7 @@ import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.model.SortType;
 import com.likya.myra.jef.utils.JobQueueOperations;
+import com.likya.myra.jef.utils.PrintVantil;
 import com.likya.xsd.myra.model.xbeans.jobprops.DependencyListDocument.DependencyList;
 import com.likya.xsd.myra.model.xbeans.jobprops.SimplePropertiesType;
 import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
@@ -133,8 +134,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 				}
 
 				cleanUpQueueIssues();
-
-				// TlosServer.print("."); //$NON-NLS-1$
+				System.err.print(PrintVantil.getVantil() + "\r");
 				Thread.sleep(cycleFrequency);
 
 			} catch (Exception e) {
