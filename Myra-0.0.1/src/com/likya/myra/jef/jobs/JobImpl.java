@@ -15,7 +15,7 @@ public abstract class JobImpl implements Runnable, Serializable {
 
 	private static final long serialVersionUID = 2540934879831919506L;
 
-	private Logger myLogger = Logger.getLogger(JobImpl.class);
+	public Logger myLogger;
 	
 	// transient private HashMap<String, JobInterface> jobQueue;
 
@@ -36,6 +36,8 @@ public abstract class JobImpl implements Runnable, Serializable {
 		
 		if(jobRuntimeProperties.getLogger() != null) {
 			myLogger = jobRuntimeProperties.getLogger();
+		} else {
+			myLogger = Logger.getLogger(JobImpl.class);
 		}
 		
 		try {
