@@ -5,7 +5,7 @@ import java.util.ResourceBundle;
 
 public class LocaleMessages {
 	
-	private static final String BUNDLE_NAME = "com.likya.myra.resources.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.likya.myra.resources.messages";
 
 	/**
 	 * @author serkan taş
