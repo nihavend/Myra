@@ -20,7 +20,7 @@
 	<artifactId>myra</artifactId>
 	<version>0.0.1</version>
 	<name>Myra</name>
-	<description>Myra Job Execution Framework</description>
+	<description>Myra Job Scheduling and Execution Framework</description>
 
 	<licenses>
 		<license>
