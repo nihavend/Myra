@@ -11,6 +11,9 @@ public class TemporaryConfig {
 	
 	private HashMap<Integer, String> groupList = new HashMap<Integer, String>();
 	
+	private int lowerLimit;
+	private int higherLimit;
+	
 	public boolean isPersistent() {
 		return isPersistent;
 	}
@@ -41,6 +44,22 @@ public class TemporaryConfig {
 
 	public void setLogBufferSize(int logBufferSize) {
 		this.logBufferSize = logBufferSize;
+	}
+
+	public int getLowerLimit() {
+		return lowerLimit;
+	}
+
+	public void setLowerLimit(int lowerLimit) {
+		this.lowerLimit = lowerLimit;
+	}
+
+	public int getHigherLimit() {
+		return higherLimit;
+	}
+
+	public void setHigherLimit(int higherLimit) {
+		this.higherLimit = higherLimit;
 	}
 	
 }
