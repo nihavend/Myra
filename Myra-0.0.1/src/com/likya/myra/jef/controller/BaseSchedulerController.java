@@ -169,6 +169,10 @@ public class BaseSchedulerController {
 	protected boolean checkDependency(JobImpl meJob, DependencyList dependencyList) {
 
 		boolean retValue = false;
+
+		if(dependencyList == null || dependencyList.getItemArray().length == 0) {
+			return true;
+		}
 		
 		Map<String, BigDecimal> variables = new HashMap<String, BigDecimal>();
 		
