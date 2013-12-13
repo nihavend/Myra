@@ -21,6 +21,6 @@ public interface InputStrategy {
 	
 	public JobListDocument getJobListDocument();
 	public void setJobListDocument(JobListDocument jobListDocument);
-	public ConfigurationManagerBean getConfigurationManagerBean();
-	public void setConfigurationManagerBean(ConfigurationManagerBean configurationManagerBean);
+	public ConfigurationManager getConfigurationManager();
+	public void setConfigurationManager(ConfigurationManager configurationManager);
 }

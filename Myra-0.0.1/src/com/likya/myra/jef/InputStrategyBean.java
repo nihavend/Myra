@@ -20,7 +20,7 @@ import com.likya.xsd.myra.model.xbeans.joblist.JobListDocument;
 public class InputStrategyBean implements InputStrategy {
 
 	private JobListDocument jobListDocument;
-	private ConfigurationManagerBean configurationManagerBean;
+	private ConfigurationManager configurationManager;
 
 	public JobListDocument getJobListDocument() {
 		return jobListDocument;
@@ -30,11 +30,12 @@ public class InputStrategyBean implements InputStrategy {
 		this.jobListDocument = jobListDocument;
 	}
 
-	public ConfigurationManagerBean getConfigurationManagerBean() {
-		return configurationManagerBean;
+	public ConfigurationManager getConfigurationManager() {
+		return configurationManager;
 	}
 
-	public void setConfigurationManagerBean(ConfigurationManagerBean configurationManagerBean) {
-		this.configurationManagerBean = configurationManagerBean;
+	public void setConfigurationManager(ConfigurationManager configurationManager) {
+		this.configurationManager = configurationManager;
 	}
+
 }
