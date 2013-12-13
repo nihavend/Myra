@@ -114,6 +114,7 @@ public class ExecuteInShell extends CommonShell {
 					tempEnv.putAll(environmentVariables);
 				}
 
+				// TODO
 				// tempEnv.putAll(XmlBeansTransformer.entryToMap(jobProperties));
 
 				processBuilder.environment().putAll(tempEnv);
@@ -123,17 +124,6 @@ public class ExecuteInShell extends CommonShell {
 				jobRuntimeInterface.getMessageBuffer().delete(0, jobRuntimeInterface.getMessageBuffer().capacity());
 
 				initGrabbers(process, jobId, CoreFactory.getLogger(), temporaryConfig.getLogBufferSize());
-				//				// any error message?
-				//				StreamGrabber errorGobbler = new StreamGrabber(process.getErrorStream(), "ERROR", CoreFactory.getLogger(), temporaryConfig.getLogBufferSize()); //$NON-NLS-1$
-				//				errorGobbler.setName(jobId + ".ErrorGobbler.id." + errorGobbler.getId()); //$NON-NLS-1$
-				//
-				//				// any output?
-				//				StreamGrabber outputGobbler = new StreamGrabber(process.getInputStream(), "OUTPUT", CoreFactory.getLogger(), temporaryConfig.getLogBufferSize()); //$NON-NLS-1$
-				//				outputGobbler.setName(jobId + ".OutputGobbler.id." + outputGobbler.getId()); //$NON-NLS-1$
-				//
-				//				// kick them off
-				//				errorGobbler.start();
-				//				outputGobbler.start();
 
 				try {
 
