@@ -71,7 +71,7 @@ public abstract class JobImpl implements Runnable, Serializable {
 		localRun();
 	}
 
-	public AbstractJobType getJobAbstractJobType() {
+	public AbstractJobType getAbstractJobType() {
 		return abstractJobType;
 	}
 
