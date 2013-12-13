@@ -17,6 +17,8 @@ package com.likya.myra.jef.model;
 
 import java.util.HashMap;
 
+import com.likya.xsd.myra.model.xbeans.stateinfo.GlobalStateDefinitionDocument.GlobalStateDefinition;
+
 public class TemporaryConfig {
 
 	private String fileToPersist = "Tlos.recover";
@@ -28,6 +30,8 @@ public class TemporaryConfig {
 	
 	private int lowerLimit;
 	private int higherLimit;
+	
+	private GlobalStateDefinition globalStateDefinition;
 	
 	public boolean isPersistent() {
 		return isPersistent;
@@ -75,6 +79,14 @@ public class TemporaryConfig {
 
 	public void setHigherLimit(int higherLimit) {
 		this.higherLimit = higherLimit;
+	}
+
+	public GlobalStateDefinition getGlobalStateDefinition() {
+		return globalStateDefinition;
+	}
+
+	public void setGlobalStateDefinition(GlobalStateDefinition globalStateDefinition) {
+		this.globalStateDefinition = globalStateDefinition;
 	}
 	
 }
