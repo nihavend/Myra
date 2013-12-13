@@ -25,6 +25,7 @@ import com.likya.myra.commons.grabber.StreamGrabber;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.model.OutputData;
+import com.likya.xsd.myra.model.xbeans.generics.UnitDocument.Unit;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.wlagen.JobAutoRetryDocument.JobAutoRetry;
 
@@ -53,8 +54,16 @@ public abstract class CommonShell extends JobImpl {
 		AbstractJobType abstractJobType = getAbstractJobType();
 		long timeout = abstractJobType.getTimeManagement().getJsTimeOut().getValueInteger().longValue();
 		
+		Long timeOut = abstractJobType.getTimeManagement().getJsTimeOut().getValueInteger().longValue();
+
+		if (abstractJobType.getTimeManagement().getJsTimeOut().getUnit() == Unit.HOURS) {
+			timeOut = timeOut * 3600;
+		} else if (abstractJobType.getTimeManagement().getJsTimeOut().getUnit() == Unit.MINUTES) {
+			timeOut = timeOut * 60;
+		}
+		
 		if(!(abstractJobType.getCascadingConditions().getJobAutoRetry() == JobAutoRetry.YES && wdtCounter > 0)) {
-			watchDogTimer = new WatchDogTimer(this, abstractJobType.getId(), Thread.currentThread(), timeout);
+			watchDogTimer = new WatchDogTimer(this, abstractJobType.getId(), Thread.currentThread(), timeout * 1000);
 			watchDogTimer.setName(abstractJobType.getId() + ".WatchDogTimer.id." + watchDogTimer.getId());
 			watchDogTimer.start();
 
