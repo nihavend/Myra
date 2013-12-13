@@ -112,11 +112,11 @@ public abstract class CommonShell extends JobImpl {
 		myLogger.info(" >>" + logLabel + ">> " + " OK");
 		
 		//any error message?
-		StreamGrabber errorGobbler = new StreamGrabber(process.getErrorStream(), "ERROR", CoreFactory.getLogger(), buffSize); //$NON-NLS-1$
+		errorGobbler = new StreamGrabber(process.getErrorStream(), "ERROR", CoreFactory.getLogger(), buffSize); //$NON-NLS-1$
 		errorGobbler.setName(jobId + ".ErrorGobbler.id." + errorGobbler.getId()); //$NON-NLS-1$
 
 		// any output?
-		StreamGrabber outputGobbler = new StreamGrabber(process.getInputStream(), "OUTPUT", CoreFactory.getLogger(), buffSize); //$NON-NLS-1$
+		outputGobbler = new StreamGrabber(process.getInputStream(), "OUTPUT", CoreFactory.getLogger(), buffSize); //$NON-NLS-1$
 		outputGobbler.setName(jobId + ".OutputGobbler.id." + outputGobbler.getId()); //$NON-NLS-1$
 
 		myLogger.info(" >>" + logLabel + " icin islemin hata ve girdi akisi baslatiliyor. " + errorGobbler.getName() + " ve " + buffSize);
