@@ -15,32 +15,19 @@
  ******************************************************************************/
 package com.likya.myra.jef;
 
-import org.apache.xmlbeans.XmlException;
-
 import com.likya.myra.jef.model.JobRuntimeProperties;
 import com.likya.myra.jef.model.TemporaryConfig;
-import com.likya.myra.jef.utils.FileUtils;
-import com.likya.xsd.myra.model.xbeans.stateinfo.GlobalStateDefinitionDocument;
-import com.likya.xsd.myra.model.xbeans.stateinfo.GlobalStateDefinitionDocument.GlobalStateDefinition;
 
 public class ConfigurationManagerBean implements ConfigurationManager {
 
 	private TemporaryConfig temporaryConfig;
 	private JobRuntimeProperties jobRuntimeProperties;
-	private GlobalStateDefinition globalStateDefinition;
 	
 	public ConfigurationManagerBean() {
 		super();
 		this.temporaryConfig = new TemporaryConfig();	
 		this.jobRuntimeProperties = new JobRuntimeProperties();
-		
-		StringBuffer xmlString = FileUtils.readFile("globalStates.xml");
-		try {
-			GlobalStateDefinitionDocument globalStateDefinitionDocument = GlobalStateDefinitionDocument.Factory.parse(xmlString.toString());
-			this.globalStateDefinition = globalStateDefinitionDocument.getGlobalStateDefinition();
-		} catch (XmlException e) {
-			e.printStackTrace();
-		}
+
 	}
 
 	@Override
@@ -51,10 +38,6 @@ public class ConfigurationManagerBean implements ConfigurationManager {
 	@Override
 	public JobRuntimeProperties getJobRuntimeProperties() {
 		return jobRuntimeProperties;
-	}
-
-	public GlobalStateDefinition getGlobalStateDefinition() {
-		return globalStateDefinition;
 	}
 
 }
