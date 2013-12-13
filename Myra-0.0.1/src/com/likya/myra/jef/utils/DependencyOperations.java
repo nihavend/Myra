@@ -288,7 +288,7 @@ public class DependencyOperations {
 			
 			JobImpl jobImpl = jobQueue.get(item.getJsId());
 
-			LiveStateInfo liveStateInfo = jobImpl.getJobAbstractJobType().getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
+			LiveStateInfo liveStateInfo = jobImpl.getAbstractJobType().getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
 
 			StateName.Enum jobStateName = liveStateInfo.getStateName();
 			SubstateName.Enum jobSubstateName = liveStateInfo.getSubstateName();
