@@ -66,7 +66,7 @@ public class ExecuteInShell extends CommonShell {
 
 		JobRuntimeInterface jobRuntimeInterface = getJobRuntimeProperties();
 
-		AbstractJobType abstractJobType = getJobAbstractJobType();
+		AbstractJobType abstractJobType = getAbstractJobType();
 		String jobId = abstractJobType.getId();
 
 		String startLog = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.0") + CommonDateUtils.getDate(startTime.getTime());
