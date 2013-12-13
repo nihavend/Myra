@@ -51,7 +51,7 @@ public class ExecuteSchComponent extends CommonShell {
 
 		// JobRuntimeInterface jobRuntimeInterface = getJobRuntimeProperties();
 
-		AbstractJobType abstractJobType = getJobAbstractJobType();
+		AbstractJobType abstractJobType = getAbstractJobType();
 
 		String jobId = abstractJobType.getId();
 
@@ -152,7 +152,7 @@ public class ExecuteSchComponent extends CommonShell {
 		
 		//initStartUp(myLogger);
 
-		SimplePropertiesType simpleProperties = getJobAbstractJobType();
+		AbstractJobType abstractJobType = getAbstractJobType();
 
 		while (true) {
 
@@ -160,10 +160,10 @@ public class ExecuteSchComponent extends CommonShell {
 
 				startWathcDogTimer();
 
-				String jobPath = simpleProperties.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
-				String jobCommand = simpleProperties.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand();
+				String jobPath = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
+				String jobCommand = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand();
 
-				JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_IN);
+				JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_IN);
 
 				startSchProcess(jobPath, jobCommand, null, this.getClass().getName(), CoreFactory.getLogger());
 
@@ -178,6 +178,7 @@ public class ExecuteSchComponent extends CommonShell {
 
 			break;
 		}
+		
 		sendOutputData();
 		cleanUp(process, startTime);
 
@@ -185,7 +186,7 @@ public class ExecuteSchComponent extends CommonShell {
 	
 	public void handleException(Exception err, Logger myLogger) {
 
-		SimplePropertiesType simpleProperties = getJobAbstractJobType();
+		SimplePropertiesType simpleProperties = getAbstractJobType();
 
 		LiveStateInfo liveStateInfo = simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
 		
@@ -203,7 +204,7 @@ public class ExecuteSchComponent extends CommonShell {
 	
 	public boolean processJobResult(boolean retryFlag, Logger myLogger) {
 
-		SimplePropertiesType simpleProperties = getJobAbstractJobType();
+		SimplePropertiesType simpleProperties = getAbstractJobType();
 
 		if (simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0).getStateName().equals(StateName.FINISHED)) {
 
@@ -237,7 +238,7 @@ public class ExecuteSchComponent extends CommonShell {
 	
 	protected void cleanUp(Process process, Calendar startTime) {
 
-		AbstractJobType abstractJobType = getJobAbstractJobType();
+		AbstractJobType abstractJobType = getAbstractJobType();
 
 		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Error for " + abstractJobType.getBaseJobInfos().getJsName());
 		stopErrorGobbler(CoreFactory.getLogger());
