@@ -28,6 +28,7 @@ import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.jobprops.SimplePropertiesType;
 import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.xbeans.stateinfo.ReturnCodeListDocument.ReturnCodeList.OsType;
+import com.likya.xsd.myra.model.xbeans.stateinfo.State;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.xbeans.stateinfo.Status;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
@@ -53,7 +54,7 @@ public class JobHelper {
 
 	protected static void setWorkDurations(JobImpl jobClassName, Calendar startTime) {
 
-		AbstractJobType abstractJobType = jobClassName.getJobAbstractJobType();
+		AbstractJobType abstractJobType = jobClassName.getAbstractJobType();
 
 		Calendar endTime = Calendar.getInstance();
 		long timeDiff = endTime.getTime().getTime() - startTime.getTime().getTime();
@@ -161,7 +162,9 @@ public class JobHelper {
 		if ((abstractJobType.getStateInfos().getJobStatusList() != null) && (localStateCheck = StateUtils.contains(abstractJobType.getStateInfos().getJobStatusList(), processExitValue)) != null) {
 			statusName = localStateCheck.getStatusName();
 		} else {
-			Status mySubStateStatuses = StateUtils.globalContains(StateName.FINISHED, SubstateName.COMPLETED, processExitValue);
+			// TODO Global state listesi agentlarda serverdan alınıyor. Burada ise ilk etapta veri dosyası olarak xml'den alınmalı ! 
+			State [] globaStates = new State[1];
+			Status mySubStateStatuses = StateUtils.globalContains(globaStates, StateName.FINISHED, SubstateName.COMPLETED, processExitValue);
 			if (mySubStateStatuses != null) {
 				statusName = mySubStateStatuses.getStatusName();
 			} else {
