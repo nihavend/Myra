@@ -50,7 +50,7 @@ public abstract class CommonShell extends JobImpl {
 	protected void startWathcDogTimer() {
 		// TL deki 
 		
-		AbstractJobType abstractJobType = getJobAbstractJobType();
+		AbstractJobType abstractJobType = getAbstractJobType();
 		long timeout = abstractJobType.getTimeManagement().getJsTimeOut().getValueInteger().longValue();
 		
 		if(!(abstractJobType.getCascadingConditions().getJobAutoRetry() == JobAutoRetry.YES && wdtCounter > 0)) {
@@ -140,12 +140,12 @@ public abstract class CommonShell extends JobImpl {
 		OutputData outputData = new OutputData();
 		
 		outputData.setGroupName("");
-		outputData.setHandleUri(getJobAbstractJobType().getHandlerURI());
-		outputData.setJobId(getJobAbstractJobType().getId2());
-		outputData.setStartTime(getJobAbstractJobType().getTimeManagement().getJsRealTime().getStartTime());
-		outputData.setStopTime(getJobAbstractJobType().getTimeManagement().getJsRealTime().getStopTime());
+		outputData.setHandleUri(getAbstractJobType().getHandlerURI());
+		outputData.setJobId(getAbstractJobType().getId2());
+		outputData.setStartTime(getAbstractJobType().getTimeManagement().getJsRealTime().getStartTime());
+		outputData.setStopTime(getAbstractJobType().getTimeManagement().getJsRealTime().getStopTime());
 		outputData.setTreeId("treeId");
-		outputData.setStateInfos(getJobAbstractJobType().getStateInfos());
+		outputData.setStateInfos(getAbstractJobType().getStateInfos());
 		
 		super.sendOutputData(outputData);
 	}
