@@ -71,7 +71,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 					SortType mySortType = indexIterator.next();
 					JobImpl scheduledJob = jobQueue.get(mySortType.getJobKey());
 
-					SimplePropertiesType simpleProperties = scheduledJob.getJobAbstractJobType();
+					SimplePropertiesType simpleProperties = scheduledJob.getAbstractJobType();
 					
 					DependencyList dependencyList = simpleProperties.getDependencyList();
 
