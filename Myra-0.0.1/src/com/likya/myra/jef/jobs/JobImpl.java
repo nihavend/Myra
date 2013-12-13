@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
 
 import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.core.CoreFactory;
-import com.likya.myra.jef.model.InstanceNotFoundException;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.model.TemporaryConfig;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
@@ -32,41 +31,36 @@ public abstract class JobImpl implements Runnable, Serializable {
 	private static final long serialVersionUID = 2540934879831919506L;
 
 	public Logger myLogger;
-	
+
 	// transient private HashMap<String, JobInterface> jobQueue;
 
 	transient private Thread myExecuter;
 
 	private AbstractJobType abstractJobType;
 	private JobRuntimeInterface jobRuntimeProperties;
-	
+
 	protected TemporaryConfig temporaryConfig;
-	
+
 	private OutputStrategy outputStrategy;
-	
+
 	public abstract void stopMyDogBarking();
-	
+
 	protected abstract void localRun();
-	
+
 	public JobImpl(AbstractJobType abstractJobType, JobRuntimeInterface jobRuntimeProperties) {
 		this.abstractJobType = abstractJobType;
 		this.jobRuntimeProperties = jobRuntimeProperties;
-		
-		if(jobRuntimeProperties.getLogger() != null) {
+
+		if (jobRuntimeProperties.getLogger() != null) {
 			myLogger = jobRuntimeProperties.getLogger();
 		} else {
 			myLogger = Logger.getLogger(JobImpl.class);
 		}
-		
-		try {
-			outputStrategy = CoreFactory.getInstance().getOutputStrategy();
-			temporaryConfig = CoreFactory.getInstance().getConfigurationManager().getTemporaryConfig();
-		} catch (InstanceNotFoundException e2) {
-			e2.printStackTrace();
-			throw new RuntimeException();
-		}
+
+		outputStrategy = CoreFactory.getInstance().getOutputStrategy();
+		temporaryConfig = CoreFactory.getInstance().getConfigurationManager().getTemporaryConfig();
 	}
-	
+
 	public final void run() {
 		localRun();
 	}
@@ -105,7 +99,7 @@ public abstract class JobImpl implements Runnable, Serializable {
 		//
 		//		TlosServer.getLogger().info(jobClassName + "|" + TlosServer.getTlosParameters().getScenarioName().toString() + "|" + getJobProperties().getGroupName().toString() + "|" + getJobProperties().getKey().toString() + "|" + DateUtils.getDate(startTime) + "|" + DateUtils.getDate(endTime) + "|" + getJobProperties().getStatusString(getJobProperties().getStatus(), getJobProperties().getProcessExitValue()).toString()); //$NON-NLS-1$
 	}
-	
+
 	protected void sendOutputData(Object object) {
 		outputStrategy.sendDataObject(object);
 	}
