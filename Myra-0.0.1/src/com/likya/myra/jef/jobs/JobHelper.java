@@ -162,8 +162,7 @@ public class JobHelper {
 		if ((abstractJobType.getStateInfos().getJobStatusList() != null) && (localStateCheck = StateUtils.contains(abstractJobType.getStateInfos().getJobStatusList(), processExitValue)) != null) {
 			statusName = localStateCheck.getStatusName();
 		} else {
-			// TODO Global state listesi agentlarda serverdan alınıyor. Burada ise ilk etapta veri dosyası olarak xml'den alınmalı ! 
-			State [] globaStates = new State[1];
+			State [] globaStates = CoreFactory.getInstance().getConfigurationManager().getTemporaryConfig().getGlobalStateDefinition().getGlobalStateArray();
 			Status mySubStateStatuses = StateUtils.globalContains(globaStates, StateName.FINISHED, SubstateName.COMPLETED, processExitValue);
 			if (mySubStateStatuses != null) {
 				statusName = mySubStateStatuses.getStatusName();
