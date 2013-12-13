@@ -67,7 +67,7 @@ public class JobQueueOperations {
 
 			job = jobsIterator.next();
 
-			SimplePropertiesType simpleProperties = job.getJobAbstractJobType();
+			SimplePropertiesType simpleProperties = job.getAbstractJobType();
 
 			SortType mySortType = new SortType(simpleProperties.getId(), simpleProperties.getBaseJobInfos().getJobPriority().intValue());
 			jobQueueArray.add(mySortType);
