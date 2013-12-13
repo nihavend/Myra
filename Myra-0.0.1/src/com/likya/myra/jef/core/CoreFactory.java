@@ -44,7 +44,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		super();
 		controllerContainer = new HashMap<String, ControllerInterface>();
 		
-		this.configurationManager = inputStrategy.getConfigurationManagerBean();
+		this.configurationManager = inputStrategy.getConfigurationManager();
 		this.managementOperations= new ManagementOperationsBean(this);
 		this.jobListDocument = inputStrategy.getJobListDocument();
 		
@@ -52,9 +52,14 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		
 	}
 
-	public static CoreFactoryInterface getInstance() throws InstanceNotFoundException {
+	public static CoreFactoryInterface getInstance() {
 		if (coreFactory == null) {
-			throw new InstanceNotFoundException("Use getInstance(ConfigurationManagerBean configurationManagerBean) ");
+			try {
+				throw new InstanceNotFoundException("Use getInstance(ConfigurationManagerBean configurationManagerBean) ");
+			} catch (InstanceNotFoundException e) {
+				e.printStackTrace();
+				return null;
+			}
 		}
 		return (CoreFactoryInterface) coreFactory;
 	}
