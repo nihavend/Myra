@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.likya.myra.jef.controller;
 
+import java.util.HashMap;
+
+import com.likya.myra.jef.jobs.JobImpl;
+
 public interface ControllerInterface extends Runnable {
 
+	public HashMap<String, JobImpl> getJobQueue();
 }

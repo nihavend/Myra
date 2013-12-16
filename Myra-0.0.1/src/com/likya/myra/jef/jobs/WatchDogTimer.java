@@ -69,7 +69,7 @@ public class WatchDogTimer extends Thread {
 	public void run() {
 		try {
 			Thread.sleep(timeout);
-			if (jobImpl.getAbstractJobType().getCascadingConditions().getJobAutoRetry() != JobAutoRetry.YES) {
+			if (jobImpl.getAbstractJobType().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() != JobAutoRetry.YES) {
 				LiveStateInfoUtils.insertNewLiveStateInfo(jobImpl.getAbstractJobType(), StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_OUT);
 				CoreFactory.getLogger().info(LocaleMessages.getString("WatchDogTimer.0")); //$NON-NLS-1$
 			} else {

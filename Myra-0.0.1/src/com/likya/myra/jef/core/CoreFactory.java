@@ -36,20 +36,22 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 	private static CoreFactory coreFactory;
 
 	private ConfigurationManager configurationManager;
-	
+
 	private ManagementOperations managementOperations;
-	
+
+	private MonitoringOperations monitoringOperations;
+
 	private JobOperations jobOperations;
-	
+
 	private OutputStrategy outputStrategy;
 
 	private CoreFactory(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
-		
+
 		super();
 		controllerContainer = new HashMap<String, ControllerInterface>();
-		
+
 		this.configurationManager = inputStrategy.getConfigurationManager();
-		
+
 		StringBuffer xmlString = FileUtils.readFile("globalStates.xml");
 		try {
 			GlobalStateDefinitionDocument globalStateDefinitionDocument = GlobalStateDefinitionDocument.Factory.parse(xmlString.toString());
@@ -57,12 +59,15 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		} catch (XmlException e) {
 			e.printStackTrace();
 		}
-		
-		this.managementOperations= new ManagementOperationsBean(this);
+
+		this.managementOperations = new ManagementOperationsBean(this);
+
+		this.monitoringOperations = new MonitoringOperationsBean(this);
+
 		this.jobListDocument = inputStrategy.getJobListDocument();
-		
+
 		this.outputStrategy = outputStrategy;
-		
+
 	}
 
 	public static CoreFactoryInterface getInstance() {
@@ -76,7 +81,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		}
 		return (CoreFactoryInterface) coreFactory;
 	}
-	
+
 	public static CoreFactoryInterface getInstance(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
 		if (coreFactory == null) {
 			coreFactory = new CoreFactory(inputStrategy, outputStrategy);
@@ -94,20 +99,20 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		} else {
 			throw new MyraException();
 		}
-		
+
 	}
-	
+
 	// Not implemented yet !!!!
-	public ArrayList<JobImpl> loadCustomJobTypes(String [] customJobTypes) {
-		
+	public ArrayList<JobImpl> loadCustomJobTypes(String[] customJobTypes) {
+
 		ArrayList<JobImpl> jobInterfaceList = new ArrayList<JobImpl>();
-		
-		for(String customJobType : customJobTypes) {
-			
+
+		for (String customJobType : customJobTypes) {
+
 			try {
-				
+
 				JobImpl jobInterface = null;
-				
+
 				@SuppressWarnings("rawtypes")
 				Class handlerClass = Class.forName(customJobType);
 
@@ -117,9 +122,9 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 					jobInterface = (JobImpl) (myObject);
 					jobInterfaceList.add(jobInterface);
 				}
-				
+
 				getLogger().info(LocaleMessages.getString("Tlos.34")); //$NON-NLS-1$
-				
+
 			} catch (Exception e) {
 				System.out.println(LocaleMessages.getString("Tlos.35") + customJobType); //$NON-NLS-1$
 				System.out.println(LocaleMessages.getString("Tlos.36")); //$NON-NLS-1$
@@ -128,7 +133,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		}
 
 		return jobInterfaceList;
-		
+
 	}
 
 	public ConfigurationManager getConfigurationManager() {
@@ -145,6 +150,10 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 
 	public OutputStrategy getOutputStrategy() {
 		return outputStrategy;
+	}
+
+	public MonitoringOperations getMonitoringOperations() {
+		return monitoringOperations;
 	}
 
 }

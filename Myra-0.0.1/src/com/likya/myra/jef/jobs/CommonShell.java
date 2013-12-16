@@ -24,12 +24,11 @@ import com.jcraft.jsch.ChannelExec;
 import com.likya.myra.commons.grabber.StreamGrabber;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
-import com.likya.myra.jef.model.OutputData;
 import com.likya.xsd.myra.model.xbeans.generics.UnitDocument.Unit;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.wlagen.JobAutoRetryDocument.JobAutoRetry;
 
-public abstract class CommonShell extends JobImpl {
+public abstract class CommonShell extends GenericInnerJob {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -37,8 +36,6 @@ public abstract class CommonShell extends JobImpl {
 	
 	transient protected StreamGrabber errorGobbler;
 	transient protected StreamGrabber outputGobbler;
-	
-	transient protected WatchDogTimer watchDogTimer = null;
 	
 	transient private int wdtCounter = 0;
 	
@@ -62,7 +59,7 @@ public abstract class CommonShell extends JobImpl {
 			timeOut = timeOut * 60;
 		}
 		
-		if(!(abstractJobType.getCascadingConditions().getJobAutoRetry() == JobAutoRetry.YES && wdtCounter > 0)) {
+		if(!(abstractJobType.getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == JobAutoRetry.YES && wdtCounter > 0)) {
 			watchDogTimer = new WatchDogTimer(this, abstractJobType.getId(), Thread.currentThread(), timeout * 1000);
 			watchDogTimer.setName(abstractJobType.getId() + ".WatchDogTimer.id." + watchDogTimer.getId());
 			watchDogTimer.start();
@@ -144,20 +141,6 @@ public abstract class CommonShell extends JobImpl {
 		}
 	}
 	
-	protected void sendOutputData() {
-		
-		OutputData outputData = new OutputData();
-		
-		outputData.setGroupName("");
-		outputData.setHandleUri(getAbstractJobType().getHandlerURI());
-		outputData.setJobId(getAbstractJobType().getId2());
-		outputData.setStartTime(getAbstractJobType().getTimeManagement().getJsRealTime().getStartTime());
-		outputData.setStopTime(getAbstractJobType().getTimeManagement().getJsRealTime().getStopTime());
-		outputData.setTreeId("treeId");
-		outputData.setStateInfos(getAbstractJobType().getStateInfos());
-		
-		super.sendOutputData(outputData);
-	}
 }
 
 

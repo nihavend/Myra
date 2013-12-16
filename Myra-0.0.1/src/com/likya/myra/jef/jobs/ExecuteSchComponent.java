@@ -30,7 +30,6 @@ import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.utils.DateUtils;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.joblist.RemoteSchProperties;
-import com.likya.xsd.myra.model.xbeans.jobprops.SimplePropertiesType;
 import com.likya.xsd.myra.model.xbeans.rs.ExecuteRShellParamsDocument.ExecuteRShellParams;
 import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
@@ -72,15 +71,6 @@ public class ExecuteSchComponent extends CommonShell {
 
 		Session session = jsch.getSession(user, host, port);
 
-		/*
-		 * String xhost="127.0.0.1"; int xport=0;
-		 * String display=JOptionPane.showInputDialog("Enter display name", xhost+":"+xport);
-		 * xhost=display.substring(0, display.indexOf(':'));
-		 * xport=Integer.parseInt(display.substring(display .indexOf(':')+1));
-		 * session.setX11Host(xhost);
-		 * session.setX11Port(xport+6000);
-		 */
-
 		java.util.Properties config = new java.util.Properties();
 		config.put("StrictHostKeyChecking", "no");
 		session.setConfig(config);
@@ -91,16 +81,8 @@ public class ExecuteSchComponent extends CommonShell {
 		Channel channel = session.openChannel("exec");
 		((ChannelExec) channel).setCommand(jobCommand);
 
-		// X Forwarding
-		// channel.setXForwarding(true);
-
 		channel.setInputStream(System.in);
-		// channel.setInputStream(null);
 
-		// channel.setOutputStream(System.out);
-
-		// FileOutputStream fos=new FileOutputStream("/tmp/stderr");
-		// ((ChannelExec)channel).setErrStream(fos);
 		((ChannelExec) channel).setErrStream(System.err);
 
 		channel.connect();
@@ -123,7 +105,7 @@ public class ExecuteSchComponent extends CommonShell {
 
 			int processExitValue = channel.getExitStatus();
 
-			myLogger.info(" >>" + " ExecuteSchComponent " + jobId + " islemi sonlandi, islem bitis degeri : " + processExitValue);
+			myLogger.info(" >>" + logLabel + jobId + " islemi sonlandi, islem bitis degeri : " + processExitValue);
 
 			StringBuffer descStr = new StringBuffer();
 
@@ -133,11 +115,11 @@ public class ExecuteSchComponent extends CommonShell {
 
 			JobHelper.writetErrorLogFromOutputs(myLogger, logClassName, stringBufferForOUTPUT, stringBufferForERROR);
 
-			JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, statusName.intValue());
+			setOfCodeMessage(abstractJobType, statusName.intValue(), descStr.toString());
 
 		} catch (InterruptedException e) {
 
-			myLogger.warn(" >>" + " ExecuteSchComponent " + ">> " + logClassName + " : Job timed-out terminating " + abstractJobType.getBaseJobInfos().getJsName());
+			myLogger.warn(" >>" + logLabel + ">> " + logClassName + " : Job timed-out terminating " + abstractJobType.getBaseJobInfos().getJsName());
 
 			channel.disconnect();
 			session.disconnect();
@@ -163,8 +145,8 @@ public class ExecuteSchComponent extends CommonShell {
 				String jobPath = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
 				String jobCommand = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand();
 
-				JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_IN);
-
+				setRunning(abstractJobType);
+				
 				startSchProcess(jobPath, jobCommand, null, this.getClass().getName(), CoreFactory.getLogger());
 
 			} catch (Exception err) {
@@ -179,20 +161,19 @@ public class ExecuteSchComponent extends CommonShell {
 			break;
 		}
 		
-		sendOutputData();
 		cleanUp(process, startTime);
 
 	}
 	
 	public void handleException(Exception err, Logger myLogger) {
 
-		SimplePropertiesType simpleProperties = getAbstractJobType();
+		AbstractJobType abstractJobType = getAbstractJobType();
 
-		LiveStateInfo liveStateInfo = simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
+		LiveStateInfo liveStateInfo = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
 		
 		/* FINISHED state i yoksa ekle */
 		if (!LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED)) {
-			JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, err.getMessage());
+			setFailedOfMessage(abstractJobType, err.getMessage());
 		}
 
 		myLogger.error(err.getMessage());
@@ -204,32 +185,25 @@ public class ExecuteSchComponent extends CommonShell {
 	
 	public boolean processJobResult(boolean retryFlag, Logger myLogger) {
 
-		SimplePropertiesType simpleProperties = getAbstractJobType();
+		AbstractJobType abstractJobType = getAbstractJobType();
+		
+		LiveStateInfo lastState = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
 
-		if (simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0).getStateName().equals(StateName.FINISHED)) {
+		if (lastState.getStateName().equals(StateName.FINISHED)) {
 
-			//sendStatusChangeInfo();
-
-			String logStr = "islem bitirildi : " + simpleProperties.getId() + " => ";
-			logStr += StateName.FINISHED.toString() + ":" + simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0).getSubstateName().toString() + ":" + simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0).getStatusName().toString();
+			String logStr = "islem bitirildi : " + abstractJobType.getId() + " => ";
+			logStr += StateName.FINISHED.toString() + ":" + lastState.getSubstateName().toString() + ":" + lastState.getStatusName().toString();
 			myLogger.info(" >>>>" + logStr + "<<<<");
 
 		} else {
 
-			// TODO Hoşuma gitmedi ama tip dönüşümü yaptım
-			if (Boolean.parseBoolean(simpleProperties.getCascadingConditions().getJobAutoRetry().toString()) && retryFlag) {
-
-				myLogger.info(" >> " + "ExecuteInShell : Job Failed ! Restarting " + simpleProperties.getBaseJobInfos().getJsName());
-
-				JobHelper.insertNewLiveStateInfo(simpleProperties, StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_IN);
-
+			if (Boolean.parseBoolean(abstractJobType.getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry().toString()) && retryFlag) {
+				myLogger.info(" >> " + logLabel + " : Job Failed ! Restarting " + abstractJobType.getBaseJobInfos().getJsName());
+				setRenewByTime(abstractJobType);
 				return true;
-
 			} else {
-
-				myLogger.info(" >>" + logLabel + ">> " + simpleProperties.getId() + ":Job Failed ! ");
-				myLogger.debug(" >>" + logLabel + ">> " + simpleProperties.getId() + "ExecuteInShell : Job Failed !");
-
+				myLogger.info(" >>" + logLabel + ">> " + abstractJobType.getId() + ":Job Failed ! ");
+				myLogger.debug(" >>" + logLabel + ">> " + abstractJobType.getId() + " : Job Failed !");
 			}
 		}
 
@@ -257,12 +231,6 @@ public class ExecuteSchComponent extends CommonShell {
 		
 		JobHelper.setJsRealTimeForStop(abstractJobType, endTime);
 		
-		// getJobRuntimeProperties().getJobProperties().getTimeManagement().setJsRealTime(jobRealTime);
-
-		// sendEndInfo(jobRuntimeProperties.getNativeFullJobPath().getFullPath(), jobProperties);
-
-		// GlobalRegistery.getSpaceWideLogger().info(logLabel + endLog);
-		// GlobalRegistery.getSpaceWideLogger().info(logLabel + duration);
 		CoreFactory.getLogger().info(" >>" + logLabel + ">> " + endLog);
 		CoreFactory.getLogger().info(" >>" + logLabel + ">> " + duration);
 
@@ -275,12 +243,6 @@ public class ExecuteSchComponent extends CommonShell {
 		// isExecuterOver = true;
 		CoreFactory.getLogger().info(" >>" + logLabel + ">> ExecuterThread:" + Thread.currentThread().getName() + " is over");
 
-	}
-
-	@Override
-	public void stopMyDogBarking() {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

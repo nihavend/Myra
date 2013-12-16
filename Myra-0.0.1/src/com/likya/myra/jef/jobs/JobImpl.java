@@ -16,7 +16,6 @@
 package com.likya.myra.jef.jobs;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import org.apache.log4j.Logger;
 
@@ -34,6 +33,8 @@ public abstract class JobImpl implements Runnable, Serializable {
 
 	// transient private HashMap<String, JobInterface> jobQueue;
 
+	transient protected WatchDogTimer watchDogTimer = null;
+
 	transient private Thread myExecuter;
 
 	private AbstractJobType abstractJobType;
@@ -41,9 +42,7 @@ public abstract class JobImpl implements Runnable, Serializable {
 
 	protected TemporaryConfig temporaryConfig;
 
-	private OutputStrategy outputStrategy;
-
-	public abstract void stopMyDogBarking();
+	protected OutputStrategy outputStrategy;
 
 	protected abstract void localRun();
 
@@ -65,6 +64,17 @@ public abstract class JobImpl implements Runnable, Serializable {
 		localRun();
 	}
 
+	protected void sendOutputData(Object object) {
+		outputStrategy.sendDataObject(object);
+	}
+	
+	final public void stopMyDogBarking() {
+		if (watchDogTimer != null) {
+			watchDogTimer.interrupt();
+			watchDogTimer = null;
+		}
+	}
+	
 	public AbstractJobType getAbstractJobType() {
 		return abstractJobType;
 	}
@@ -83,42 +93,6 @@ public abstract class JobImpl implements Runnable, Serializable {
 
 	public String getJobInfo() {
 		return ""; // jobProperties.getKey() + ":" + jobProperties.getStatusString(jobProperties.getStatus(), jobProperties.getProcessExitValue()); //$NON-NLS-1$
-	}
-
-	public void reportLog(JobImpl jobClass, Date startTime, Date endTime) {
-
-		//		String jobClassName = "JOBSTATS|";
-		//
-		//		if (jobClass instanceof ExternalProgram) {
-		//			jobClassName = jobClassName.concat("STANDART");
-		//		} else if (jobClass instanceof ManuelExternalProgram) {
-		//			jobClassName = jobClassName.concat("MANUEL");
-		//		} else if (jobClass instanceof RepetitiveExternalProgram) {
-		//			jobClassName = jobClassName.concat("TEKRARLI");
-		//		}
-		//
-		//		TlosServer.getLogger().info(jobClassName + "|" + TlosServer.getTlosParameters().getScenarioName().toString() + "|" + getJobProperties().getGroupName().toString() + "|" + getJobProperties().getKey().toString() + "|" + DateUtils.getDate(startTime) + "|" + DateUtils.getDate(endTime) + "|" + getJobProperties().getStatusString(getJobProperties().getStatus(), getJobProperties().getProcessExitValue()).toString()); //$NON-NLS-1$
-	}
-
-	protected void sendOutputData(Object object) {
-		outputStrategy.sendDataObject(object);
-	}
-
-	public String[] parseParameter() {
-
-		String[] cmd = null;
-
-		//		if (getJobProperties().getJobParamList() != null && !getJobProperties().getJobParamList().equals("")) {
-		//			String tmpCmd[] = ValidPlatforms.getCommand(getJobProperties().getJobCommand());
-		//			String tmpPrm[] = getJobProperties().getJobParamList().split(" ").clone();
-		//			cmd = new String[tmpCmd.length + tmpPrm.length];
-		//			System.arraycopy(tmpCmd, 0, cmd, 0, tmpCmd.length);
-		//			System.arraycopy(tmpPrm, 0, cmd, tmpCmd.length, tmpPrm.length);
-		//		} else {
-		//			cmd = ValidPlatforms.getCommand(getSimpleJobProperties().getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand());
-		//		}
-
-		return cmd;
 	}
 
 	public Logger getMyLogger() {

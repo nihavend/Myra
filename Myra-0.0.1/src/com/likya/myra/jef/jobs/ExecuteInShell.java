@@ -52,13 +52,6 @@ public class ExecuteInShell extends CommonShell {
 		super(abstractJobType, jobRuntimeProperties);
 	}
 
-	public void stopMyDogBarking() {
-		if (watchDogTimer != null) {
-			watchDogTimer.interrupt();
-			watchDogTimer = null;
-		}
-	}
-
 	@Override
 	protected void localRun() {
 
@@ -119,6 +112,8 @@ public class ExecuteInShell extends CommonShell {
 
 				processBuilder.environment().putAll(tempEnv);
 
+				setRunning(abstractJobType);
+				
 				process = processBuilder.start();
 
 				jobRuntimeInterface.getMessageBuffer().delete(0, jobRuntimeInterface.getMessageBuffer().capacity());
@@ -160,9 +155,9 @@ public class ExecuteInShell extends CommonShell {
 					JobHelper.writetErrorLogFromOutputs(CoreFactory.getLogger(), this.getClass().getName(), stringBufferForOUTPUT, stringBufferForERROR);
 
 					if (errStr != null && hasErrorInLog) {
-						JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, "Log da bulunan kelime yüzünden !");
+						setFailedOfLog(abstractJobType);
 					} else {
-						JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, statusName.intValue(), jobRuntimeInterface.getMessageBuffer().toString());
+						setOfCodeMessage(abstractJobType, statusName.intValue(), jobRuntimeInterface.getMessageBuffer().toString());
 					}
 
 				} catch (InterruptedException e) {
@@ -187,7 +182,7 @@ public class ExecuteInShell extends CommonShell {
 					Thread.interrupted();
 
 					process.destroy();
-					JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, e.getMessage());
+					setFailedOfMessage(abstractJobType, e.getMessage());
 
 				}
 
@@ -202,7 +197,7 @@ public class ExecuteInShell extends CommonShell {
 					watchDogTimer.interrupt();
 					watchDogTimer = null;
 				}
-				JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, err.getMessage());
+				setFailedOfMessage(abstractJobType, err.getMessage());
 				err.printStackTrace();
 			}
 
@@ -220,10 +215,10 @@ public class ExecuteInShell extends CommonShell {
 					break;
 				case JobTypeDef.INT_TIME_BASED:
 					// DateUtils.iterateNextDate(abstractJobType);
-					JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME);
+					setRenewByTime(abstractJobType);
 					break;
 				case JobTypeDef.INT_USER_BASED:
-					JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYUSER);
+					setRenewByUser(abstractJobType);
 					break;
 
 				default:
@@ -238,7 +233,7 @@ public class ExecuteInShell extends CommonShell {
 
 				boolean stateCond = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.STOPPED, StatusName.BYUSER);
 
-				if (abstractJobType.getCascadingConditions().getJobAutoRetry() == JobAutoRetry.YES && retryFlag && stateCond) {
+				if (abstractJobType.getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == JobAutoRetry.YES && retryFlag && stateCond) {
 					CoreFactory.getLogger().info(LocaleMessages.getString("ExternalProgram.11") + jobId);
 
 					if (retryCounter < jobRuntimeInterface.getAutoRetryCount()) {
@@ -252,7 +247,7 @@ public class ExecuteInShell extends CommonShell {
 						startTime = Calendar.getInstance();
 						JobHelper.setJsRealTimeForStart(abstractJobType, startTime);
 
-						JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME);
+						setRenewByTime(abstractJobType);
 
 						continue;
 					}
