@@ -27,7 +27,6 @@ import com.jcraft.jsch.Session;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
-import com.likya.myra.jef.utils.DateUtils;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.joblist.RemoteSchProperties;
 import com.likya.xsd.myra.model.xbeans.rs.ExecuteRShellParamsDocument.ExecuteRShellParams;
@@ -39,11 +38,37 @@ import com.likya.xsd.myra.model.xbeans.stateinfo.SubstateNameDocument.SubstateNa
 public class ExecuteSchComponent extends CommonShell {
 
 	private static final long serialVersionUID = 7931558555995487881L;
-	
+
 	private final String logLabel = " ExecuteSchComponent ";
 
 	public ExecuteSchComponent(AbstractJobType abstractJobType, JobRuntimeInterface jobRuntimeProperties) {
 		super(abstractJobType, jobRuntimeProperties);
+	}
+	
+	@Override
+	public void localRun() {
+
+		startTime = Calendar.getInstance();
+		
+		//initStartUp(myLogger);
+
+		AbstractJobType abstractJobType = getAbstractJobType();
+
+		try {
+
+			startWathcDogTimer();
+
+			String jobPath = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
+			String jobCommand = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand();
+
+			setRunning(abstractJobType);
+
+			startSchProcess(jobPath, jobCommand, null, this.getClass().getName(), CoreFactory.getLogger());
+
+		} catch (Exception err) {
+			handleException(err, CoreFactory.getLogger());
+		}
+
 	}
 
 	public void startSchProcess(String jobPath, String jobCommand, Map<String, String> environmentVariables, String logClassName, Logger myLogger) throws Exception {
@@ -87,7 +112,7 @@ public class ExecuteSchComponent extends CommonShell {
 
 		channel.connect();
 
-		initGrabbers(channel, jobId,  myLogger, temporaryConfig.getLogBufferSize());
+		initGrabbers(channel, jobId, myLogger, temporaryConfig.getLogBufferSize());
 
 		try {
 
@@ -113,7 +138,7 @@ public class ExecuteSchComponent extends CommonShell {
 
 			JobHelper.updateDescStr(descStr, stringBufferForOUTPUT, stringBufferForERROR);
 
-			JobHelper.writetErrorLogFromOutputs(myLogger, logClassName, stringBufferForOUTPUT, stringBufferForERROR);
+			JobHelper.writeErrorLogFromOutputs(myLogger, logClassName, stringBufferForOUTPUT, stringBufferForERROR);
 
 			setOfCodeMessage(abstractJobType, statusName.intValue(), descStr.toString());
 
@@ -127,50 +152,12 @@ public class ExecuteSchComponent extends CommonShell {
 		}
 	}
 
-	@Override
-	public void localRun() {
-		
-		Calendar startTime = Calendar.getInstance();
-		
-		//initStartUp(myLogger);
-
-		AbstractJobType abstractJobType = getAbstractJobType();
-
-		while (true) {
-
-			try {
-
-				startWathcDogTimer();
-
-				String jobPath = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
-				String jobCommand = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand();
-
-				setRunning(abstractJobType);
-				
-				startSchProcess(jobPath, jobCommand, null, this.getClass().getName(), CoreFactory.getLogger());
-
-			} catch (Exception err) {
-				handleException(err, CoreFactory.getLogger());
-			}
-
-			if (processJobResult(true, CoreFactory.getLogger())) {
-				//retryFlag = false;
-				continue;
-			}
-
-			break;
-		}
-		
-		cleanUp(process, startTime);
-
-	}
-	
 	public void handleException(Exception err, Logger myLogger) {
 
 		AbstractJobType abstractJobType = getAbstractJobType();
 
 		LiveStateInfo liveStateInfo = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
-		
+
 		/* FINISHED state i yoksa ekle */
 		if (!LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED)) {
 			setFailedOfMessage(abstractJobType, err.getMessage());
@@ -180,68 +167,6 @@ public class ExecuteSchComponent extends CommonShell {
 
 		myLogger.error(" >>" + logLabel + ">> " + err.getMessage());
 		err.printStackTrace();
-
-	}
-	
-	public boolean processJobResult(boolean retryFlag, Logger myLogger) {
-
-		AbstractJobType abstractJobType = getAbstractJobType();
-		
-		LiveStateInfo lastState = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
-
-		if (lastState.getStateName().equals(StateName.FINISHED)) {
-
-			String logStr = "islem bitirildi : " + abstractJobType.getId() + " => ";
-			logStr += StateName.FINISHED.toString() + ":" + lastState.getSubstateName().toString() + ":" + lastState.getStatusName().toString();
-			myLogger.info(" >>>>" + logStr + "<<<<");
-
-		} else {
-
-			if (Boolean.parseBoolean(abstractJobType.getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry().toString()) && retryFlag) {
-				myLogger.info(" >> " + logLabel + " : Job Failed ! Restarting " + abstractJobType.getBaseJobInfos().getJsName());
-				setRenewByTime(abstractJobType);
-				return true;
-			} else {
-				myLogger.info(" >>" + logLabel + ">> " + abstractJobType.getId() + ":Job Failed ! ");
-				myLogger.debug(" >>" + logLabel + ">> " + abstractJobType.getId() + " : Job Failed !");
-			}
-		}
-
-		return false;
-	}
-	
-	protected void cleanUp(Process process, Calendar startTime) {
-
-		AbstractJobType abstractJobType = getAbstractJobType();
-
-		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Error for " + abstractJobType.getBaseJobInfos().getJsName());
-		stopErrorGobbler(CoreFactory.getLogger());
-
-		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Output for " + abstractJobType.getBaseJobInfos().getJsName());
-		stopOutputGobbler(CoreFactory.getLogger());
-
-		Calendar endTime = Calendar.getInstance();
-
-		long timeDiff = endTime.getTime().getTime() - startTime.getTime().getTime();
-
-		String endLog = abstractJobType.getBaseJobInfos().getJsName() + ":Bitis zamani : " + DateUtils.getDate(endTime.getTime());
-		String duration = abstractJobType.getBaseJobInfos().getJsName() + ": islem suresi : " + DateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
-		getJobRuntimeProperties().setCompletionDate(endTime);
-		getJobRuntimeProperties().setWorkDuration(DateUtils.getUnFormattedElapsedTime((int) timeDiff / 1000));
-		
-		JobHelper.setJsRealTimeForStop(abstractJobType, endTime);
-		
-		CoreFactory.getLogger().info(" >>" + logLabel + ">> " + endLog);
-		CoreFactory.getLogger().info(" >>" + logLabel + ">> " + duration);
-
-		if (watchDogTimer != null) {
-			CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Watchdog for " + abstractJobType.getBaseJobInfos().getJsName());
-			stopMyDogBarking();
-		}
-
-		process = null;
-		// isExecuterOver = true;
-		CoreFactory.getLogger().info(" >>" + logLabel + ">> ExecuterThread:" + Thread.currentThread().getName() + " is over");
 
 	}
 

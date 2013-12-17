@@ -20,8 +20,9 @@ import java.util.Calendar;
 import org.apache.log4j.Logger;
 
 import com.likya.myra.LocaleMessages;
-import com.likya.myra.commons.utils.CommonDateUtils;
+import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
+import com.likya.myra.commons.utils.PeriodCalculations;
 import com.likya.myra.commons.utils.StateUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
@@ -59,8 +60,8 @@ public class JobHelper {
 		Calendar endTime = Calendar.getInstance();
 		long timeDiff = endTime.getTime().getTime() - startTime.getTime().getTime();
 
-		String endLog = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.14") + CommonDateUtils.getDate(endTime.getTime());
-		String duration = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.15") + CommonDateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
+		String endLog = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.14") + MyraDateUtils.getDate(endTime.getTime());
+		String duration = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.15") + MyraDateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
 
 		StopTime stopTimeTemp = StopTime.Factory.newInstance();
 		stopTimeTemp.setTime(endTime);
@@ -70,7 +71,7 @@ public class JobHelper {
 		jobClassName.getJobRuntimeProperties().setCompletionDate(endTime);
 		// getJobProperties().setCompletionDateTime(endTime);
 
-		jobClassName.getJobRuntimeProperties().setWorkDuration(CommonDateUtils.getUnFormattedElapsedTime((int) timeDiff / 1000));
+		jobClassName.getJobRuntimeProperties().setWorkDuration(MyraDateUtils.getUnFormattedElapsedTime((int) timeDiff / 1000));
 		// getJobProperties().setWorkDurationNumeric(timeDiff);
 
 		CoreFactory.getLogger().info(endLog);
@@ -80,7 +81,71 @@ public class JobHelper {
 
 	}
 
-	protected static void setJsRealTimeForStart(SimplePropertiesType simpleProperties, Calendar startTime) {
+	protected static void setJsPlannedTimeForStart(AbstractJobType abstractJobType, long period) {
+
+		// System.err.println("1 : " + CommonDateUtils.getDate(startTime.getTime()));
+
+		// Calendar jobCalendar = abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime();
+
+		// System.err.println("Before : " + CommonDateUtils.getDate(jobCalendar.getTime()));
+
+		//		jobCalendar.set(Calendar.YEAR, startTime.get(Calendar.YEAR));
+		//		jobCalendar.set(Calendar.MONTH, startTime.get(Calendar.MONTH));
+		//		jobCalendar.set(Calendar.DAY_OF_MONTH, startTime.get(Calendar.DAY_OF_MONTH));
+
+		Calendar returnCal = PeriodCalculations.addPeriod(Calendar.getInstance(), period);
+
+		abstractJobType.getTimeManagement().getJsPlannedTime().setStartTime(returnCal);
+
+		// System.err.println("After : " + CommonDateUtils.getDate(returnCal.getTime()));
+
+		// System.err.println(startTime.before(returnCal));
+
+		// System.err.println();
+
+		//		System.err.println("1 : " + CommonDateUtils.getDate(startTime.getTime()));
+		//
+		//		System.err.println("Before : " + CommonDateUtils.getDate(abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime().getTime()));
+		//		
+		//		Calendar startDateTime = PeriodCalculations.dateToXmlTime(abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime().toString());
+		//		
+		//		System.err.println("2 : " + CommonDateUtils.getDate(startDateTime.getTime()));
+		//		
+		//		Calendar returnCal = PeriodCalculations.addPeriod(startDateTime, period);
+		//		
+		//		System.err.println("3 : " + CommonDateUtils.getDate(returnCal.getTime()));
+		//
+		//		abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().setTime(returnCal);
+		//		
+		//		System.err.println("After : " + CommonDateUtils.getDate(abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime().getTime()));
+		//		
+		// GDateBuilder gDateBuilder = new GDateBuilder(startTime);
+
+		// System.err.println("2 : " + CommonDateUtils.getDate(abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime().getTime()));
+
+		// abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().setDate(xmlDateTime.getCalendarValue());
+
+		// System.err.println("3 : " + CommonDateUtils.getDate(abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getDate().getTime()));
+
+		//		Calendar cal = abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime();
+		//		
+		//		System.err.println("Before : " + CommonDateUtils.getDate(cal.getTime()));
+		//
+		//		Calendar startDateTime = PeriodCalculations.dateToXmlTime(cal.toString());
+		//		Calendar returnCal = PeriodCalculations.addPeriod(startDateTime, period);
+		//
+		//		abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().setTime(returnCal);
+		//		
+		//		cal = abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime();
+		//
+		//		System.err.println("After : " + CommonDateUtils.getDate(cal.getTime()));
+
+		//		Date scheduledTime = abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime();
+		//		System.err.println(scheduledTime);
+
+	}
+
+	protected static void setJsRealTimeForStart(AbstractJobType abstractJobType, Calendar startTime) {
 
 		JsRealTime jobRealTime;
 
@@ -88,7 +153,7 @@ public class JobHelper {
 		StartTime startTimeTemp = StartTime.Factory.newInstance();
 		startTimeTemp.setTime(startTime);
 		startTimeTemp.setDate(startTime);
-		simpleProperties.getTimeManagement().setJsRealTime(jobRealTime);
+		abstractJobType.getTimeManagement().setJsRealTime(jobRealTime);
 	}
 
 	protected static void setJsRealTimeForStop(AbstractJobType abstractJobType, Calendar stopTime) {
@@ -162,7 +227,7 @@ public class JobHelper {
 		if ((abstractJobType.getStateInfos().getJobStatusList() != null) && (localStateCheck = StateUtils.contains(abstractJobType.getStateInfos().getJobStatusList(), processExitValue)) != null) {
 			statusName = localStateCheck.getStatusName();
 		} else {
-			State [] globaStates = CoreFactory.getInstance().getConfigurationManager().getTemporaryConfig().getGlobalStateDefinition().getGlobalStateArray();
+			State[] globaStates = CoreFactory.getInstance().getConfigurationManager().getTemporaryConfig().getGlobalStateDefinition().getGlobalStateArray();
 			Status mySubStateStatuses = StateUtils.globalContains(globaStates, StateName.FINISHED, SubstateName.COMPLETED, processExitValue);
 			if (mySubStateStatuses != null) {
 				statusName = mySubStateStatuses.getStatusName();
@@ -178,7 +243,7 @@ public class JobHelper {
 		return statusName;
 	}
 
-	protected static void writetErrorLogFromOutputs(Logger myLogger, String logClassName, StringBuilder stringBufferForOUTPUT, StringBuilder stringBufferForERROR) {
+	protected static void writeErrorLogFromOutputs(Logger myLogger, String logClassName, StringBuilder stringBufferForOUTPUT, StringBuilder stringBufferForERROR) {
 
 		StringBuffer descStr = new StringBuffer();
 

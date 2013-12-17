@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
+
 package com.likya.myra.jef.jobs;
 
 import java.io.Serializable;
@@ -30,6 +31,8 @@ public abstract class JobImpl implements Runnable, Serializable {
 	private static final long serialVersionUID = 2540934879831919506L;
 
 	public Logger myLogger;
+	
+	protected int retryCounter = 1;
 
 	// transient private HashMap<String, JobInterface> jobQueue;
 
@@ -45,6 +48,11 @@ public abstract class JobImpl implements Runnable, Serializable {
 	protected OutputStrategy outputStrategy;
 
 	protected abstract void localRun();
+	protected abstract void processJobResult();
+	protected abstract void cleanUp();
+
+	protected abstract void startWathcDogTimer();
+	protected abstract void stopMyDogBarking();
 
 	public JobImpl(AbstractJobType abstractJobType, JobRuntimeInterface jobRuntimeProperties) {
 		this.abstractJobType = abstractJobType;
@@ -61,18 +69,16 @@ public abstract class JobImpl implements Runnable, Serializable {
 	}
 
 	public final void run() {
+		
 		localRun();
+		
+		processJobResult();
+
+		cleanUp();
 	}
 
 	protected void sendOutputData(Object object) {
 		outputStrategy.sendDataObject(object);
-	}
-	
-	final public void stopMyDogBarking() {
-		if (watchDogTimer != null) {
-			watchDogTimer.interrupt();
-			watchDogTimer = null;
-		}
 	}
 	
 	public AbstractJobType getAbstractJobType() {

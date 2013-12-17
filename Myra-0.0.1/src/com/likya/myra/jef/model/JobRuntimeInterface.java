@@ -42,12 +42,6 @@ public interface JobRuntimeInterface {
 	public String getLogAnalyzeString();
 	public void setLogAnalyzeString(String logAnalyzeString);
 	
-	public int getAutoRetryCount();
-	public void setAutoRetryCount(int autoRetryCount);
-	
-	public int getAutoRetryDelay() ;
-	public void setAutoRetryDelay(int autoRetryDelay) ;
-	
 	public Logger getLogger();
 	public void setLogger(Logger myLogger);
 	

@@ -16,37 +16,28 @@
 package com.likya.myra.jef.jobs;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jvnet.winp.WinProcess;
 
 import com.likya.myra.LocaleMessages;
 import com.likya.myra.commons.ValidPlatforms;
 import com.likya.myra.commons.grabber.StreamGrabber;
-import com.likya.myra.commons.utils.CommonDateUtils;
-import com.likya.myra.commons.utils.LiveStateInfoUtils;
+import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
-import com.likya.xsd.myra.model.xbeans.generics.JobTypeDefDocument.JobTypeDef;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
-import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
-import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
-import com.likya.xsd.myra.model.xbeans.stateinfo.SubstateNameDocument.SubstateName;
-import com.likya.xsd.myra.model.xbeans.wlagen.JobAutoRetryDocument.JobAutoRetry;
 
 public class ExecuteInShell extends CommonShell {
 
 	private static final long serialVersionUID = 1L;
 
 	boolean isShell = true;
-
-	private boolean retryFlag = true;
-	private int retryCounter = 1;
-
-	transient private WatchDogTimer watchDogTimer = null;
 
 	public ExecuteInShell(AbstractJobType abstractJobType, JobRuntimeInterface jobRuntimeProperties) {
 		super(abstractJobType, jobRuntimeProperties);
@@ -55,226 +46,169 @@ public class ExecuteInShell extends CommonShell {
 	@Override
 	protected void localRun() {
 
-		Calendar startTime = Calendar.getInstance();
+		startTime = Calendar.getInstance();
 
-		JobRuntimeInterface jobRuntimeInterface = getJobRuntimeProperties();
+		try {
+			startProcess(startTime);
+		} catch (Exception err) {
+			handleException(err, myLogger);
+		}
+
+	}
+
+	protected void cleanUp() {
+
+		stopErrorGobbler(myLogger);
+		stopOutputGobbler(myLogger);
+		
+		// restore to the value derived from sernayobilgileri file.
+		//			getJobProperties().setJobParamList(getJobProperties().getJobParamListPerm());
+
+		sendOutputData();
+
+		setMyExecuter(null);
+		process = null;
+	}
+
+	public void startProcess(Calendar startTime) throws IOException {
 
 		AbstractJobType abstractJobType = getAbstractJobType();
-		String jobId = abstractJobType.getId();
 
-		String startLog = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.0") + CommonDateUtils.getDate(startTime.getTime());
+		String startLog = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.0") + MyraDateUtils.getDate(startTime.getTime());
 
 		JobHelper.setJsRealTimeForStart(abstractJobType, startTime);
 
 		CoreFactory.getLogger().info(startLog);
 
-		while (true) {
+		String jobId = abstractJobType.getId();
 
-			try {
+		JobRuntimeInterface jobRuntimeInterface = getJobRuntimeProperties();
 
-				StringBuilder stringBufferForERROR = new StringBuilder();
-				StringBuilder stringBufferForOUTPUT = new StringBuilder();
+		StringBuilder stringBufferForERROR = new StringBuilder();
+		StringBuilder stringBufferForOUTPUT = new StringBuilder();
 
-				jobRuntimeInterface.setRecentWorkDuration(jobRuntimeInterface.getWorkDuration());
-				jobRuntimeInterface.setRecentWorkDurationNumeric(jobRuntimeInterface.getWorkDurationNumeric());
+		jobRuntimeInterface.setRecentWorkDuration(jobRuntimeInterface.getWorkDuration());
+		jobRuntimeInterface.setRecentWorkDurationNumeric(jobRuntimeInterface.getWorkDurationNumeric());
 
-				startWathcDogTimer();
+		startWathcDogTimer();
 
-				ProcessBuilder processBuilder = null;
+		ProcessBuilder processBuilder = null;
 
-				String jobCommand = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand();
+		String jobCommand = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand();
 
-				CoreFactory.getLogger().info(" >>" + " ExecuteInShell " + jobId + " Çalıştırılacak komut : " + jobCommand);
+		CoreFactory.getLogger().info(" >>" + " ExecuteInShell " + jobId + " Çalıştırılacak komut : " + jobCommand);
 
-				if (isShell) {
-					String[] cmd = ValidPlatforms.getCommand(jobCommand);
-					processBuilder = new ProcessBuilder(cmd);
-				} else {
-					processBuilder = JobHelper.parsJobCmdArgs(jobCommand);
-				}
-
-				String jobPath = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
-				if (jobPath != null) {
-					jobCommand = JobHelper.removeSlashAtTheEnd(abstractJobType, jobPath, jobCommand);
-					processBuilder.directory(new File(jobPath));
-				}
-
-				Map<String, String> tempEnv = new HashMap<String, String>();
-
-				Map<String, String> environmentVariables = new HashMap<String, String>();
-
-				if (environmentVariables != null && environmentVariables.size() > 0) {
-					tempEnv.putAll(environmentVariables);
-				}
-
-				// TODO
-				// tempEnv.putAll(XmlBeansTransformer.entryToMap(jobProperties));
-
-				processBuilder.environment().putAll(tempEnv);
-
-				setRunning(abstractJobType);
-				
-				process = processBuilder.start();
-
-				jobRuntimeInterface.getMessageBuffer().delete(0, jobRuntimeInterface.getMessageBuffer().capacity());
-
-				initGrabbers(process, jobId, CoreFactory.getLogger(), temporaryConfig.getLogBufferSize());
-
-				try {
-
-					process.waitFor();
-
-					int processExitValue = process.exitValue();
-					CoreFactory.getLogger().info(jobId + LocaleMessages.getString("ExternalProgram.6") + processExitValue); //$NON-NLS-1$
-
-					String errStr = jobRuntimeInterface.getLogAnalyzeString();
-					boolean hasErrorInLog = false;
-					//					
-					//					if (!getJobProperties().getLogFilePath().equals(ScenarioLoader.UNDEFINED_VALUE)) {
-					//						if (errStr != null) {
-					//							hasErrorInLog = FileUtils.analyzeFileForString(getJobProperties().getLogFilePath(), errStr);
-					//						}
-					//					} else if (errStr != null) {
-					//						CoreFactory.getLogger().error("jobFailString: \"" + errStr + "\" " + LocaleMessages.getString("ExternalProgram.1") + " !");
-					//					}
-
-					if (watchDogTimer != null) {
-						watchDogTimer.interrupt();
-						watchDogTimer = null;
-					}
-
-					cleanUpFastEndings(errorGobbler, outputGobbler);
-
-					stringBufferForERROR = errorGobbler.getOutputBuffer();
-					stringBufferForOUTPUT = outputGobbler.getOutputBuffer();
-
-					JobHelper.updateDescStr(jobRuntimeInterface.getMessageBuffer(), stringBufferForOUTPUT, stringBufferForERROR);
-
-					StatusName.Enum statusName = JobHelper.searchReturnCodeInStates(abstractJobType, processExitValue, jobRuntimeInterface.getMessageBuffer());
-
-					JobHelper.writetErrorLogFromOutputs(CoreFactory.getLogger(), this.getClass().getName(), stringBufferForOUTPUT, stringBufferForERROR);
-
-					if (errStr != null && hasErrorInLog) {
-						setFailedOfLog(abstractJobType);
-					} else {
-						setOfCodeMessage(abstractJobType, statusName.intValue(), jobRuntimeInterface.getMessageBuffer().toString());
-					}
-
-				} catch (InterruptedException e) {
-
-					errorGobbler.interrupt();
-					outputGobbler.interrupt();
-					if (ValidPlatforms.getOSName() != null && ValidPlatforms.getOSName().contains(ValidPlatforms.OS_WINDOWS)) {
-						try {
-							// System.out.println("Killing windows process tree...");
-							WinProcess winProcess = new WinProcess(process);
-							winProcess.killRecursively();
-							// System.out.println("Killed.");
-						} catch (Exception e1) {
-							e1.printStackTrace();
-						}
-					}
-					// Stop the process from running
-					CoreFactory.getLogger().warn(LocaleMessages.getString("ExternalProgram.8") + jobId); //$NON-NLS-1$
-
-					// process.waitFor() komutu thread'in interrupt statusunu temizlemedigi icin 
-					// asagidaki sekilde temizliyoruz
-					Thread.interrupted();
-
-					process.destroy();
-					setFailedOfMessage(abstractJobType, e.getMessage());
-
-				}
-
-				errorGobbler.stopStreamGobbler();
-				outputGobbler.stopStreamGobbler();
-				errorGobbler = null;
-				outputGobbler = null;
-				watchDogTimer = null;
-
-			} catch (Exception err) {
-				if (watchDogTimer != null) {
-					watchDogTimer.interrupt();
-					watchDogTimer = null;
-				}
-				setFailedOfMessage(abstractJobType, err.getMessage());
-				err.printStackTrace();
-			}
-
-			LiveStateInfo liveStateInfo = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
-
-			if (/* if not in dependency chain kontrolü eklenecek !!! */LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS)) {
-
-				JobHelper.setWorkDurations(this, startTime);
-
-				int jobType = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDef().intValue();
-
-				switch (jobType) {
-				case JobTypeDef.INT_EVENT_BASED:
-					// Not implemented yet
-					break;
-				case JobTypeDef.INT_TIME_BASED:
-					// DateUtils.iterateNextDate(abstractJobType);
-					setRenewByTime(abstractJobType);
-					break;
-				case JobTypeDef.INT_USER_BASED:
-					setRenewByUser(abstractJobType);
-					break;
-
-				default:
-					break;
-				}
-
-				CoreFactory.getLogger().info(LocaleMessages.getString("ExternalProgram.9") + jobId + " => " + liveStateInfo.getStatusName().toString());
-
-			} else {
-
-				JobHelper.setWorkDurations(this, startTime);
-
-				boolean stateCond = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.STOPPED, StatusName.BYUSER);
-
-				if (abstractJobType.getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == JobAutoRetry.YES && retryFlag && stateCond) {
-					CoreFactory.getLogger().info(LocaleMessages.getString("ExternalProgram.11") + jobId);
-
-					if (retryCounter < jobRuntimeInterface.getAutoRetryCount()) {
-						retryCounter++;
-						try {
-							Thread.sleep(jobRuntimeInterface.getAutoRetryDelay());
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-
-						startTime = Calendar.getInstance();
-						JobHelper.setJsRealTimeForStart(abstractJobType, startTime);
-
-						setRenewByTime(abstractJobType);
-
-						continue;
-					}
-				}
-
-				CoreFactory.getLogger().info(jobId + LocaleMessages.getString("ExternalProgram.12")); //$NON-NLS-1$
-				CoreFactory.getLogger().debug(jobId + LocaleMessages.getString("ExternalProgram.13")); //$NON-NLS-1$
-
-			}
-
-			// restore to the value derived from sernayobilgileri file.
-			//			getJobProperties().setJobParamList(getJobProperties().getJobParamListPerm());
-
-			retryFlag = false;
-
-			break;
+		if (isShell) {
+			String[] cmd = ValidPlatforms.getCommand(jobCommand);
+			processBuilder = new ProcessBuilder(cmd);
+		} else {
+			processBuilder = JobHelper.parsJobCmdArgs(jobCommand);
 		}
 
-		sendOutputData();
-		
-		setMyExecuter(null);
-		process = null;
+		String jobPath = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
+		if (jobPath != null) {
+			jobCommand = JobHelper.removeSlashAtTheEnd(abstractJobType, jobPath, jobCommand);
+			processBuilder.directory(new File(jobPath));
+		}
+
+		Map<String, String> tempEnv = new HashMap<String, String>();
+
+		Map<String, String> environmentVariables = new HashMap<String, String>();
+
+		if (environmentVariables != null && environmentVariables.size() > 0) {
+			tempEnv.putAll(environmentVariables);
+		}
+
+		// TODO
+		// tempEnv.putAll(XmlBeansTransformer.entryToMap(jobProperties));
+
+		processBuilder.environment().putAll(tempEnv);
+
+		setRunning(abstractJobType);
+
+		process = processBuilder.start();
+
+		jobRuntimeInterface.getMessageBuffer().delete(0, jobRuntimeInterface.getMessageBuffer().capacity());
+
+		initGrabbers(process, jobId, CoreFactory.getLogger(), temporaryConfig.getLogBufferSize());
+
+		try {
+
+			process.waitFor();
+
+			int processExitValue = process.exitValue();
+			CoreFactory.getLogger().info(jobId + LocaleMessages.getString("ExternalProgram.6") + processExitValue); //$NON-NLS-1$
+
+			String errStr = jobRuntimeInterface.getLogAnalyzeString();
+			boolean hasErrorInLog = false;
+			//
+			//			if (!getJobProperties().getLogFilePath().equals(ScenarioLoader.UNDEFINED_VALUE)) {
+			//				if (errStr != null) {
+			//					hasErrorInLog = FileUtils.analyzeFileForString(getJobProperties().getLogFilePath(), errStr);
+			//				}
+			//			} else if (errStr != null) {
+			//				CoreFactory.getLogger().error("jobFailString: \"" + errStr + "\" " + LocaleMessages.getString("ExternalProgram.1") + " !");
+			//			}
+
+			stopMyDogBarking();
+
+			cleanUpFastEndings(errorGobbler, outputGobbler);
+
+			stringBufferForERROR = errorGobbler.getOutputBuffer();
+			stringBufferForOUTPUT = outputGobbler.getOutputBuffer();
+
+			JobHelper.updateDescStr(jobRuntimeInterface.getMessageBuffer(), stringBufferForOUTPUT, stringBufferForERROR);
+
+			StatusName.Enum statusName = JobHelper.searchReturnCodeInStates(abstractJobType, processExitValue, jobRuntimeInterface.getMessageBuffer());
+
+			JobHelper.writeErrorLogFromOutputs(CoreFactory.getLogger(), this.getClass().getName(), stringBufferForOUTPUT, stringBufferForERROR);
+
+			if (errStr != null && hasErrorInLog) {
+				setFailedOfLog(abstractJobType);
+			} else {
+				setOfCodeMessage(abstractJobType, statusName.intValue(), jobRuntimeInterface.getMessageBuffer().toString());
+			}
+
+		} catch (InterruptedException e) {
+
+			errorGobbler.interrupt();
+			outputGobbler.interrupt();
+			if (ValidPlatforms.getOSName() != null && ValidPlatforms.getOSName().contains(ValidPlatforms.OS_WINDOWS)) {
+				try {
+					// System.out.println("Killing windows process tree...");
+					WinProcess winProcess = new WinProcess(process);
+					winProcess.killRecursively();
+					// System.out.println("Killed.");
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+			// Stop the process from running
+			CoreFactory.getLogger().warn(LocaleMessages.getString("ExternalProgram.8") + jobId); //$NON-NLS-1$
+
+			// process.waitFor() komutu thread'in interrupt statusunu temizlemedigi icin 
+			// asagidaki sekilde temizliyoruz
+			Thread.interrupted();
+
+			process.destroy();
+			setFailedOfMessage(abstractJobType, e.getMessage());
+
+		}
 
 	}
 
-	public boolean isRetryFlag() {
-		return retryFlag;
+	public void handleException(Exception err, Logger myLogger) {
+
+		AbstractJobType abstractJobType = getAbstractJobType();
+
+		stopMyDogBarking();
+
+		myLogger.error(err.getMessage());
+
+		setFailedOfMessage(abstractJobType, err.getMessage());
+
+		err.printStackTrace();
+
 	}
 
 	protected void cleanUpFastEndings(StreamGrabber errorGobbler, StreamGrabber outputGobbler) throws InterruptedException {

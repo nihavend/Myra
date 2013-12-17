@@ -39,9 +39,6 @@ public class JobRuntimeProperties implements JobRuntimeInterface {
 	
 	private String logAnalyzeString;
 	
-	private int autoRetryCount;
-	private int autoRetryDelay;
-
 	public JobRuntimeProperties() {
 		super();
 		// jobSimpleProperties = SimpleProperties.Factory.newInstance();
@@ -134,22 +131,6 @@ public class JobRuntimeProperties implements JobRuntimeInterface {
 
 	public void setLogAnalyzeString(String logAnalyzeString) {
 		this.logAnalyzeString = logAnalyzeString;
-	}
-
-	public int getAutoRetryCount() {
-		return autoRetryCount;
-	}
-
-	public void setAutoRetryCount(int autoRetryCount) {
-		this.autoRetryCount = autoRetryCount;
-	}
-
-	public int getAutoRetryDelay() {
-		return autoRetryDelay;
-	}
-
-	public void setAutoRetryDelay(int autoRetryDelay) {
-		this.autoRetryDelay = autoRetryDelay;
 	}
 
 	public Logger getLogger() {
