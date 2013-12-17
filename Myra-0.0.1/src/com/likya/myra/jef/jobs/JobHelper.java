@@ -255,8 +255,8 @@ public class JobHelper {
 
 	}
 
-	public static LiveStateInfo insertNewLiveStateInfo(SimplePropertiesType simpleProperties, int enumStateName, int enumSubstateName, int enumStatusName) {
-		LiveStateInfo liveStateInfo = LiveStateInfoUtils.insertNewLiveStateInfo(simpleProperties, enumStateName, enumSubstateName, enumStatusName);
+	public static LiveStateInfo insertNewLiveStateInfo(AbstractJobType abstractJobType, int enumStateName, int enumSubstateName, int enumStatusName) {
+		LiveStateInfo liveStateInfo = LiveStateInfoUtils.insertNewLiveStateInfo(abstractJobType, enumStateName, enumSubstateName, enumStatusName);
 		//sendStatusChangeInfo();
 		return liveStateInfo;
 	}
