@@ -214,7 +214,7 @@ public abstract class GenericInnerJob extends JobImpl {
 
 		outputData.setGroupName("");
 		outputData.setHandleUri(getAbstractJobType().getHandlerURI());
-		outputData.setJobId(getAbstractJobType().getId2());
+		outputData.setJobId(getAbstractJobType().getId());
 		outputData.setStartTime(getAbstractJobType().getTimeManagement().getJsRealTime().getStartTime());
 		outputData.setStopTime(getAbstractJobType().getTimeManagement().getJsRealTime().getStopTime());
 		outputData.setTreeId("treeId");
