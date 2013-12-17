@@ -272,8 +272,9 @@ public class BaseSchedulerController {
 		logger.debug(LocaleMessages.getString("TlosServer.66")); //$NON-NLS-1$
 //		logger.debug(scheduledJob.getJobProperties().toString());
 		
+
 		LiveStateInfoUtils.insertNewLiveStateInfo(scheduledJob.getAbstractJobType(), StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_IN);
-		
+
 		Thread starterThread = new Thread(scheduledJob);
 //		if (scheduledJob.getJobProperties().isManuel()) {
 //			starterThread.setName("TlosLite-M-" + scheduledJob.getJobProperties().getKey());
