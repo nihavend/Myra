@@ -29,8 +29,8 @@ import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.model.SortType;
 import com.likya.myra.jef.utils.JobQueueOperations;
+import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.jobprops.DependencyListDocument.DependencyList;
-import com.likya.xsd.myra.model.xbeans.jobprops.SimplePropertiesType;
 import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
@@ -70,20 +70,20 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 					SortType mySortType = indexIterator.next();
 					JobImpl scheduledJob = jobQueue.get(mySortType.getJobKey());
 
-					SimplePropertiesType simpleProperties = scheduledJob.getAbstractJobType();
+					AbstractJobType abstractJobType = scheduledJob.getAbstractJobType();
 					
-					DependencyList dependencyList = simpleProperties.getDependencyList();
+					DependencyList dependencyList = abstractJobType.getDependencyList();
 
 					// ArrayList<DependencyInfo> dependentJobList = scheduledJob.getJobProperties().getJobDependencyInfoList();
 
 					// if (scheduledJob instanceof ExternalProgram) {
 						// if (scheduledJob.getJobProperties().getStatus() == JobProperties.READY) {
 
-					LiveStateInfo liveStateInfo = simpleProperties.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
+					LiveStateInfo liveStateInfo = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
 
 					if(LiveStateInfoUtils.equalStates(liveStateInfo, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME)) {
 						// Waiting for time to execute
-						Date scheduledTime = simpleProperties.getTimeManagement().getJsPlannedTime().getStartTime().getTime().getTime();
+						Date scheduledTime = abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime();
 						Date currentTime = Calendar.getInstance().getTime();
 						
 						if (scheduledTime.before(currentTime)) {
