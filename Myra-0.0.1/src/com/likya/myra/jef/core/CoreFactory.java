@@ -123,11 +123,11 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 					jobInterfaceList.add(jobInterface);
 				}
 
-				getLogger().info(LocaleMessages.getString("Tlos.34")); //$NON-NLS-1$
+				getLogger().info(LocaleMessages.getString("Myra.34")); //$NON-NLS-1$
 
 			} catch (Exception e) {
-				System.out.println(LocaleMessages.getString("Tlos.35") + customJobType); //$NON-NLS-1$
-				System.out.println(LocaleMessages.getString("Tlos.36")); //$NON-NLS-1$
+				System.out.println(LocaleMessages.getString("Myra.35") + customJobType); //$NON-NLS-1$
+				System.out.println(LocaleMessages.getString("Myra.36")); //$NON-NLS-1$
 				e.printStackTrace();
 			}
 		}
