@@ -22,10 +22,10 @@ import java.util.Date;
 import com.likya.myra.LocaleMessages;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.MyraDateUtils;
-import com.likya.myra.commons.utils.RestrictedDailyIterator;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.model.OutputData;
+import com.likya.myra.jef.utils.Scheduler;
 import com.likya.xsd.myra.model.xbeans.generics.JobTypeDefDocument.JobTypeDef;
 import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
@@ -75,15 +75,7 @@ public abstract class GenericInnerJob extends JobImpl {
 	}
 	
 	protected void scheduleForNextExecution(AbstractJobType abstractJobType) {
-		
-		Calendar tmpCal = Calendar.getInstance();
-		
-		int daysOfWeek[] = abstractJobType.getScheduleInfo().getDaysOfWeekArray();
-		
-		RestrictedDailyIterator restrictedDailyIterator = new RestrictedDailyIterator(tmpCal.get(Calendar.HOUR_OF_DAY), tmpCal.get(Calendar.MINUTE), tmpCal.get(Calendar.SECOND), daysOfWeek);
-		
-		abstractJobType.getTimeManagement().getJsPlannedTime().setStartTime(restrictedDailyIterator.next());
-		
+		Scheduler.scheduleForNextExecution(abstractJobType);		
 	}
 	
 //	public boolean processJobResultFromSch() {

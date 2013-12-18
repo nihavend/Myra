@@ -22,7 +22,7 @@
 			<param name="ConversionPattern" value="%d{ISO8601}|%c{1}|%m%n" />
 		</layout>
 		<filter class="org.apache.log4j.varia.LevelRangeFilter">
-			<param name="LevelMin" value="info" />
+			<param name="LevelMin" value="fatal" />
 			<param name="LevelMax" value="fatal" />
 		</filter>
 	</appender>
