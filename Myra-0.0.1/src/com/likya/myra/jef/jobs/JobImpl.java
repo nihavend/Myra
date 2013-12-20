@@ -32,7 +32,7 @@ public abstract class JobImpl implements Runnable, Serializable {
 
 	public Logger myLogger;
 	
-	protected int retryCounter = 1;
+	protected int retryCounter = 0;
 
 	// transient private HashMap<String, JobInterface> jobQueue;
 
