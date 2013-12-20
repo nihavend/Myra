@@ -157,7 +157,7 @@ public abstract class GenericInnerJob extends JobImpl {
 
 				} else {
 					// reset counter and leave for normal scheduling
-					retryCounter = 1;
+					retryCounter = 0;
 				}
 			
 			}
