@@ -20,23 +20,23 @@ import java.util.Calendar;
 import org.apache.log4j.Logger;
 
 import com.likya.myra.LocaleMessages;
-import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
+import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.commons.utils.PeriodCalculations;
 import com.likya.myra.commons.utils.StateUtils;
 import com.likya.myra.jef.core.CoreFactory;
-import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
-import com.likya.xsd.myra.model.xbeans.jobprops.SimplePropertiesType;
-import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
-import com.likya.xsd.myra.model.xbeans.stateinfo.ReturnCodeListDocument.ReturnCodeList.OsType;
-import com.likya.xsd.myra.model.xbeans.stateinfo.State;
-import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
-import com.likya.xsd.myra.model.xbeans.stateinfo.Status;
-import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
-import com.likya.xsd.myra.model.xbeans.stateinfo.SubstateNameDocument.SubstateName;
-import com.likya.xsd.myra.model.xbeans.wlagen.JsRealTimeDocument.JsRealTime;
-import com.likya.xsd.myra.model.xbeans.wlagen.StartTimeDocument.StartTime;
-import com.likya.xsd.myra.model.xbeans.wlagen.StopTimeDocument.StopTime;
+import com.likya.xsd.myra.model.joblist.AbstractJobType;
+import com.likya.xsd.myra.model.jobprops.SimplePropertiesType;
+import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
+import com.likya.xsd.myra.model.stateinfo.ReturnCodeListDocument.ReturnCodeList.OsType;
+import com.likya.xsd.myra.model.stateinfo.State;
+import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
+import com.likya.xsd.myra.model.stateinfo.Status;
+import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
+import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
+import com.likya.xsd.myra.model.wlagen.JsRealTimeDocument.JsRealTime;
+import com.likya.xsd.myra.model.wlagen.StartTimeDocument.StartTime;
+import com.likya.xsd.myra.model.wlagen.StopTimeDocument.StopTime;
 
 public class JobHelper {
 

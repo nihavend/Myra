@@ -27,13 +27,13 @@ import com.jcraft.jsch.Session;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
-import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
-import com.likya.xsd.myra.model.xbeans.joblist.RemoteSchProperties;
-import com.likya.xsd.myra.model.xbeans.rs.ExecuteRShellParamsDocument.ExecuteRShellParams;
-import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
-import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
-import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
-import com.likya.xsd.myra.model.xbeans.stateinfo.SubstateNameDocument.SubstateName;
+import com.likya.xsd.myra.model.joblist.AbstractJobType;
+import com.likya.xsd.myra.model.joblist.RemoteSchProperties;
+import com.likya.xsd.myra.model.rs.ExecuteRShellParamsDocument.ExecuteRShellParams;
+import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
+import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
+import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
+import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 
 public class ExecuteSchComponent extends CommonShell {
 

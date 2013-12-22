@@ -24,7 +24,7 @@ import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.model.TemporaryConfig;
-import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
+import com.likya.xsd.myra.model.joblist.AbstractJobType;
 
 public abstract class JobImpl implements Runnable, Serializable {
 

@@ -18,10 +18,10 @@ package com.likya.myra.jef.jobs;
 import com.likya.myra.LocaleMessages;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
-import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
-import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
-import com.likya.xsd.myra.model.xbeans.stateinfo.SubstateNameDocument.SubstateName;
-import com.likya.xsd.myra.model.xbeans.wlagen.JobAutoRetryDocument.JobAutoRetry;
+import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
+import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
+import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
+import com.likya.xsd.myra.model.wlagen.JobAutoRetryDocument.JobAutoRetry;
 
 public class WatchDogTimer extends Thread {
 

@@ -26,13 +26,13 @@ import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.model.OutputData;
 import com.likya.myra.jef.utils.Scheduler;
-import com.likya.xsd.myra.model.xbeans.generics.JobTypeDefDocument.JobTypeDef;
-import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
-import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
-import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
-import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
-import com.likya.xsd.myra.model.xbeans.stateinfo.SubstateNameDocument.SubstateName;
-import com.likya.xsd.myra.model.xbeans.wlagen.JobAutoRetryDocument.JobAutoRetry;
+import com.likya.xsd.myra.model.generics.JobTypeDefDocument.JobTypeDef;
+import com.likya.xsd.myra.model.joblist.AbstractJobType;
+import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
+import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
+import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
+import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
+import com.likya.xsd.myra.model.wlagen.JobAutoRetryDocument.JobAutoRetry;
 
 public abstract class GenericInnerJob extends JobImpl {
 	

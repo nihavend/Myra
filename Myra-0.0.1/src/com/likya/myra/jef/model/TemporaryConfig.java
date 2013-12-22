@@ -17,7 +17,7 @@ package com.likya.myra.jef.model;
 
 import java.util.HashMap;
 
-import com.likya.xsd.myra.model.xbeans.stateinfo.GlobalStateDefinitionDocument.GlobalStateDefinition;
+import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument.GlobalStateDefinition;
 
 public class TemporaryConfig {
 

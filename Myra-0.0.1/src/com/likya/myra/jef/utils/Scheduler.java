@@ -21,9 +21,9 @@ import java.util.Calendar;
 
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.commons.utils.RestrictedDailyIterator;
-import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
-import com.likya.xsd.myra.model.xbeans.jobprops.DaysOfMonthDocument.DaysOfMonth;
-import com.likya.xsd.myra.model.xbeans.jobprops.ScheduleInfoDocument.ScheduleInfo;
+import com.likya.xsd.myra.model.joblist.AbstractJobType;
+import com.likya.xsd.myra.model.jobprops.DaysOfMonthDocument.DaysOfMonth;
+import com.likya.xsd.myra.model.jobprops.ScheduleInfoDocument.ScheduleInfo;
 
 public class Scheduler {
 	

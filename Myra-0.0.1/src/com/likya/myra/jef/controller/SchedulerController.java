@@ -30,12 +30,12 @@ import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.model.SortType;
 import com.likya.myra.jef.utils.JobQueueOperations;
-import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
-import com.likya.xsd.myra.model.xbeans.jobprops.DependencyListDocument.DependencyList;
-import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
-import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
-import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
-import com.likya.xsd.myra.model.xbeans.stateinfo.SubstateNameDocument.SubstateName;
+import com.likya.xsd.myra.model.joblist.AbstractJobType;
+import com.likya.xsd.myra.model.jobprops.DependencyListDocument.DependencyList;
+import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
+import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
+import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
+import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 
 public class SchedulerController extends BaseSchedulerController implements ControllerInterface {
 

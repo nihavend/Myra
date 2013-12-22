@@ -18,9 +18,9 @@ package com.likya.myra.jef.model;
 
 import java.io.Serializable;
 
-import com.likya.xsd.myra.model.xbeans.stateinfo.StateInfosDocument.StateInfos;
-import com.likya.xsd.myra.model.xbeans.wlagen.StartTimeDocument.StartTime;
-import com.likya.xsd.myra.model.xbeans.wlagen.StopTimeDocument.StopTime;
+import com.likya.xsd.myra.model.stateinfo.StateInfosDocument.StateInfos;
+import com.likya.xsd.myra.model.wlagen.StartTimeDocument.StartTime;
+import com.likya.xsd.myra.model.wlagen.StopTimeDocument.StopTime;
 
 public class OutputData implements Serializable {
 

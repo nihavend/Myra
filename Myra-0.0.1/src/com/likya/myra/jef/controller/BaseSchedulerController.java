@@ -30,12 +30,12 @@ import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactoryInterface;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.TemporaryConfig;
-import com.likya.xsd.myra.model.xbeans.jobprops.DependencyListDocument.DependencyList;
-import com.likya.xsd.myra.model.xbeans.stateinfo.LiveStateInfoDocument.LiveStateInfo;
-import com.likya.xsd.myra.model.xbeans.stateinfo.StateNameDocument.StateName;
-import com.likya.xsd.myra.model.xbeans.stateinfo.StatusNameDocument.StatusName;
-import com.likya.xsd.myra.model.xbeans.stateinfo.SubstateNameDocument.SubstateName;
-import com.likya.xsd.myra.model.xbeans.wlagen.ItemDocument.Item;
+import com.likya.xsd.myra.model.jobprops.DependencyListDocument.DependencyList;
+import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
+import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
+import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
+import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
+import com.likya.xsd.myra.model.wlagen.ItemDocument.Item;
 
 public class BaseSchedulerController {
 

@@ -25,7 +25,7 @@ import com.likya.myra.jef.controller.SchedulerController;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.utils.JobQueueOperations;
-import com.likya.xsd.myra.model.xbeans.joblist.JobListDocument;
+import com.likya.xsd.myra.model.joblist.JobListDocument;
 
 
 public class CoreFactoryBase {

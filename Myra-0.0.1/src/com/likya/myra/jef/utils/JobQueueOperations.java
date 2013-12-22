@@ -35,8 +35,8 @@ import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.model.JobRuntimeProperties;
 import com.likya.myra.jef.model.PersistObject;
 import com.likya.myra.jef.model.SortType;
-import com.likya.xsd.myra.model.xbeans.joblist.AbstractJobType;
-import com.likya.xsd.myra.model.xbeans.joblist.JobListDocument;
+import com.likya.xsd.myra.model.joblist.AbstractJobType;
+import com.likya.xsd.myra.model.joblist.JobListDocument;
 
 public class JobQueueOperations {
 

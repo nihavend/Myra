@@ -29,7 +29,7 @@ import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.InstanceNotFoundException;
 import com.likya.myra.jef.model.MyraException;
 import com.likya.myra.jef.utils.FileUtils;
-import com.likya.xsd.myra.model.xbeans.stateinfo.GlobalStateDefinitionDocument;
+import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument;
 
 public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface {
 
