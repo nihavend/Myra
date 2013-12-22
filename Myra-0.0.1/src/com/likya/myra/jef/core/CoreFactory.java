@@ -20,6 +20,7 @@ import java.util.HashMap;
 
 import org.apache.xmlbeans.XmlException;
 
+import com.likya.commons.utils.FileUtils;
 import com.likya.myra.LocaleMessages;
 import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.InputStrategy;
@@ -28,7 +29,6 @@ import com.likya.myra.jef.controller.ControllerInterface;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.InstanceNotFoundException;
 import com.likya.myra.jef.model.MyraException;
-import com.likya.myra.jef.utils.FileUtils;
 import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument;
 
 public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface {
