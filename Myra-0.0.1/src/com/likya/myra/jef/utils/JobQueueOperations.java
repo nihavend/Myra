@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -283,5 +284,32 @@ public class JobQueueOperations {
 		}
 
 		return jobQueue;
+	}
+	
+	public static HashMap<String, AbstractJobType> toAbstractJobTypeList(HashMap<String, JobImpl> jobQueue) {
+		
+		HashMap<String, AbstractJobType> tmpList = new HashMap<String, AbstractJobType>();
+		
+		Iterator<String> jobsIterator = jobQueue.keySet().iterator();
+
+		while (jobsIterator.hasNext()) {
+			String jobKey = jobsIterator.next();
+			tmpList.put(jobKey, jobQueue.get(jobKey).getAbstractJobType());
+		}
+		
+		return tmpList;
+	}
+	
+	public static Collection<String> getKeyList(Collection<AbstractJobType> abstractJobTypeList) {
+		
+		ArrayList<String> jobKeys = new ArrayList<>();
+		Iterator<AbstractJobType> abstractJobTypeIterator = abstractJobTypeList.iterator();
+		
+		while (abstractJobTypeIterator.hasNext()) {
+			AbstractJobType abstractJobType = abstractJobTypeIterator.next();
+			jobKeys.add(abstractJobType.getId());
+		}
+		
+		return jobKeys;
 	}
 }
