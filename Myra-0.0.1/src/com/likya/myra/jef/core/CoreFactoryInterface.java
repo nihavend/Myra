@@ -20,6 +20,8 @@ import com.likya.myra.jef.OutputStrategy;
 
 public interface CoreFactoryInterface {
 	
+	public MonitoringOperations getMonitoringOperations();
+		
 	public ManagementOperations getManagementOperations();
 	
 	public JobOperations getJobOperations();
