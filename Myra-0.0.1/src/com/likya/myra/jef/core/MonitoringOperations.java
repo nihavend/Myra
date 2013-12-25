@@ -15,12 +15,17 @@
  ******************************************************************************/
 package com.likya.myra.jef.core;
 
+import java.util.Collection;
 import java.util.HashMap;
 
+import org.apache.commons.collections.Predicate;
+
 import com.likya.myra.jef.jobs.JobImpl;
+import com.likya.xsd.myra.model.joblist.AbstractJobType;
 
 public interface MonitoringOperations {
 	
 	public HashMap<String, JobImpl> getJobQueue();
+	public Collection<AbstractJobType> getJobList(Predicate predicate);
 
 }
