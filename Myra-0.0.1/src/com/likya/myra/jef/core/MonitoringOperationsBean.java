@@ -16,10 +16,16 @@
 package com.likya.myra.jef.core;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 
 import com.likya.myra.jef.controller.ControllerInterface;
 import com.likya.myra.jef.jobs.JobImpl;
+import com.likya.myra.jef.utils.JobQueueOperations;
+import com.likya.xsd.myra.model.joblist.AbstractJobType;
 
 public class MonitoringOperationsBean implements MonitoringOperations {
 
@@ -43,4 +49,21 @@ public class MonitoringOperationsBean implements MonitoringOperations {
 
 	}
 
+	@SuppressWarnings("unchecked")
+	public Collection<AbstractJobType> getJobList(Predicate predicate) {
+		
+		HashMap<String, ControllerInterface> controllerContainer = coreFactory.getControllerContainer();
+
+		ArrayList<ControllerInterface> controllerArray = new ArrayList<ControllerInterface>(controllerContainer.values());
+
+		ControllerInterface controllerInterface = ((ControllerInterface) controllerArray.get(0));
+		
+		HashMap<String, AbstractJobType> abstractJobTypeList = JobQueueOperations.toAbstractJobTypeList(controllerInterface.getJobQueue());
+		
+		Collection<AbstractJobType> filteredList;
+		
+		filteredList = CollectionUtils.select(abstractJobTypeList.values(), predicate);
+		
+		return filteredList;
+	}
 }
