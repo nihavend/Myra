@@ -52,7 +52,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 
 		this.configurationManager = inputStrategy.getConfigurationManager();
 
-		StringBuffer xmlString = FileUtils.readFile("globalStates.xml");
+		StringBuffer xmlString = FileUtils.readFile(this.getClass(), "globalStates.xml");
 		try {
 			GlobalStateDefinitionDocument globalStateDefinitionDocument = GlobalStateDefinitionDocument.Factory.parse(xmlString.toString());
 			configurationManager.getTemporaryConfig().setGlobalStateDefinition(globalStateDefinitionDocument.getGlobalStateDefinition());
