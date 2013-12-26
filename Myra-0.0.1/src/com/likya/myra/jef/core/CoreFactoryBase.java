@@ -35,7 +35,7 @@ public class CoreFactoryBase {
 	private int executionState = CoreStateInfo.STATE_STARTING;
 	
 	
-	private static final Logger logger = Logger.getLogger(CoreFactoryBase.class);
+	private static final Logger logger = Logger.getLogger("Myra");
 	
 	/**
 	 * For current version it is limited to one
