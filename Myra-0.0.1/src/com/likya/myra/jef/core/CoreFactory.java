@@ -67,6 +67,8 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		this.jobListDocument = inputStrategy.getJobListDocument();
 
 		this.outputStrategy = outputStrategy;
+		
+		this.jobOperations = new JobOperationsBean(this);
 
 	}
 
