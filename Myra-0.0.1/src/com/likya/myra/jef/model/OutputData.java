@@ -18,6 +18,7 @@ package com.likya.myra.jef.model;
 
 import java.io.Serializable;
 
+import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.StateInfosDocument.StateInfos;
 import com.likya.xsd.myra.model.wlagen.StartTimeDocument.StartTime;
 import com.likya.xsd.myra.model.wlagen.StopTimeDocument.StopTime;
@@ -91,5 +92,21 @@ public class OutputData implements Serializable {
 
 	public void setStateInfos(StateInfos stateInfos) {
 		this.stateInfos = stateInfos;
+	}
+	
+	public static OutputData generateDefault(AbstractJobType abstractJobType) {
+		
+		OutputData outputData = new OutputData();
+
+		outputData.setGroupName("");
+		outputData.setHandleUri(abstractJobType.getHandlerURI());
+		outputData.setJobId(abstractJobType.getId());
+		outputData.setStartTime(abstractJobType.getTimeManagement().getJsRealTime().getStartTime());
+		outputData.setStopTime(abstractJobType.getTimeManagement().getJsRealTime().getStopTime());
+		outputData.setTreeId("treeId");
+		outputData.setStateInfos(abstractJobType.getStateInfos());
+		
+		return outputData;
+
 	}
 }
