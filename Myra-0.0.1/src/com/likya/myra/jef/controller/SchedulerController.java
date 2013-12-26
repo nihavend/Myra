@@ -51,9 +51,9 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 		ArrayList<SortType> jobIndex = JobQueueOperations.createProrityIndex(jobQueue);
 		Collections.sort(jobIndex);
 		
-		logger.info("Starting : ");
-		logger.debug(LocaleMessages.getString("TlosServer.38")); 
-		logger.info(LocaleMessages.getString("TlosServer.39") + jobQueue.size());
+		CoreFactory.getLogger().info("Starting : ");
+		CoreFactory.getLogger().debug(LocaleMessages.getString("TlosServer.38")); 
+		CoreFactory.getLogger().info(LocaleMessages.getString("TlosServer.39") + jobQueue.size());
 
 		while (executionPermission) {
 
