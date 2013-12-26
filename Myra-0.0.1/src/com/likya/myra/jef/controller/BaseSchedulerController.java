@@ -23,10 +23,10 @@ import java.util.Map;
 import net.java.dev.eval.Expression;
 
 import org.apache.commons.collections.iterators.ArrayIterator;
-import org.apache.log4j.Logger;
 
 import com.likya.myra.LocaleMessages;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
+import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.CoreFactoryInterface;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.TemporaryConfig;
@@ -38,8 +38,6 @@ import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 import com.likya.xsd.myra.model.wlagen.ItemDocument.Item;
 
 public class BaseSchedulerController {
-
-	protected Logger logger = Logger.getLogger(SchedulerController.class);
 
 	protected HashMap<String, JobImpl> jobQueue;
 
@@ -269,7 +267,7 @@ public class BaseSchedulerController {
 //			getScenarioRuntimeProperties().setStartTime(Calendar.getInstance().getTime());
 //		}
 		
-		logger.debug(LocaleMessages.getString("TlosServer.66")); //$NON-NLS-1$
+		CoreFactory.getLogger().debug(LocaleMessages.getString("TlosServer.66")); //$NON-NLS-1$
 //		logger.debug(scheduledJob.getJobProperties().toString());
 		
 
@@ -340,11 +338,11 @@ public class BaseSchedulerController {
 		int numOfActiveJobs = getNumOfActiveJobs();
 
 		if ((!thresholdOverflow) && (numOfActiveJobs >= higherLimit)) {
-			logger.info(LocaleMessages.getString("TlosServer.68") + numOfActiveJobs + LocaleMessages.getString("TlosServer.69") + lowerLimit); //$NON-NLS-1$ //$NON-NLS-2$
+			CoreFactory.getLogger().info(LocaleMessages.getString("TlosServer.68") + numOfActiveJobs + LocaleMessages.getString("TlosServer.69") + lowerLimit); //$NON-NLS-1$ //$NON-NLS-2$
 			thresholdOverflow = true;
 		} else if (thresholdOverflow && (numOfActiveJobs <= lowerLimit)) {
 			thresholdOverflow = false;
-			logger.info(LocaleMessages.getString("TlosServer.70") + numOfActiveJobs); //$NON-NLS-1$
+			CoreFactory.getLogger().info(LocaleMessages.getString("TlosServer.70") + numOfActiveJobs); //$NON-NLS-1$
 		}
 
 		// System.out.println("lowerLimit : " + lowerLimit + " higherLimit : " +
@@ -391,10 +389,6 @@ public class BaseSchedulerController {
 //			}
 //		}
 		return true;
-	}
-
-	public void setLogger(Logger logger) {
-		this.logger = logger;
 	}
 
 	public HashMap<String, JobImpl> getJobQueue() {
