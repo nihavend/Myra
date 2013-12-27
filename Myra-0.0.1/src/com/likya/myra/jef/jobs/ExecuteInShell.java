@@ -94,7 +94,7 @@ public class ExecuteInShell extends CommonShell {
 
 		ProcessBuilder processBuilder = null;
 
-		String jobCommand = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand();
+		String jobCommand = abstractJobType.getBaseJobInfos().getJobTypeDetails().getJobCommand();
 
 		CoreFactory.getLogger().info(" >>" + " ExecuteInShell " + jobId + " Çalıştırılacak komut : " + jobCommand);
 
@@ -105,7 +105,7 @@ public class ExecuteInShell extends CommonShell {
 			processBuilder = JobHelper.parsJobCmdArgs(jobCommand);
 		}
 
-		String jobPath = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
+		String jobPath = abstractJobType.getBaseJobInfos().getJobTypeDetails().getJobPath();
 		if (jobPath != null) {
 			jobCommand = JobHelper.removeSlashAtTheEnd(abstractJobType, jobPath, jobCommand);
 			processBuilder.directory(new File(jobPath));
