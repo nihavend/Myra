@@ -26,13 +26,13 @@ import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.model.OutputData;
 import com.likya.myra.jef.utils.Scheduler;
-import com.likya.xsd.myra.model.generics.JobTypeDefDocument.JobTypeDef;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 import com.likya.xsd.myra.model.wlagen.JobAutoRetryDocument.JobAutoRetry;
+import com.likya.xsd.myra.model.wlagen.TriggerDocument.Trigger;
 
 public abstract class GenericInnerJob extends JobImpl {
 	
@@ -117,17 +117,17 @@ public abstract class GenericInnerJob extends JobImpl {
 
 			JobHelper.setWorkDurations(this, startTime);
 
-			int jobType = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDef().intValue();
+			int jobType = abstractJobType.getManagement().getTrigger().intValue();
 
 			switch (jobType) {
-			case JobTypeDef.INT_EVENT_BASED:
+			case Trigger.INT_EVENT:
 				// Not implemented yet
 				break;
-			case JobTypeDef.INT_TIME_BASED:
+			case Trigger.INT_TIME:
 				scheduleForNextExecution(abstractJobType);
 				setRenewByTime(abstractJobType);
 				break;
-			case JobTypeDef.INT_USER_BASED:
+			case Trigger.INT_USER:
 				setRenewByUser(abstractJobType);
 				break;
 
@@ -143,13 +143,13 @@ public abstract class GenericInnerJob extends JobImpl {
 
 			boolean stateCond = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.STOPPED, StatusName.BYUSER);
 
-			if (abstractJobType.getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == JobAutoRetry.YES && !stateCond) {
+			if (abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == JobAutoRetry.YES && !stateCond) {
 				
-				if (retryCounter < abstractJobType.getCascadingConditions().getJobAutoRetryInfo().getMaxCount().intValue()) {
+				if (retryCounter < abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getMaxCount().intValue()) {
 					CoreFactory.getLogger().info(LocaleMessages.getString("ExternalProgram.11") + jobId);
 					retryCounter++;
 
-					long stepTime = MyraDateUtils.getDurationInMilliSecs(abstractJobType.getCascadingConditions().getJobAutoRetryInfo().getStep());
+					long stepTime = MyraDateUtils.getDurationInMilliSecs(abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getStep());
 
 					JobHelper.setJsPlannedTimeForStart(abstractJobType, stepTime);
 
