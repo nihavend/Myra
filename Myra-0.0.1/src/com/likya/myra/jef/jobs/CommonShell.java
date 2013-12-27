@@ -107,17 +107,17 @@ public abstract class CommonShell extends GenericInnerJob {
 		// TL deki 
 
 		AbstractJobType abstractJobType = getAbstractJobType();
-		long timeout = abstractJobType.getTimeManagement().getJsTimeOut().getValueInteger().longValue();
+		long timeout = abstractJobType.getManagement().getTimeManagement().getJsTimeOut().getValueInteger().longValue();
 
-		Long timeOut = abstractJobType.getTimeManagement().getJsTimeOut().getValueInteger().longValue();
+		Long timeOut = abstractJobType.getManagement().getTimeManagement().getJsTimeOut().getValueInteger().longValue();
 
-		if (abstractJobType.getTimeManagement().getJsTimeOut().getUnit() == Unit.HOURS) {
+		if (abstractJobType.getManagement().getTimeManagement().getJsTimeOut().getUnit() == Unit.HOURS) {
 			timeOut = timeOut * 3600;
-		} else if (abstractJobType.getTimeManagement().getJsTimeOut().getUnit() == Unit.MINUTES) {
+		} else if (abstractJobType.getManagement().getTimeManagement().getJsTimeOut().getUnit() == Unit.MINUTES) {
 			timeOut = timeOut * 60;
 		}
 
-		if (!(abstractJobType.getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == JobAutoRetry.YES && wdtCounter > 0)) {
+		if (!(abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == JobAutoRetry.YES && wdtCounter > 0)) {
 			watchDogTimer = new WatchDogTimer(this, abstractJobType.getId(), Thread.currentThread(), timeout * 1000);
 			watchDogTimer.setName(abstractJobType.getId() + ".WatchDogTimer.id." + watchDogTimer.getId());
 			watchDogTimer.start();
