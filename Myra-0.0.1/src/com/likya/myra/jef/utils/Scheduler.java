@@ -76,7 +76,7 @@ public class Scheduler {
 		
 		System.err.println(MyraDateUtils.getDate(selectedSchedule.getTime()));
 		
-		abstractJobType.getTimeManagement().getJsPlannedTime().setStartTime(selectedSchedule);
+		abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(selectedSchedule);
 		
 	}
 }
