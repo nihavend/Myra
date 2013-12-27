@@ -87,7 +87,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 
 					if(LiveStateInfoUtils.equalStates(liveStateInfo, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME)) {
 						// Waiting for time to execute
-						Date scheduledTime = abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime();
+						Date scheduledTime = abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime();
 						Date currentTime = Calendar.getInstance().getTime();
 						
 						if (scheduledTime.before(currentTime)) {
