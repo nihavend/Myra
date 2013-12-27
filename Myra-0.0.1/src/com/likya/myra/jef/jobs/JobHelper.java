@@ -66,7 +66,7 @@ public class JobHelper {
 		StopTime stopTimeTemp = StopTime.Factory.newInstance();
 		stopTimeTemp.setTime(endTime);
 		stopTimeTemp.setDate(endTime);
-		abstractJobType.getTimeManagement().getJsRealTime().setStopTime(stopTimeTemp);
+		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStopTime(stopTimeTemp);
 
 		jobClassName.getJobRuntimeProperties().setCompletionDate(endTime);
 		// getJobProperties().setCompletionDateTime(endTime);
@@ -95,7 +95,7 @@ public class JobHelper {
 
 		Calendar returnCal = PeriodCalculations.addPeriod(Calendar.getInstance(), period);
 
-		abstractJobType.getTimeManagement().getJsPlannedTime().setStartTime(returnCal);
+		abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(returnCal);
 
 		// System.err.println("After : " + CommonDateUtils.getDate(returnCal.getTime()));
 
@@ -153,7 +153,7 @@ public class JobHelper {
 		StartTime startTimeTemp = StartTime.Factory.newInstance();
 		startTimeTemp.setTime(startTime);
 		startTimeTemp.setDate(startTime);
-		abstractJobType.getTimeManagement().setJsRealTime(jobRealTime);
+		abstractJobType.getManagement().getTimeManagement().setJsRealTime(jobRealTime);
 	}
 
 	protected static void setJsRealTimeForStop(AbstractJobType abstractJobType, Calendar stopTime) {
@@ -162,7 +162,7 @@ public class JobHelper {
 		stopTimeTemp.setTime(stopTime);
 		stopTimeTemp.setDate(stopTime);
 
-		abstractJobType.getTimeManagement().getJsRealTime().setStopTime(stopTimeTemp);
+		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStopTime(stopTimeTemp);
 
 	}
 
