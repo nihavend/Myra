@@ -58,8 +58,8 @@ public class ExecuteSchComponent extends CommonShell {
 
 			startWathcDogTimer();
 
-			String jobPath = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobPath();
-			String jobCommand = abstractJobType.getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand();
+			String jobPath = abstractJobType.getBaseJobInfos().getJobTypeDetails().getJobPath();
+			String jobCommand = abstractJobType.getBaseJobInfos().getJobTypeDetails().getJobCommand();
 
 			setRunning(abstractJobType);
 
