@@ -101,8 +101,8 @@ public class OutputData implements Serializable {
 		outputData.setGroupName("");
 		outputData.setHandleUri(abstractJobType.getHandlerURI());
 		outputData.setJobId(abstractJobType.getId());
-		outputData.setStartTime(abstractJobType.getTimeManagement().getJsRealTime().getStartTime());
-		outputData.setStopTime(abstractJobType.getTimeManagement().getJsRealTime().getStopTime());
+		outputData.setStartTime(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime());
+		outputData.setStopTime(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStopTime());
 		outputData.setTreeId("treeId");
 		outputData.setStateInfos(abstractJobType.getStateInfos());
 		
