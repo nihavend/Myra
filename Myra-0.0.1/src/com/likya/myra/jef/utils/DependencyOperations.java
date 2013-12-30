@@ -15,24 +15,6 @@
  ******************************************************************************/
 package com.likya.myra.jef.utils;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-
-import net.java.dev.eval.Expression;
-
-import org.apache.commons.collections.iterators.ArrayIterator;
-import org.apache.log4j.Logger;
-
-import com.likya.myra.jef.core.CoreFactory;
-import com.likya.myra.jef.jobs.JobImpl;
-import com.likya.myra.jef.model.JobRuntimeProperties;
-import com.likya.xsd.myra.model.joblist.AbstractJobType;
-import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
-import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
-import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
-import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
-import com.likya.xsd.myra.model.wlagen.ItemDocument.Item;
 
 public class DependencyOperations {
 
@@ -255,81 +237,4 @@ public class DependencyOperations {
 
 	}
 */
-	public static boolean resolveDep(AbstractJobType abstractJobType, HashMap<String, JobImpl> jobQueue) throws Exception {
-
-		Logger logger = CoreFactory.getLogger();
-
-		String dependencyExpression = abstractJobType.getDependencyList().getDependencyExpression();
-		Item[] dependencyArray = abstractJobType.getDependencyList().getItemArray();
-
-		String ownerJsName = abstractJobType.getBaseJobInfos().getJsName();
-
-		dependencyExpression = dependencyExpression.replace("AND", "&&");
-		dependencyExpression = dependencyExpression.replace("OR", "||");
-
-		Expression exp = new Expression(dependencyExpression);
-		BigDecimal result = new BigDecimal(0);
-
-		ArrayIterator dependencyArrayIterator = new ArrayIterator(dependencyArray);
-
-		Map<String, BigDecimal> variables = new HashMap<String, BigDecimal>();
-
-		while (dependencyArrayIterator.hasNext()) {
-
-			Item item = (Item) (dependencyArrayIterator.next());
-			JobRuntimeProperties jobRuntimeProperties = null;
-
-			if (dependencyExpression.indexOf(item.getDependencyID().toUpperCase()) < 0) {
-				String errorMessage = "     > " + ownerJsName + " isi icin hatali bagimlilik tanimlamasi yapilmis ! (" + dependencyExpression + ") kontrol ediniz.";
-				logger.info(errorMessage);
-				logger.error(errorMessage);
-				throw new Exception(errorMessage);
-			}
-			
-			JobImpl jobImpl = jobQueue.get(item.getJsId());
-
-			LiveStateInfo liveStateInfo = jobImpl.getAbstractJobType().getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
-
-			StateName.Enum jobStateName = liveStateInfo.getStateName();
-			SubstateName.Enum jobSubstateName = liveStateInfo.getSubstateName();
-			StatusName.Enum jobStatusName = liveStateInfo.getStatusName();
-
-			StateName.Enum itemStateName = item.getJsDependencyRule().getStateName();
-			SubstateName.Enum itemSubstateName = item.getJsDependencyRule().getSubstateName();
-			StatusName.Enum itemStatusName = item.getJsDependencyRule().getStatusName();
-
-			if (itemStateName != null && itemSubstateName == null && itemStatusName == null) {
-				if (jobStateName.equals(itemStateName)) {
-					variables.put(item.getDependencyID(), new BigDecimal(1)); // true
-				} else {
-					variables.put(item.getDependencyID(), new BigDecimal(0)); // false
-				}
-			} else if (itemStateName != null && itemSubstateName != null && itemStatusName == null) {
-				if (jobStateName.equals(itemStateName) && jobSubstateName.equals(itemSubstateName)) {
-					variables.put(item.getDependencyID(), new BigDecimal(1)); // true
-				} else {
-					variables.put(item.getDependencyID(), new BigDecimal(0)); // false
-				}
-			} else if (itemStateName != null && itemSubstateName != null && itemStatusName != null && jobStateName != null && jobSubstateName != null) {
-				if (jobStateName.equals(itemStateName) && jobSubstateName.equals(itemSubstateName)) {
-					if (jobStatusName != null)
-						if (jobStatusName.equals(itemStatusName)) {
-							variables.put(item.getDependencyID(), new BigDecimal(1)); // true
-						} else {
-							variables.put(item.getDependencyID(), new BigDecimal(0)); // false
-						}
-				} else {
-					variables.put(item.getDependencyID(), new BigDecimal(0)); // false
-				}
-			} else {
-				return false;
-			}
-
-		}
-
-		result = exp.eval(variables);
-
-		return result.intValue() == 0 ? false : true;
-
-	}
 }
