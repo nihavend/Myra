@@ -15,13 +15,27 @@
  ******************************************************************************/
 package com.likya.myra.jef;
 
+import com.likya.xsd.myra.model.joblist.JobListDocument;
 
-public class OutputStrategyBean implements OutputStrategy {
+public class InputStrategyImpl implements InputStrategy {
 
-	@Override
-	public void sendDataObject(Object dataObject) {
-		// TODO Auto-generated method stub
-		
+	private JobListDocument jobListDocument;
+	private ConfigurationManager configurationManager;
+
+	public JobListDocument getJobListDocument() {
+		return jobListDocument;
+	}
+
+	public void setJobListDocument(JobListDocument jobListDocument) {
+		this.jobListDocument = jobListDocument;
+	}
+
+	public ConfigurationManager getConfigurationManager() {
+		return configurationManager;
+	}
+
+	public void setConfigurationManager(ConfigurationManager configurationManager) {
+		this.configurationManager = configurationManager;
 	}
 
 }

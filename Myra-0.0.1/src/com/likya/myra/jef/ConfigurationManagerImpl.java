@@ -15,27 +15,29 @@
  ******************************************************************************/
 package com.likya.myra.jef;
 
-import com.likya.xsd.myra.model.joblist.JobListDocument;
+import com.likya.myra.jef.model.JobRuntimeProperties;
+import com.likya.myra.jef.model.TemporaryConfig;
 
-public class InputStrategyBean implements InputStrategy {
+public class ConfigurationManagerImpl implements ConfigurationManager {
 
-	private JobListDocument jobListDocument;
-	private ConfigurationManager configurationManager;
+	private TemporaryConfig temporaryConfig;
+	private JobRuntimeProperties jobRuntimeProperties;
+	
+	public ConfigurationManagerImpl() {
+		super();
+		this.temporaryConfig = new TemporaryConfig();	
+		this.jobRuntimeProperties = new JobRuntimeProperties();
 
-	public JobListDocument getJobListDocument() {
-		return jobListDocument;
 	}
 
-	public void setJobListDocument(JobListDocument jobListDocument) {
-		this.jobListDocument = jobListDocument;
+	@Override
+	public TemporaryConfig getTemporaryConfig() {
+		return temporaryConfig;
 	}
 
-	public ConfigurationManager getConfigurationManager() {
-		return configurationManager;
-	}
-
-	public void setConfigurationManager(ConfigurationManager configurationManager) {
-		this.configurationManager = configurationManager;
+	@Override
+	public JobRuntimeProperties getJobRuntimeProperties() {
+		return jobRuntimeProperties;
 	}
 
 }

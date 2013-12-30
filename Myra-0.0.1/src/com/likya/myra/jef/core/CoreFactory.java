@@ -60,15 +60,15 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 			e.printStackTrace();
 		}
 
-		this.managementOperations = new ManagementOperationsBean(this);
+		this.managementOperations = new ManagementOperationsImpl(this);
 
-		this.monitoringOperations = new MonitoringOperationsBean(this);
+		this.monitoringOperations = new MonitoringOperationsImpl(this);
 
 		this.jobListDocument = inputStrategy.getJobListDocument();
 
 		this.outputStrategy = outputStrategy;
 		
-		this.jobOperations = new JobOperationsBean(this);
+		this.jobOperations = new JobOperationsImpl(this);
 
 	}
 

@@ -24,11 +24,11 @@ import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 
-public class JobOperationsBean implements JobOperations {
+public class JobOperationsImpl implements JobOperations {
 	
 	private CoreFactory coreFactory;
 	
-	public JobOperationsBean(CoreFactory coreFactory) {
+	public JobOperationsImpl(CoreFactory coreFactory) {
 		super();
 		this.coreFactory = coreFactory;
 	}

@@ -15,29 +15,13 @@
  ******************************************************************************/
 package com.likya.myra.jef;
 
-import com.likya.myra.jef.model.JobRuntimeProperties;
-import com.likya.myra.jef.model.TemporaryConfig;
 
-public class ConfigurationManagerBean implements ConfigurationManager {
-
-	private TemporaryConfig temporaryConfig;
-	private JobRuntimeProperties jobRuntimeProperties;
-	
-	public ConfigurationManagerBean() {
-		super();
-		this.temporaryConfig = new TemporaryConfig();	
-		this.jobRuntimeProperties = new JobRuntimeProperties();
-
-	}
+public class OutputStrategyImpl implements OutputStrategy {
 
 	@Override
-	public TemporaryConfig getTemporaryConfig() {
-		return temporaryConfig;
-	}
-
-	@Override
-	public JobRuntimeProperties getJobRuntimeProperties() {
-		return jobRuntimeProperties;
+	public void sendDataObject(Object dataObject) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

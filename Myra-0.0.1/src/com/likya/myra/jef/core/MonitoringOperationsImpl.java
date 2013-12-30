@@ -27,12 +27,12 @@ import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.utils.JobQueueOperations;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 
-public class MonitoringOperationsBean implements MonitoringOperations {
+public class MonitoringOperationsImpl implements MonitoringOperations {
 
 	private CoreFactory coreFactory;
 	// private Logger logger = CoreFactory.getLogger();
 
-	public MonitoringOperationsBean(CoreFactory coreFactory) {
+	public MonitoringOperationsImpl(CoreFactory coreFactory) {
 		super();
 		this.coreFactory = coreFactory;
 	}

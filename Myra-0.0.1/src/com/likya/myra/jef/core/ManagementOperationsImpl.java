@@ -25,12 +25,12 @@ import com.likya.myra.jef.controller.ControllerInterface;
 import com.likya.myra.jef.controller.SchedulerController;
 import com.likya.myra.jef.utils.JobQueueOperations;
 
-public class ManagementOperationsBean implements ManagementOperations {
+public class ManagementOperationsImpl implements ManagementOperations {
 
 	private CoreFactory coreFactory;
 	private Logger logger = CoreFactory.getLogger();
 	
-	public ManagementOperationsBean(CoreFactory coreFactory) {
+	public ManagementOperationsImpl(CoreFactory coreFactory) {
 		super();
 		this.coreFactory = coreFactory;
 	}
