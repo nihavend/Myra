@@ -15,23 +15,19 @@
  ******************************************************************************/
 package com.likya.myra.jef.controller;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
-import net.java.dev.eval.Expression;
-
-import org.apache.commons.collections.iterators.ArrayIterator;
-
+import com.likya.commons.model.UnresolvedDependencyException;
 import com.likya.myra.LocaleMessages;
+import com.likya.myra.commons.utils.JobDependencyResolver;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.CoreFactoryInterface;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.TemporaryConfig;
+import com.likya.myra.jef.utils.JobQueueOperations;
 import com.likya.xsd.myra.model.jobprops.DependencyListDocument.DependencyList;
-import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
@@ -45,7 +41,7 @@ public class BaseSchedulerController {
 
 	protected boolean executionPermission = true;
 	
-	protected int cycleFrequency = 500;
+	protected int cycleFrequency = 1000;
 	
 	private boolean thresholdOverflow = false;
 
@@ -179,80 +175,20 @@ public class BaseSchedulerController {
 //	}
 
 	// protected boolean checkDependency(Job meJob, ArrayList<DependencyInfo> jobDependencyInfoList) {
-	protected boolean checkDependency(JobImpl meJob, DependencyList dependencyList) {
-
-		boolean retValue = false;
-
+	protected boolean checkDependency(JobImpl meJob, DependencyList dependencyList) throws UnresolvedDependencyException {
+		
 		if(dependencyList == null || dependencyList.getItemArray().length == 0) {
 			return true;
 		}
-		
-		Map<String, BigDecimal> variables = new HashMap<String, BigDecimal>();
-		
+
 		String dependencyExpression = dependencyList.getDependencyExpression().trim().toUpperCase();
 		
-		Expression exp = new Expression(dependencyExpression);
-		
 		Item[] dependencyArray = dependencyList.getItemArray();
-		
-		ArrayIterator dependencyArrayIterator = new ArrayIterator(dependencyArray);
-		
-		while (dependencyArrayIterator.hasNext()) {
 
-			Item item = (Item) (dependencyArrayIterator.next());
-			
-			if (jobQueue.get(item.getJsId()) == null) {
-				return false;
-			}
-			
-			// Cyclic dependency shoud be checked !!!
-			// cleanCyclecDeps(meJob, jobProperties, ?);
-			
-			LiveStateInfo liveStateInfo = jobQueue.get(item.getJsId()).getAbstractJobType().getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
-			
-			boolean compResult = LiveStateInfoUtils.compareDepencyRule(variables, item, liveStateInfo);
-			
-			if(!compResult) {
-				return compResult;
-			}
-			
-		}
-		
-		BigDecimal evResult = exp.eval(variables);
-		
-		retValue = evResult.intValue() == 0 ? false : true;
+		boolean retValue = JobDependencyResolver.isResolved(CoreFactory.getLogger(), meJob.getAbstractJobType(), dependencyExpression, dependencyArray, JobQueueOperations.toAbstractJobTypeList(jobQueue));
 		
 		return retValue; 
 		
-//		int i = 0;
-//
-//		while (i < jobDependencyInfoList.size()) {
-//			
-//			Job selectedJob = jobQueue.get(jobDependencyInfoList.get(i).getJobKey());
-//			
-//			if (!(selectedJob instanceof RepetitiveExternalProgram)) {
-//			
-//				JobProperties jobProperties = selectedJob.getJobProperties();
-//				
-//				if ((jobProperties.getStatus() != JobProperties.DISABLED)) {
-//
-//					if (jobDependencyInfoList.get(i).getStatus() == JobProperties.SUCCESS && jobProperties.getStatus() != JobProperties.SUCCESS && jobProperties.getStatus() != JobProperties.SKIP) {
-//						cleanCyclecDeps(meJob, jobProperties, JobProperties.FAIL);
-//						return false;
-//					} else if (jobDependencyInfoList.get(i).getStatus() == JobProperties.FAIL && jobProperties.getStatus() != JobProperties.FAIL) {
-//						cleanCyclecDeps(meJob, jobProperties, JobProperties.SUCCESS);
-//						return false;
-//					} else if (jobDependencyInfoList.get(i).getStatus() == JobProperties.SUCSFAIL && jobProperties.getStatus() != JobProperties.FAIL && jobProperties.getStatus() != JobProperties.SUCCESS) {
-//						cleanCyclecDeps(meJob, jobProperties, JobProperties.FAIL);
-//						cleanCyclecDeps(meJob, jobProperties, JobProperties.SUCCESS);
-//						return false;
-//					}
-//				}
-//			}
-//			i++;
-//		}
-//
-//		return true;
 	}
 
 	protected void executeJob(JobImpl scheduledJob) throws InterruptedException {
