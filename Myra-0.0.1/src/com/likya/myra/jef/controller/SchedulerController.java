@@ -22,6 +22,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+
+import com.likya.commons.model.UnresolvedDependencyException;
+import com.likya.commons.utils.PrintVantil;
 import com.likya.myra.LocaleMessages;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
@@ -47,25 +51,27 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 
 	@Override
 	public void run() {
+		
+		Logger logger = CoreFactory.getLogger();
 
 		ArrayList<SortType> jobIndex = JobQueueOperations.createProrityIndex(jobQueue);
 		Collections.sort(jobIndex);
-		
-		CoreFactory.getLogger().info("Starting : ");
-		CoreFactory.getLogger().debug(LocaleMessages.getString("TlosServer.38")); 
-		CoreFactory.getLogger().info(LocaleMessages.getString("TlosServer.39") + jobQueue.size());
+
+		logger.info("Starting : ");
+		logger.debug(LocaleMessages.getString("TlosServer.38"));
+		logger.info(LocaleMessages.getString("TlosServer.39") + jobQueue.size());
 
 		while (executionPermission) {
 
 			try {
 
 				Iterator<SortType> indexIterator = jobIndex.iterator();
-				
-				CoreFactory.getLogger().debug("Job Queue Size " + jobQueue.size());
-				CoreFactory.getLogger().debug("Job Index Size " + jobIndex.size());
+
+				logger.debug("Job Queue Size " + jobQueue.size());
+				logger.debug("Job Index Size " + jobIndex.size());
 
 				while (indexIterator.hasNext()) {
-					
+
 					if ((coreFactoryInterface.getManagementOperations().getExecutionState() == CoreStateInfo.STATE_SUSPENDED) || checkThresholdOverflow()) {
 						// TlosServer.print(".");
 						break;
@@ -75,91 +81,102 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 					JobImpl scheduledJob = jobQueue.get(mySortType.getJobKey());
 
 					AbstractJobType abstractJobType = scheduledJob.getAbstractJobType();
-					
+
 					DependencyList dependencyList = abstractJobType.getDependencyList();
 
 					// ArrayList<DependencyInfo> dependentJobList = scheduledJob.getJobProperties().getJobDependencyInfoList();
 
 					// if (scheduledJob instanceof ExternalProgram) {
-						// if (scheduledJob.getJobProperties().getStatus() == JobProperties.READY) {
+					// if (scheduledJob.getJobProperties().getStatus() == JobProperties.READY) {
 
 					LiveStateInfo liveStateInfo = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
 
-					if(LiveStateInfoUtils.equalStates(liveStateInfo, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME)) {
-						// Waiting for time to execute
-						Date scheduledTime = abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime();
-						Date currentTime = Calendar.getInstance().getTime();
-						
-						if (scheduledTime.before(currentTime)) {
+					try {
+
+						if (LiveStateInfoUtils.equalStates(liveStateInfo, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME)) {
+							// Waiting for time to execute
+							Date scheduledTime = abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime();
+							Date currentTime = Calendar.getInstance().getTime();
+
+							if (scheduledTime.before(currentTime)) {
+								if (checkDependency(scheduledJob, dependencyList)) {
+									executeJob(scheduledJob);
+								} else {
+									// Time ok but dependency, so change status !
+									liveStateInfo.setStatusName(StatusName.WAITING);
+								}
+							}
+
+						} else if (LiveStateInfoUtils.equalStates(liveStateInfo, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_WAITING)) {
+							// Waiting for dependency to execute
 							if (checkDependency(scheduledJob, dependencyList)) {
 								executeJob(scheduledJob);
-							} else {
-								// Time ok but dependency, so change status !
-								liveStateInfo.setStatusName(StatusName.WAITING);
 							}
 						}
-						
-					} else if(LiveStateInfoUtils.equalStates(liveStateInfo, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_WAITING)) {
-						// Waiting for dependency to execute
-						if (checkDependency(scheduledJob, dependencyList)) {
-							executeJob(scheduledJob);
-						}
-					}
-					
-//					if (scheduledJob.getJobRuntimeProperties().getJobSimpleProperties().getStatus() == JobProperties.READY) {
-//					
-//							Date scheduledTime = scheduledJob.getJobProperties().getTime();
-//							Date currentTime = Calendar.getInstance().getTime();
-//
-//							if (scheduledTime.before(currentTime)) {
-//								if (dependentJobList.get(0).getJobKey().equals(ScenarioLoader.UNDEFINED_VALUE)) {
-//									executeJob(scheduledJob);
-//								} else {
-//									if (checkDependency(scheduledJob, dependentJobList)) {
-//										executeJob(scheduledJob);
-//									} else {
-//										if (scheduledJob.getJobProperties().getStatus() != JobProperties.SKIP) {
-//											scheduledJob.getJobProperties().setStatus(JobProperties.WAITING);
-//										}
-//									}
-//
-//								}
-//							}
-//
-//						} else if (scheduledJob.getJobProperties().getStatus() == JobProperties.WAITING) {
-//
-//							if (checkDependency(scheduledJob, dependentJobList)) {
-//								executeJob(scheduledJob);
-//							} else {
-//								if (scheduledJob.getJobProperties().getStatus() != JobProperties.SKIP) {
-//									scheduledJob.getJobProperties().setStatus(JobProperties.WAITING);
-//								}
-//							}
-//
-//						}
-//					} else if (scheduledJob instanceof RepetitiveExternalProgram) {
-//						executeRepetitiveJob(scheduledJob);
-//					} else if (scheduledJob instanceof ManuelExternalProgram) {
-//						executeManuelJob(scheduledJob);
-//					}
-				
-				
-				} // end of while
-				
-				if (isPersistent) {
-					 JobQueueOperations.persistJobQueue(coreFactoryInterface.getConfigurationManager(), jobQueue);
-					 JobQueueOperations.persistDisabledJobQueue(coreFactoryInterface.getConfigurationManager(), disabledJobQueue);
-				}
 
-				cleanUpQueueIssues();
-				
-				Thread.sleep(cycleFrequency);
+					} catch (UnresolvedDependencyException ude) {
+						// LiveStateInfoUtils.insertNewLiveStateInfo(scheduledJob.getAbstractJobType(), StateName.INT_CANCELLED, SubstateName.INT_STOPPED, StatusName.INT_BYEVENT);
+						// logger.fatal("Job " + scheduledJob.getAbstractJobType().getId() + " disabled due to invalid dependency definiton !");
+						ude.printStackTrace();
+					}
+
+					//					if (scheduledJob.getJobRuntimeProperties().getJobSimpleProperties().getStatus() == JobProperties.READY) {
+					//					
+					//							Date scheduledTime = scheduledJob.getJobProperties().getTime();
+					//							Date currentTime = Calendar.getInstance().getTime();
+					//
+					//							if (scheduledTime.before(currentTime)) {
+					//								if (dependentJobList.get(0).getJobKey().equals(ScenarioLoader.UNDEFINED_VALUE)) {
+					//									executeJob(scheduledJob);
+					//								} else {
+					//									if (checkDependency(scheduledJob, dependentJobList)) {
+					//										executeJob(scheduledJob);
+					//									} else {
+					//										if (scheduledJob.getJobProperties().getStatus() != JobProperties.SKIP) {
+					//											scheduledJob.getJobProperties().setStatus(JobProperties.WAITING);
+					//										}
+					//									}
+					//
+					//								}
+					//							}
+					//
+					//						} else if (scheduledJob.getJobProperties().getStatus() == JobProperties.WAITING) {
+					//
+					//							if (checkDependency(scheduledJob, dependentJobList)) {
+					//								executeJob(scheduledJob);
+					//							} else {
+					//								if (scheduledJob.getJobProperties().getStatus() != JobProperties.SKIP) {
+					//									scheduledJob.getJobProperties().setStatus(JobProperties.WAITING);
+					//								}
+					//							}
+					//
+					//						}
+					//					} else if (scheduledJob instanceof RepetitiveExternalProgram) {
+					//						executeRepetitiveJob(scheduledJob);
+					//					} else if (scheduledJob instanceof ManuelExternalProgram) {
+					//						executeManuelJob(scheduledJob);
+					//					}
+
+				} // end of while
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
+			if (isPersistent) {
+				JobQueueOperations.persistJobQueue(coreFactoryInterface.getConfigurationManager(), jobQueue);
+				JobQueueOperations.persistDisabledJobQueue(coreFactoryInterface.getConfigurationManager(), disabledJobQueue);
+			}
+
+			cleanUpQueueIssues();
+
+			try {
+				Thread.sleep(cycleFrequency);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			System.err.print(PrintVantil.getVantil() + "\r");
 		}
 
 	}
-
 }
