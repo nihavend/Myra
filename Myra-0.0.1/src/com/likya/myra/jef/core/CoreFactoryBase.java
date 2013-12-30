@@ -32,7 +32,7 @@ public class CoreFactoryBase {
 	
 	private static final String version = "0.0.1";
 	
-	private int executionState = CoreStateInfo.STATE_STARTING;
+	private CoreStateInfo coreStateInfo = CoreStateInfo.STATE_STARTING;
 	
 	
 	private static final Logger logger = Logger.getLogger("Myra");
@@ -102,12 +102,12 @@ public class CoreFactoryBase {
 		return version;
 	}
 
-	protected int getExecutionState() {
-		return executionState;
+	protected CoreStateInfo getExecutionState() {
+		return coreStateInfo;
 	}
 
-	protected synchronized void setExecutionState(int executionState) {
-		this.executionState = executionState;
+	protected synchronized void setExecutionState(CoreStateInfo coreStateInfo) {
+		this.coreStateInfo = coreStateInfo;
 	}
 
 	public int getNumOfSchedulerControllers() {

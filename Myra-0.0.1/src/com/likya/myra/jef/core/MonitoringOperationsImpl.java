@@ -36,14 +36,21 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 		super();
 		this.coreFactory = coreFactory;
 	}
-
-	public HashMap<String, JobImpl> getJobQueue() {
-
+	
+	private ControllerInterface getControllerInterface() {
 		HashMap<String, ControllerInterface> controllerContainer = coreFactory.getControllerContainer();
 
 		ArrayList<ControllerInterface> controllerArray = new ArrayList<ControllerInterface>(controllerContainer.values());
 
 		ControllerInterface controllerInterface = ((ControllerInterface) controllerArray.get(0));
+		
+		return controllerInterface;
+		
+	}
+
+	public HashMap<String, JobImpl> getJobQueue() {
+
+		ControllerInterface controllerInterface = getControllerInterface();
 		
 		return controllerInterface.getJobQueue();
 
@@ -65,5 +72,10 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 		filteredList = CollectionUtils.select(abstractJobTypeList.values(), predicate);
 		
 		return filteredList;
+	}
+
+	public boolean isThresholdOverflow() {
+		ControllerInterface controllerInterface = getControllerInterface();
+		return controllerInterface.isThresholdOverflow();
 	}
 }

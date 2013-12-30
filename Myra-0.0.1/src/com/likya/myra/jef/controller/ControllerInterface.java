@@ -22,4 +22,5 @@ import com.likya.myra.jef.jobs.JobImpl;
 public interface ControllerInterface extends Runnable {
 
 	public HashMap<String, JobImpl> getJobQueue();
+	public boolean isThresholdOverflow();
 }

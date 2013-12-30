@@ -23,6 +23,7 @@ import com.likya.myra.LocaleMessages;
 import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.controller.ControllerInterface;
 import com.likya.myra.jef.controller.SchedulerController;
+import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.utils.JobQueueOperations;
 
 public class ManagementOperationsImpl implements ManagementOperations {
@@ -103,13 +104,13 @@ public class ManagementOperationsImpl implements ManagementOperations {
 	}
 
 	@Override
-	public int getExecutionState() {
+	public CoreStateInfo getExecutionState() {
 		return coreFactory.getExecutionState();
 	}
 
 	@Override
-	public void setExecutionState(int executionState) {
-		coreFactory.setExecutionState(executionState);
+	public void setExecutionState(CoreStateInfo coreStateInfo) {
+		coreFactory.setExecutionState(coreStateInfo);
 	}
 
 	@Override

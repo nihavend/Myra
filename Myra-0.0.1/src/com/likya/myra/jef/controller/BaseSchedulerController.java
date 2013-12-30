@@ -142,19 +142,19 @@ public class BaseSchedulerController {
 //			getScenarioRuntimeProperties().setCurrentState(ScenarioRuntimeProperties.STATE_WAITING);
 //			getScenarioRuntimeProperties().setEndTime(Calendar.getInstance().getTime());
 //			if (tlosParameters.isNormalizable()) {
-//				schedulerLogger.info(LocaleMessages.getString("TlosServer.43")); //$NON-NLS-1$
+//				schedulerLogger.info(LocaleMessages.getString("TlosServer.43"));
 //				JobQueueOperations.normalizeJobQueue(jobQueue);
-//				schedulerLogger.info(LocaleMessages.getString("TlosServer.44")); //$NON-NLS-1$
+//				schedulerLogger.info(LocaleMessages.getString("TlosServer.44"));
 //			}
 //			if (tlosParameters.isMail()) {
 //				tlosMailServer.sendMail(new EndOfCycleMail(jobQueue));
 //			}
 //			if (tlosParameters.isSms()) {
-//				tlosSMSServer.sendSMS(new SMSType(LocaleMessages.getString("TlosServer.45") + TlosServer.getTlosParameters().getScenarioName() + LocaleMessages.getString("TlosServer.46"))); //$NON-NLS-1$ //$NON-NLS-2$
+//				tlosSMSServer.sendSMS(new SMSType(LocaleMessages.getString("TlosServer.45") + TlosServer.getTlosParameters().getScenarioName() + LocaleMessages.getString("TlosServer.46"))); //$NON-NLS-2$
 //			}
 //			if (loadTest) {
 //				++loadTestTurnCount;
-//				schedulerLogger.info(LocaleMessages.getString("TlosServer.47") + loadTestTurnCount); //$NON-NLS-1$
+//				schedulerLogger.info(LocaleMessages.getString("TlosServer.47") + loadTestTurnCount);
 //				setUpForTest();
 //				try {
 //					Thread.sleep(3000);
@@ -203,7 +203,7 @@ public class BaseSchedulerController {
 //			getScenarioRuntimeProperties().setStartTime(Calendar.getInstance().getTime());
 //		}
 		
-		CoreFactory.getLogger().debug(LocaleMessages.getString("TlosServer.66")); //$NON-NLS-1$
+		CoreFactory.getLogger().debug(LocaleMessages.getString("TlosServer.66"));
 //		logger.debug(scheduledJob.getJobProperties().toString());
 		
 
@@ -260,7 +260,7 @@ public class BaseSchedulerController {
 //		return;
 //	}
 
-	public synchronized boolean checkThresholdOverflow() {
+	protected synchronized boolean checkThresholdOverflow() {
 
 		TemporaryConfig temporaryConfig = coreFactoryInterface.getConfigurationManager().getTemporaryConfig();
 		
@@ -274,11 +274,11 @@ public class BaseSchedulerController {
 		int numOfActiveJobs = getNumOfActiveJobs();
 
 		if ((!thresholdOverflow) && (numOfActiveJobs >= higherLimit)) {
-			CoreFactory.getLogger().info(LocaleMessages.getString("TlosServer.68") + numOfActiveJobs + LocaleMessages.getString("TlosServer.69") + lowerLimit); //$NON-NLS-1$ //$NON-NLS-2$
+			CoreFactory.getLogger().info(LocaleMessages.getString("TlosServer.68") + numOfActiveJobs + LocaleMessages.getString("TlosServer.69") + lowerLimit);
 			thresholdOverflow = true;
 		} else if (thresholdOverflow && (numOfActiveJobs <= lowerLimit)) {
 			thresholdOverflow = false;
-			CoreFactory.getLogger().info(LocaleMessages.getString("TlosServer.70") + numOfActiveJobs); //$NON-NLS-1$
+			CoreFactory.getLogger().info(LocaleMessages.getString("TlosServer.70") + numOfActiveJobs);
 		}
 
 		// System.out.println("lowerLimit : " + lowerLimit + " higherLimit : " +
@@ -341,5 +341,10 @@ public class BaseSchedulerController {
 
 	public void setCycleFrequency(int cycleFrequency) {
 		this.cycleFrequency = cycleFrequency;
+	}
+
+
+	public boolean isThresholdOverflow() {
+		return thresholdOverflow;
 	}
 }

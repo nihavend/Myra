@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.likya.myra.jef.core;
 
+import com.likya.myra.jef.model.CoreStateInfo;
+
 public interface ManagementOperations {
 
 	public void start() throws Throwable;
@@ -29,8 +31,8 @@ public interface ManagementOperations {
 
 	public void forceFullShutDown();
 	
-	public int getExecutionState();
+	public CoreStateInfo getExecutionState();
 	
-	public void setExecutionState(int executionState);
+	public void setExecutionState(CoreStateInfo coreStateInfo);
 
 }

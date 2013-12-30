@@ -27,5 +27,6 @@ public interface MonitoringOperations {
 	
 	public HashMap<String, JobImpl> getJobQueue();
 	public Collection<AbstractJobType> getJobList(Predicate predicate);
+	public boolean isThresholdOverflow();
 
 }
