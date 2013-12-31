@@ -18,7 +18,6 @@ package com.likya.myra.jef;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlException;
 
 import com.likya.myra.commons.utils.XMLValidations;
 import com.likya.myra.jef.model.JobRuntimeProperties;
@@ -29,29 +28,24 @@ import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument.GlobalSt
 public class ConfigurationManagerImpl implements ConfigurationManager {
 
 	private MyraConfig myraConfig;
-	
+
 	private final String fileToPersist = "Myra.recover";
-	
+
 	private JobRuntimeProperties jobRuntimeProperties;
-	
+
 	private GlobalStateDefinition globalStateDefinition;
-	
+
 	private HashMap<Integer, String> groupList = new HashMap<Integer, String>();
-	
+
 	public ConfigurationManagerImpl(MyraConfigDocument myraConfigDocument) {
 		super();
-		
-		try {
-			if (!XMLValidations.validateWithXSDAndLog(Logger.getRootLogger(), myraConfigDocument)) {
-				throw new XmlException("MyraConfigDocument is null or damaged !");
-			}
-			
-			myraConfig = myraConfigDocument.getMyraConfig();
-		} catch (XmlException e) {
-			e.printStackTrace();
-			return;
+
+		if (!XMLValidations.validateWithXSDAndLog(Logger.getRootLogger(), myraConfigDocument)) {
+			throw new RuntimeException("MyraConfigDocument is null or damaged !");
 		}
-		
+
+		myraConfig = myraConfigDocument.getMyraConfig();
+
 		this.jobRuntimeProperties = new JobRuntimeProperties();
 
 	}
