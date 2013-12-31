@@ -24,7 +24,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.jvnet.winp.WinProcess;
 
-import com.likya.myra.LocaleMessages;
 import com.likya.myra.commons.ValidPlatforms;
 import com.likya.myra.commons.grabber.StreamGrabber;
 import com.likya.myra.commons.utils.MyraDateUtils;
@@ -74,7 +73,7 @@ public class ExecuteInShell extends CommonShell {
 
 		AbstractJobType abstractJobType = getAbstractJobType();
 
-		String startLog = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.0") + MyraDateUtils.getDate(startTime.getTime());
+		String startLog = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.0") + MyraDateUtils.getDate(startTime.getTime());
 
 		JobHelper.setJsRealTimeForStart(abstractJobType, startTime);
 
@@ -130,14 +129,14 @@ public class ExecuteInShell extends CommonShell {
 
 		jobRuntimeInterface.getMessageBuffer().delete(0, jobRuntimeInterface.getMessageBuffer().capacity());
 
-		initGrabbers(process, jobId, CoreFactory.getLogger(), temporaryConfig.getLogBufferSize());
+		initGrabbers(process, jobId, CoreFactory.getLogger(), myraConfig.getLogbuffersize());
 
 		try {
 
 			process.waitFor();
 
 			int processExitValue = process.exitValue();
-			CoreFactory.getLogger().info(jobId + LocaleMessages.getString("ExternalProgram.6") + processExitValue); //$NON-NLS-1$
+			CoreFactory.getLogger().info(jobId + CoreFactory.getMessage("ExternalProgram.6") + processExitValue); //$NON-NLS-1$
 
 			String errStr = jobRuntimeInterface.getLogAnalyzeString();
 			boolean hasErrorInLog = false;
@@ -184,7 +183,7 @@ public class ExecuteInShell extends CommonShell {
 				}
 			}
 			// Stop the process from running
-			CoreFactory.getLogger().warn(LocaleMessages.getString("ExternalProgram.8") + jobId); //$NON-NLS-1$
+			CoreFactory.getLogger().warn(CoreFactory.getMessage("ExternalProgram.8") + jobId); //$NON-NLS-1$
 
 			// process.waitFor() komutu thread'in interrupt statusunu temizlemedigi icin 
 			// asagidaki sekilde temizliyoruz
