@@ -30,7 +30,7 @@
 	<appender name="myrasummaryfile" class="org.apache.log4j.RollingFileAppender">
 		<param name="maxFileSize" value="1000KB" />
 		<param name="maxBackupIndex" value="5" />
-		<param name="File" value="TlosEkran.log" />
+		<param name="File" value="console.log" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{ISO8601}|%c{1}|%m%n" />
 		</layout>
@@ -43,7 +43,7 @@
 	<appender name="myratracefile" class="org.apache.log4j.RollingFileAppender">
 		<param name="maxFileSize" value="1000KB" />
 		<param name="maxBackupIndex" value="5" />
-		<param name="File" value="TlosTrace.log" />
+		<param name="File" value="myraTrace.log" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{DATE} %5p %c{1}:%L - %m%n" />
 		</layout>
