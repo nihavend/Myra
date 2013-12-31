@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.likya.myra.jef.core;
 
-import com.likya.myra.LocaleMessages;
 import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.jobs.JobHelper;
 import com.likya.myra.jef.model.OutputData;
@@ -89,7 +88,7 @@ public class JobOperationsImpl implements JobOperations {
 	@Override
 	public void disableJob(String jobName) {
 		
-		CoreFactory.getLogger().info(LocaleMessages.getString("TlosCommInterface.35") + jobName);
+		CoreFactory.getLogger().info(CoreFactory.getMessage("TlosCommInterface.35") + jobName);
 
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobName)) {
 
@@ -106,7 +105,7 @@ public class JobOperationsImpl implements JobOperations {
 //				TlosServer.getDisabledJobQueue().put(jobName, jobName);
 //			}
 			
-			CoreFactory.getLogger().info(LocaleMessages.getString("TlosCommInterface.19") + jobName + " : " + abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0).toString());
+			CoreFactory.getLogger().info(CoreFactory.getMessage("TlosCommInterface.19") + jobName + " : " + abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0).toString());
 		}
 	}
 
