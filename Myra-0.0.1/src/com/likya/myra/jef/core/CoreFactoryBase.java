@@ -19,6 +19,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
+import com.likya.commons.utils.LocaleMessages;
 import com.likya.myra.commons.utils.XMLValidations;
 import com.likya.myra.jef.controller.ControllerInterface;
 import com.likya.myra.jef.controller.SchedulerController;
@@ -32,10 +33,12 @@ public class CoreFactoryBase {
 	
 	private static final String version = "0.0.1";
 	
+	protected final static String localePath = "com.likya.myra.resources.messages";
+	
 	private CoreStateInfo coreStateInfo = CoreStateInfo.STATE_STARTING;
 	
 	
-	private static final Logger logger = Logger.getLogger("Myra");
+	private static Logger logger = Logger.getLogger("Myra");
 	
 	/**
 	 * For current version it is limited to one
@@ -94,6 +97,15 @@ public class CoreFactoryBase {
 		return logger;
 	}
 	
+	protected static void registerMessageBundle() {
+		LocaleMessages.registerBundle(localePath);
+		getLogger().info(CoreFactory.getMessage("Pinara.37") + localePath);
+	}
+
+	public static String getMessage(String key) {
+		return LocaleMessages.getString(localePath, key);
+	}
+	
 	protected HashMap<String, ControllerInterface> getControllerContainer() {
 		return controllerContainer;
 	}
@@ -110,7 +122,11 @@ public class CoreFactoryBase {
 		this.coreStateInfo = coreStateInfo;
 	}
 
-	public int getNumOfSchedulerControllers() {
+	protected int getNumOfSchedulerControllers() {
 		return numOfSchedulerControllers;
+	}
+
+	public static void setLogger(Logger logger) {
+		CoreFactoryBase.logger = logger;
 	}
 }
