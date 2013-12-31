@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.likya.myra.jef.jobs;
 
-import com.likya.myra.LocaleMessages;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
@@ -71,9 +70,9 @@ public class WatchDogTimer extends Thread {
 			Thread.sleep(timeout);
 			if (jobImpl.getAbstractJobType().getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() != JobAutoRetry.YES) {
 				LiveStateInfoUtils.insertNewLiveStateInfo(jobImpl.getAbstractJobType(), StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_OUT);
-				CoreFactory.getLogger().info(LocaleMessages.getString("WatchDogTimer.0")); //$NON-NLS-1$
+				CoreFactory.getLogger().info(CoreFactory.getMessage("WatchDogTimer.0")); //$NON-NLS-1$
 			} else {
-				CoreFactory.getLogger().info(LocaleMessages.getString("WatchDogTimer.1") + jobImpl.getAbstractJobType().getId()); //$NON-NLS-1$
+				CoreFactory.getLogger().info(CoreFactory.getMessage("WatchDogTimer.1") + jobImpl.getAbstractJobType().getId()); //$NON-NLS-1$
 				ownerOfTimer.interrupt();
 			}
 		} catch (InterruptedException e) {
