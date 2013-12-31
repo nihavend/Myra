@@ -112,7 +112,7 @@ public class ExecuteSchComponent extends CommonShell {
 
 		channel.connect();
 
-		initGrabbers(channel, jobId, myLogger, temporaryConfig.getLogBufferSize());
+		initGrabbers(channel, jobId, myLogger, myraConfig.getLogbuffersize());
 
 		try {
 
