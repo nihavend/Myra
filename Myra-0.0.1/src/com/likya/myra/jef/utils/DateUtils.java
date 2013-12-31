@@ -23,7 +23,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.likya.myra.LocaleMessages;
+import com.likya.myra.jef.core.CoreFactory;
 
 public class DateUtils {
 	public static String getDate(Date executionTime) {
@@ -50,7 +50,7 @@ public class DateUtils {
 		seconds = timeInSeconds;
 //		System.out.println(hours + " hour(s) " + minutes + " minute(s) " + seconds + " second(s)");
 		
-		return hours + LocaleMessages.getString("DateUtils.2") + minutes + LocaleMessages.getString("DateUtils.3") + seconds + LocaleMessages.getString("DateUtils.4"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return hours + CoreFactory.getMessage("DateUtils.2") + minutes + CoreFactory.getMessage("DateUtils.3") + seconds + CoreFactory.getMessage("DateUtils.4"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	} 
 	
 	public static String getUnFormattedElapsedTime(int timeInSeconds) {
