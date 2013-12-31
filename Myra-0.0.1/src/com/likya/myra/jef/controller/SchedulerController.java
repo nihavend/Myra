@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 
 import com.likya.commons.model.UnresolvedDependencyException;
 import com.likya.commons.utils.PrintVantil;
-import com.likya.myra.LocaleMessages;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.CoreFactoryInterface;
@@ -58,8 +57,8 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 		Collections.sort(jobIndex);
 
 		logger.info("Starting : ");
-		logger.debug(LocaleMessages.getString("TlosServer.38"));
-		logger.info(LocaleMessages.getString("TlosServer.39") + jobQueue.size());
+		logger.debug(CoreFactory.getMessage("MyraServer.38"));
+		logger.info(CoreFactory.getMessage("MyraServer.39") + jobQueue.size());
 
 		while (executionPermission) {
 
@@ -115,8 +114,8 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 						}
 
 					} catch (UnresolvedDependencyException ude) {
-						// LiveStateInfoUtils.insertNewLiveStateInfo(scheduledJob.getAbstractJobType(), StateName.INT_CANCELLED, SubstateName.INT_STOPPED, StatusName.INT_BYEVENT);
-						// logger.fatal("Job " + scheduledJob.getAbstractJobType().getId() + " disabled due to invalid dependency definiton !");
+						LiveStateInfoUtils.insertNewLiveStateInfo(scheduledJob.getAbstractJobType(), StateName.INT_CANCELLED, SubstateName.INT_STOPPED, StatusName.INT_BYEVENT);
+						logger.fatal("Job " + scheduledJob.getAbstractJobType().getId() + " disabled due to invalid dependency definiton !");
 						ude.printStackTrace();
 					}
 
