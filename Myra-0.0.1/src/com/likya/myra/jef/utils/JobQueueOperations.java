@@ -28,7 +28,6 @@ import java.util.Iterator;
 import org.apache.commons.collections.iterators.ArrayIterator;
 import org.apache.log4j.Logger;
 
-import com.likya.myra.LocaleMessages;
 import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.jobs.JobImpl;
@@ -87,7 +86,7 @@ public class JobQueueOperations {
 
 		try {
 
-			File fileTemp = new File(configurationManager.getTemporaryConfig().getFileToPersist() + "_disabled.temp"); //$NON-NLS-1$
+			File fileTemp = new File(configurationManager.getFileToPersist() + "_disabled.temp"); //$NON-NLS-1$
 			fos = new FileOutputStream(fileTemp);
 
 			out = new ObjectOutputStream(fos);
@@ -95,7 +94,7 @@ public class JobQueueOperations {
 			out.writeObject(jobQueue);
 			out.close();
 
-			File file = new File(configurationManager.getTemporaryConfig().getFileToPersist() + "_disabled");
+			File file = new File(configurationManager.getFileToPersist() + "_disabled");
 
 			if (file.exists()) {
 				file.delete();
@@ -117,13 +116,13 @@ public class JobQueueOperations {
 		ObjectOutputStream out = null;
 
 		if (jobQueue.size() == 0) {
-			CoreFactory.getLogger().fatal(LocaleMessages.getString("JobQueueOperations.10")); //$NON-NLS-1$
-			CoreFactory.getLogger().fatal(LocaleMessages.getString("JobQueueOperations.11")); //$NON-NLS-1$
+			CoreFactory.getLogger().fatal(CoreFactory.getMessage("JobQueueOperations.10")); //$NON-NLS-1$
+			CoreFactory.getLogger().fatal(CoreFactory.getMessage("JobQueueOperations.11")); //$NON-NLS-1$
 			System.exit(-1);
 		}
 		try {
 
-			File fileTemp = new File(configurationManager.getTemporaryConfig().getFileToPersist() + ".temp"); //$NON-NLS-1$
+			File fileTemp = new File(configurationManager.getFileToPersist() + ".temp"); //$NON-NLS-1$
 			fos = new FileOutputStream(fileTemp);
 
 			out = new ObjectOutputStream(fos);
@@ -132,12 +131,12 @@ public class JobQueueOperations {
 
 			persistObject.setJobQueue(jobQueue);
 			persistObject.setTlosVersion(CoreFactory.getVersion());
-			persistObject.setGroupList(configurationManager.getTemporaryConfig().getGroupList());
+			persistObject.setGroupList(configurationManager.getGroupList());
 
 			out.writeObject(persistObject);
 			out.close();
 
-			File file = new File(configurationManager.getTemporaryConfig().getFileToPersist());
+			File file = new File(configurationManager.getFileToPersist());
 
 			if (file.exists()) {
 				file.delete();
