@@ -15,20 +15,33 @@
  ******************************************************************************/
 package com.likya.myra.jef;
 
+import java.util.HashMap;
+
 import com.likya.myra.jef.model.JobRuntimeProperties;
-import com.likya.myra.jef.model.TemporaryConfig;
+import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
+import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument.GlobalStateDefinition;
 
 /**
  * @author serkan
  * 
- * This interface defines the configuration management
- * strategy for the JEF core. 
- *
+ *         This interface defines the configuration management
+ *         strategy for the JEF core.
+ * 
  */
 public interface ConfigurationManager {
-	
-	public TemporaryConfig getTemporaryConfig();
-	
+
+	public MyraConfig getMyraConfig();
+
 	public JobRuntimeProperties getJobRuntimeProperties();
+
+	public GlobalStateDefinition getGlobalStateDefinition();
+	
+	public void setGlobalStateDefinition(GlobalStateDefinition globalStateDefinition);
+
+	public String getFileToPersist();
+
+	public HashMap<Integer, String> getGroupList();
+
+	public void setGroupList(HashMap<Integer, String> groupList);
 
 }
