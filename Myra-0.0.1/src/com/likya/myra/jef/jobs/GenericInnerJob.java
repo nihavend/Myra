@@ -19,7 +19,6 @@ package com.likya.myra.jef.jobs;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.likya.myra.LocaleMessages;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.jef.core.CoreFactory;
@@ -135,7 +134,7 @@ public abstract class GenericInnerJob extends JobImpl {
 				break;
 			}
 
-			CoreFactory.getLogger().info(LocaleMessages.getString("ExternalProgram.9") + jobId + " => " + liveStateInfo.getStatusName().toString());
+			CoreFactory.getLogger().info(CoreFactory.getMessage("ExternalProgram.9") + jobId + " => " + liveStateInfo.getStatusName().toString());
 
 		} else {
 
@@ -146,7 +145,7 @@ public abstract class GenericInnerJob extends JobImpl {
 			if (abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == JobAutoRetry.YES && !stateCond) {
 				
 				if (retryCounter < abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getMaxCount().intValue()) {
-					CoreFactory.getLogger().info(LocaleMessages.getString("ExternalProgram.11") + jobId);
+					CoreFactory.getLogger().info(CoreFactory.getMessage("ExternalProgram.11") + jobId);
 					retryCounter++;
 
 					long stepTime = MyraDateUtils.getDurationInMilliSecs(abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getStep());
@@ -162,8 +161,8 @@ public abstract class GenericInnerJob extends JobImpl {
 			
 			}
 
-			CoreFactory.getLogger().info(jobId + LocaleMessages.getString("ExternalProgram.12"));
-			CoreFactory.getLogger().debug(jobId + LocaleMessages.getString("ExternalProgram.13"));
+			CoreFactory.getLogger().info(jobId + CoreFactory.getMessage("ExternalProgram.12"));
+			CoreFactory.getLogger().debug(jobId + CoreFactory.getMessage("ExternalProgram.13"));
 
 		}
 	}
