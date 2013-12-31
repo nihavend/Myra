@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
-import com.likya.myra.jef.model.TemporaryConfig;
+import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 
 public abstract class JobImpl implements Runnable, Serializable {
@@ -43,7 +43,7 @@ public abstract class JobImpl implements Runnable, Serializable {
 	private AbstractJobType abstractJobType;
 	private JobRuntimeInterface jobRuntimeProperties;
 
-	protected TemporaryConfig temporaryConfig;
+	protected MyraConfig myraConfig;
 
 	protected OutputStrategy outputStrategy;
 
@@ -65,7 +65,7 @@ public abstract class JobImpl implements Runnable, Serializable {
 		}
 
 		outputStrategy = CoreFactory.getInstance().getOutputStrategy();
-		temporaryConfig = CoreFactory.getInstance().getConfigurationManager().getTemporaryConfig();
+		myraConfig = CoreFactory.getInstance().getConfigurationManager().getMyraConfig();
 	}
 
 	public final void run() {
