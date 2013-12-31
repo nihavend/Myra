@@ -15,18 +15,17 @@
  ******************************************************************************/
 package com.likya.myra.jef.core;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 
 import com.likya.commons.utils.FileUtils;
-import com.likya.myra.LocaleMessages;
+import com.likya.myra.commons.utils.XMLValidations;
 import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.InputStrategy;
 import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.controller.ControllerInterface;
-import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.InstanceNotFoundException;
 import com.likya.myra.jef.model.MyraException;
 import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument;
@@ -48,14 +47,22 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 	private CoreFactory(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
 
 		super();
+		
+		registerMessageBundle();
+		
 		controllerContainer = new HashMap<String, ControllerInterface>();
 
 		this.configurationManager = inputStrategy.getConfigurationManager();
+		
+		String configFile = "globalStates.xml";
 
-		StringBuffer xmlString = FileUtils.readFile(this.getClass(), "globalStates.xml");
+		StringBuffer xmlString = FileUtils.readFile(this.getClass(), configFile);
 		try {
 			GlobalStateDefinitionDocument globalStateDefinitionDocument = GlobalStateDefinitionDocument.Factory.parse(xmlString.toString());
-			configurationManager.getTemporaryConfig().setGlobalStateDefinition(globalStateDefinitionDocument.getGlobalStateDefinition());
+			if (!XMLValidations.validateWithXSDAndLog(Logger.getRootLogger(), globalStateDefinitionDocument)) {
+				throw new XmlException(configFile + " is null or damaged !");
+			}
+			configurationManager.setGlobalStateDefinition(globalStateDefinitionDocument.getGlobalStateDefinition());
 		} catch (XmlException e) {
 			e.printStackTrace();
 		}
@@ -101,40 +108,6 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		} else {
 			throw new MyraException();
 		}
-
-	}
-
-	// Not implemented yet !!!!
-	public ArrayList<JobImpl> loadCustomJobTypes(String[] customJobTypes) {
-
-		ArrayList<JobImpl> jobInterfaceList = new ArrayList<JobImpl>();
-
-		for (String customJobType : customJobTypes) {
-
-			try {
-
-				JobImpl jobInterface = null;
-
-				@SuppressWarnings("rawtypes")
-				Class handlerClass = Class.forName(customJobType);
-
-				Object myObject = handlerClass.newInstance();
-
-				if (myObject instanceof JobImpl) {
-					jobInterface = (JobImpl) (myObject);
-					jobInterfaceList.add(jobInterface);
-				}
-
-				getLogger().info(LocaleMessages.getString("Myra.34")); //$NON-NLS-1$
-
-			} catch (Exception e) {
-				System.out.println(LocaleMessages.getString("Myra.35") + customJobType); //$NON-NLS-1$
-				System.out.println(LocaleMessages.getString("Myra.36")); //$NON-NLS-1$
-				e.printStackTrace();
-			}
-		}
-
-		return jobInterfaceList;
 
 	}
 
