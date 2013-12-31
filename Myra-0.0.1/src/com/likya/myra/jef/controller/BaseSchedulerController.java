@@ -19,14 +19,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import com.likya.commons.model.UnresolvedDependencyException;
-import com.likya.myra.LocaleMessages;
 import com.likya.myra.commons.utils.JobDependencyResolver;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.CoreFactoryInterface;
 import com.likya.myra.jef.jobs.JobImpl;
-import com.likya.myra.jef.model.TemporaryConfig;
 import com.likya.myra.jef.utils.JobQueueOperations;
+import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
 import com.likya.xsd.myra.model.jobprops.DependencyListDocument.DependencyList;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
@@ -203,7 +202,7 @@ public class BaseSchedulerController {
 //			getScenarioRuntimeProperties().setStartTime(Calendar.getInstance().getTime());
 //		}
 		
-		CoreFactory.getLogger().debug(LocaleMessages.getString("TlosServer.66"));
+		CoreFactory.getLogger().debug(CoreFactory.getMessage("Myra.66"));
 //		logger.debug(scheduledJob.getJobProperties().toString());
 		
 
@@ -262,10 +261,10 @@ public class BaseSchedulerController {
 
 	protected synchronized boolean checkThresholdOverflow() {
 
-		TemporaryConfig temporaryConfig = coreFactoryInterface.getConfigurationManager().getTemporaryConfig();
+		MyraConfig myraConfig = coreFactoryInterface.getConfigurationManager().getMyraConfig();
 		
-		int lowerLimit = temporaryConfig.getLowerLimit();
-		int higherLimit = temporaryConfig.getHigherLimit();
+		int lowerLimit = myraConfig.getLowerThreshold();
+		int higherLimit = myraConfig.getHigherThreshold();
 		
 		if(lowerLimit >= higherLimit) {
 			return false;
@@ -274,11 +273,11 @@ public class BaseSchedulerController {
 		int numOfActiveJobs = getNumOfActiveJobs();
 
 		if ((!thresholdOverflow) && (numOfActiveJobs >= higherLimit)) {
-			CoreFactory.getLogger().info(LocaleMessages.getString("TlosServer.68") + numOfActiveJobs + LocaleMessages.getString("TlosServer.69") + lowerLimit);
+			CoreFactory.getLogger().info(CoreFactory.getMessage("Myra.68") + numOfActiveJobs + CoreFactory.getMessage("Myra.69") + lowerLimit);
 			thresholdOverflow = true;
 		} else if (thresholdOverflow && (numOfActiveJobs <= lowerLimit)) {
 			thresholdOverflow = false;
-			CoreFactory.getLogger().info(LocaleMessages.getString("TlosServer.70") + numOfActiveJobs);
+			CoreFactory.getLogger().info(CoreFactory.getMessage("Myra.70") + numOfActiveJobs);
 		}
 
 		// System.out.println("lowerLimit : " + lowerLimit + " higherLimit : " +
