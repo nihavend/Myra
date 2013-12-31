@@ -19,7 +19,6 @@ import java.util.Calendar;
 
 import org.apache.log4j.Logger;
 
-import com.likya.myra.LocaleMessages;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.commons.utils.PeriodCalculations;
@@ -60,8 +59,8 @@ public class JobHelper {
 		Calendar endTime = Calendar.getInstance();
 		long timeDiff = endTime.getTime().getTime() - startTime.getTime().getTime();
 
-		String endLog = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.14") + MyraDateUtils.getDate(endTime.getTime());
-		String duration = abstractJobType.getId() + LocaleMessages.getString("ExternalProgram.15") + MyraDateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
+		String endLog = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.14") + MyraDateUtils.getDate(endTime.getTime());
+		String duration = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.15") + MyraDateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
 
 		StopTime stopTimeTemp = StopTime.Factory.newInstance();
 		stopTimeTemp.setTime(endTime);
@@ -227,7 +226,7 @@ public class JobHelper {
 		if ((abstractJobType.getStateInfos().getJobStatusList() != null) && (localStateCheck = StateUtils.contains(abstractJobType.getStateInfos().getJobStatusList(), processExitValue)) != null) {
 			statusName = localStateCheck.getStatusName();
 		} else {
-			State[] globaStates = CoreFactory.getInstance().getConfigurationManager().getTemporaryConfig().getGlobalStateDefinition().getGlobalStateArray();
+			State[] globaStates = CoreFactory.getInstance().getConfigurationManager().getGlobalStateDefinition().getGlobalStateArray();
 			Status mySubStateStatuses = StateUtils.globalContains(globaStates, StateName.FINISHED, SubstateName.COMPLETED, processExitValue);
 			if (mySubStateStatuses != null) {
 				statusName = mySubStateStatuses.getStatusName();
