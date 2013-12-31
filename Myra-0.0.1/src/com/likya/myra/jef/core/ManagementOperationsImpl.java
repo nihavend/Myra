@@ -19,7 +19,6 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
-import com.likya.myra.LocaleMessages;
 import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.controller.ControllerInterface;
 import com.likya.myra.jef.controller.SchedulerController;
@@ -42,7 +41,7 @@ public class ManagementOperationsImpl implements ManagementOperations {
 
 		sendTermSignalToControllers();
 
-		logger.info(LocaleMessages.getString("TlosServer.49")); //$NON-NLS-1$
+		logger.info(CoreFactory.getMessage("Myra.49")); //$NON-NLS-1$
 
 		for (String key : controllerContainer.keySet()) {
 			SchedulerController schedulerController = (SchedulerController) controllerContainer.get(key);
@@ -61,7 +60,7 @@ public class ManagementOperationsImpl implements ManagementOperations {
 		
 		for (String key : controllerContainer.keySet()) {
 			SchedulerController schedulerController = (SchedulerController) controllerContainer.get(key);
-			if (configurationManager.getTemporaryConfig().isPersistent()) {
+			if (configurationManager.getMyraConfig().getPersistent()) {
 				JobQueueOperations.persistJobQueue(configurationManager, schedulerController.getJobQueue());
 				JobQueueOperations.persistDisabledJobQueue(configurationManager, schedulerController.getDisabledJobQueue());
 			}
