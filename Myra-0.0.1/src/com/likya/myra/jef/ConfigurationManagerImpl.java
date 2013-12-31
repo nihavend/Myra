@@ -15,29 +15,74 @@
  ******************************************************************************/
 package com.likya.myra.jef;
 
+import java.util.HashMap;
+
+import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlException;
+
+import com.likya.myra.commons.utils.XMLValidations;
 import com.likya.myra.jef.model.JobRuntimeProperties;
-import com.likya.myra.jef.model.TemporaryConfig;
+import com.likya.xsd.myra.model.config.MyraConfigDocument;
+import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
+import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument.GlobalStateDefinition;
 
 public class ConfigurationManagerImpl implements ConfigurationManager {
 
-	private TemporaryConfig temporaryConfig;
+	private MyraConfig myraConfig;
+	
+	private final String fileToPersist = "Myra.recover";
+	
 	private JobRuntimeProperties jobRuntimeProperties;
 	
-	public ConfigurationManagerImpl() {
+	private GlobalStateDefinition globalStateDefinition;
+	
+	private HashMap<Integer, String> groupList = new HashMap<Integer, String>();
+	
+	public ConfigurationManagerImpl(MyraConfigDocument myraConfigDocument) {
 		super();
-		this.temporaryConfig = new TemporaryConfig();	
+		
+		try {
+			if (!XMLValidations.validateWithXSDAndLog(Logger.getRootLogger(), myraConfigDocument)) {
+				throw new XmlException("MyraConfigDocument is null or damaged !");
+			}
+			
+			myraConfig = myraConfigDocument.getMyraConfig();
+		} catch (XmlException e) {
+			e.printStackTrace();
+			return;
+		}
+		
 		this.jobRuntimeProperties = new JobRuntimeProperties();
 
 	}
 
 	@Override
-	public TemporaryConfig getTemporaryConfig() {
-		return temporaryConfig;
-	}
-
-	@Override
 	public JobRuntimeProperties getJobRuntimeProperties() {
 		return jobRuntimeProperties;
+	}
+
+	public MyraConfig getMyraConfig() {
+		return myraConfig;
+	}
+
+	public GlobalStateDefinition getGlobalStateDefinition() {
+		return globalStateDefinition;
+	}
+
+	public void setGlobalStateDefinition(GlobalStateDefinition globalStateDefinition) {
+		this.globalStateDefinition = globalStateDefinition;
+	}
+
+	public String getFileToPersist() {
+		return fileToPersist;
+	}
+
+	public HashMap<Integer, String> getGroupList() {
+		return groupList;
+	}
+
+	public void setGroupList(HashMap<Integer, String> groupList) {
+		this.groupList = groupList;
 	}
 
 }
