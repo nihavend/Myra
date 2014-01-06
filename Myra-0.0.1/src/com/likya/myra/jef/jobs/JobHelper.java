@@ -92,7 +92,9 @@ public class JobHelper {
 		//		jobCalendar.set(Calendar.MONTH, startTime.get(Calendar.MONTH));
 		//		jobCalendar.set(Calendar.DAY_OF_MONTH, startTime.get(Calendar.DAY_OF_MONTH));
 
-		Calendar returnCal = PeriodCalculations.addPeriod(Calendar.getInstance(), period);
+		String timeZone = abstractJobType.getManagement().getTimeManagement().getTimeZone();
+		
+		Calendar returnCal = PeriodCalculations.addPeriod(Calendar.getInstance(), period, timeZone);
 
 		abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(returnCal);
 
