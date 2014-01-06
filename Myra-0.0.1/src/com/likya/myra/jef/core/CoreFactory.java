@@ -48,7 +48,11 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 
 		super();
 		
-		registerMessageBundle();
+		try {
+			registerMessageBundle();
+		} catch(Throwable t) {
+			t.printStackTrace();
+		}
 		
 		controllerContainer = new HashMap<String, ControllerInterface>();
 
@@ -103,7 +107,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 			if (validateFactory()) {
 				startControllers();
 			} else {
-				// TODO log errors and throw exception
+				throw new Exception();
 			}
 		} else {
 			throw new MyraException();
