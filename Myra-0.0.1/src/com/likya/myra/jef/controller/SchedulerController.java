@@ -24,7 +24,6 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
-import com.likya.commons.utils.PrintVantil;
 import com.likya.myra.commons.model.UnresolvedDependencyException;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
@@ -174,7 +173,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			System.err.print(PrintVantil.getVantil() + "\r");
+			// System.err.print(PrintVantil.getVantil() + "\r");
 		}
 
 	}
