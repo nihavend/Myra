@@ -44,7 +44,7 @@ public class Scheduler {
 	private static boolean periodicSchedule(AbstractJobType abstractJobType) {
 
 		boolean retValue = true;
-		
+
 		Calendar nextPeriodTime = PeriodCalculations.forward(abstractJobType);
 
 		if (nextPeriodTime == null) {
@@ -56,14 +56,14 @@ public class Scheduler {
 				// yeni zamana kurulmadı, artık çalışmayacak
 				retValue = false;
 			}
-		} 
+		}
 
 		return retValue;
 	}
 
 	private static Calendar regularSchedule(AbstractJobType abstractJobType) {
 
-		Calendar tmpCal = Calendar.getInstance();
+		Calendar tmpCal = abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStopTime();
 
 		Calendar selectedSchedule = null;
 
@@ -77,33 +77,36 @@ public class Scheduler {
 
 		DaysOfMonth daysOfMonth = scheduleInfo.getDaysOfMonth();
 
-		int dayList[] = daysOfMonth.getDaysArray();
+		if (daysOfMonth != null) {
+			
+			int dayList[] = daysOfMonth.getDaysArray();
 
-		if (Arrays.binarySearch(dayList, tmpCal.get(Calendar.DAY_OF_MONTH)) > 0) {
-			if (tmpCal.before(selectedSchedule)) {
-				selectedSchedule = tmpCal;
+			if (Arrays.binarySearch(dayList, tmpCal.get(Calendar.DAY_OF_MONTH)) > 0) {
+				if (tmpCal.before(selectedSchedule)) {
+					selectedSchedule = tmpCal;
+				}
 			}
-		}
 
-		String firstDay = daysOfMonth.getFirstDayOfMonth();
+			String firstDay = daysOfMonth.getFirstDayOfMonth();
 
-		if (firstDay != null && !firstDay.equals("")) {
-			Calendar localCal = Calendar.getInstance();
-			int lastDayOfMonth = localCal.getActualMaximum(Calendar.DAY_OF_MONTH);
-			localCal.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
-			if (localCal.before(selectedSchedule)) {
-				selectedSchedule = localCal;
+			if (firstDay != null && !firstDay.equals("")) {
+				Calendar localCal = Calendar.getInstance();
+				int lastDayOfMonth = localCal.getActualMaximum(Calendar.DAY_OF_MONTH);
+				localCal.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
+				if (localCal.before(selectedSchedule)) {
+					selectedSchedule = localCal;
+				}
 			}
-		}
 
-		String lastDay = daysOfMonth.getLastDayOfMonth();
+			String lastDay = daysOfMonth.getLastDayOfMonth();
 
-		if (lastDay != null && !lastDay.equals("")) {
-			Calendar localCal = Calendar.getInstance();
-			int lastDayOfMonth = localCal.getActualMinimum(Calendar.DAY_OF_MONTH);
-			localCal.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
-			if (localCal.before(selectedSchedule)) {
-				selectedSchedule = localCal;
+			if (lastDay != null && !lastDay.equals("")) {
+				Calendar localCal = Calendar.getInstance();
+				int lastDayOfMonth = localCal.getActualMinimum(Calendar.DAY_OF_MONTH);
+				localCal.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
+				if (localCal.before(selectedSchedule)) {
+					selectedSchedule = localCal;
+				}
 			}
 		}
 
