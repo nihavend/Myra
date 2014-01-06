@@ -20,12 +20,17 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 import com.likya.commons.utils.LocaleMessages;
+import com.likya.myra.commons.utils.DependencyOperations;
+import com.likya.myra.commons.utils.NetTreeResolver;
 import com.likya.myra.commons.utils.XMLValidations;
 import com.likya.myra.jef.controller.ControllerInterface;
 import com.likya.myra.jef.controller.SchedulerController;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.utils.JobQueueOperations;
+import com.likya.myra.jef.utils.NetTreeManagerImp;
+import com.likya.myra.jef.utils.NetTreeManagerInterface;
+import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.joblist.JobListDocument;
 
 
@@ -37,8 +42,9 @@ public class CoreFactoryBase {
 	
 	private CoreStateInfo coreStateInfo = CoreStateInfo.STATE_STARTING;
 	
-	
 	private static Logger logger = Logger.getLogger("Myra");
+	
+	private NetTreeManagerInterface netTreeManagerInterface;
 	
 	/**
 	 * For current version it is limited to one
@@ -54,20 +60,49 @@ public class CoreFactoryBase {
 	protected JobListDocument jobListDocument;
 	
 	protected boolean validateFactory() throws Exception {
+		
 		if (!XMLValidations.validateWithXSDAndLog(getLogger(), jobListDocument)) {
 			throw new Exception("JobList.xml is null or damaged !");
 		}
+		
+		HashMap<String, JobImpl> jobQueue = JobQueueOperations.transformJobQueue(jobListDocument);
+		HashMap<String, AbstractJobType> abstractJobTypeQueue = JobQueueOperations.toAbstractJobTypeList(jobQueue);
+		
+		if(!DependencyOperations.validateDependencyList(logger, abstractJobTypeQueue)) {
+			throw new Exception("JobList.xml is is not  valid !");
+		}
+		
 		return true;
 	}
 	
 	private void initializeFactory() {
 		
+		netTreeManagerInterface = new NetTreeManagerImp(jobListDocument.getJobList().getGenericJobArray());
+		
 		for (int counter = 0; counter < numOfSchedulerControllers; counter++) {
 			HashMap<String, JobImpl> jobQueue = JobQueueOperations.transformJobQueue(jobListDocument);
+			updateNetTreeStatus(jobQueue);
 			controllerContainer.put(counter + "", new SchedulerController((CoreFactoryInterface) this, jobQueue));
 		}
 	}
 	
+	private void updateNetTreeStatus(HashMap<String, JobImpl> jobQueue) {
+		
+		for (NetTreeResolver.NetTree netTreeMap : netTreeManagerInterface.getNetTreeMap().values()) {
+			
+			for(AbstractJobType abstractJobType : netTreeMap.getMembers()) {
+				if(jobQueue.containsKey(abstractJobType.getId())) {
+					JobImpl jobImpl = jobQueue.get(abstractJobType.getId());
+					jobImpl.getJobRuntimeProperties().setMemberIdOfNetTree(netTreeMap.getVirtualId());
+				}
+			}
+			
+			// System.err.println("netTree.virtualId : " + netTree.getVirtualId());
+			// System.err.println("netTree.members.size : " + netTree.getMembers().size());
+		}
+
+	}
+
 	protected void startControllers() {
 		
 		initializeFactory();
@@ -83,7 +118,7 @@ public class CoreFactoryBase {
 		// if (tlosParameters.isPersistent()) {
 		// 	JobQueueOperations.recoverDisabledJobQueue(tlosParameters, disabledJobQueue, jobQueue);
 		// }
-
+		
 		for (String key : controllerContainer.keySet()) {
 			
 			Thread controller = new Thread(controllerContainer.get(key));
@@ -91,6 +126,8 @@ public class CoreFactoryBase {
 			controller.start();
 			
 		}
+		
+		netTreeManagerInterface.startMe();
 	}
 	
 	public static Logger getLogger() {
@@ -128,5 +165,9 @@ public class CoreFactoryBase {
 
 	public static void setLogger(Logger logger) {
 		CoreFactoryBase.logger = logger;
+	}
+
+	public NetTreeManagerInterface getNetTreeManagerInterface() {
+		return netTreeManagerInterface;
 	}
 }
