@@ -20,7 +20,6 @@ import com.likya.myra.jef.core.CoreFactory;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
-import com.likya.xsd.myra.model.wlagen.JobAutoRetryDocument.JobAutoRetry;
 
 public class WatchDogTimer extends Thread {
 
@@ -68,7 +67,7 @@ public class WatchDogTimer extends Thread {
 	public void run() {
 		try {
 			Thread.sleep(timeout);
-			if (jobImpl.getAbstractJobType().getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() != JobAutoRetry.YES) {
+			if (jobImpl.getAbstractJobType().getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() != true) {
 				LiveStateInfoUtils.insertNewLiveStateInfo(jobImpl.getAbstractJobType(), StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_OUT);
 				CoreFactory.getLogger().info(CoreFactory.getMessage("WatchDogTimer.0")); //$NON-NLS-1$
 			} else {
