@@ -25,6 +25,11 @@ public class JobRuntimeProperties implements JobRuntimeInterface {
 	
 	private Logger myLogger;
 	
+	/**
+	 * null means job is not member of any NetTree, just free
+	 */
+	private String memberIdOfNetTree = null; 
+	
 	private ArrayList<Integer> previousStatusList = new ArrayList<Integer>();
 	
 	private Calendar completionDate = null;
@@ -139,6 +144,14 @@ public class JobRuntimeProperties implements JobRuntimeInterface {
 
 	public void setLogger(Logger myLogger) {
 		this.myLogger = myLogger;
+	}
+
+	public String getMemberIdOfNetTree() {
+		return memberIdOfNetTree;
+	}
+
+	public void setMemberIdOfNetTree(String memberIdOfNetTree) {
+		this.memberIdOfNetTree = memberIdOfNetTree;
 	}
 
 }

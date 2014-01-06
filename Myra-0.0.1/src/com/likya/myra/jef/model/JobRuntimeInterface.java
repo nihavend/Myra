@@ -45,4 +45,7 @@ public interface JobRuntimeInterface {
 	public Logger getLogger();
 	public void setLogger(Logger myLogger);
 	
+	public String getMemberIdOfNetTree();
+	public void setMemberIdOfNetTree(String memberIdOfNetTree);
+	
 }
