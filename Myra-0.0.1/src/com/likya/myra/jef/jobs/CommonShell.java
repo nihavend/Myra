@@ -28,7 +28,6 @@ import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.xsd.myra.model.generics.UnitDocument.Unit;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
-import com.likya.xsd.myra.model.wlagen.JobAutoRetryDocument.JobAutoRetry;
 
 public abstract class CommonShell extends GenericInnerJob {
 
@@ -117,7 +116,7 @@ public abstract class CommonShell extends GenericInnerJob {
 			timeOut = timeOut * 60;
 		}
 
-		if (!(abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == JobAutoRetry.YES && wdtCounter > 0)) {
+		if (!(abstractJobType.getManagement().getCascadingConditions() != null && abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == true && wdtCounter > 0)) {
 			watchDogTimer = new WatchDogTimer(this, abstractJobType.getId(), Thread.currentThread(), timeout * 1000);
 			watchDogTimer.setName(abstractJobType.getId() + ".WatchDogTimer.id." + watchDogTimer.getId());
 			watchDogTimer.start();
