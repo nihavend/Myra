@@ -30,7 +30,6 @@ import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
-import com.likya.xsd.myra.model.wlagen.JobAutoRetryDocument.JobAutoRetry;
 import com.likya.xsd.myra.model.wlagen.TriggerDocument.Trigger;
 
 public abstract class GenericInnerJob extends JobImpl {
@@ -73,8 +72,8 @@ public abstract class GenericInnerJob extends JobImpl {
 		sendOutputData();
 	}
 	
-	protected void scheduleForNextExecution(AbstractJobType abstractJobType) {
-		Scheduler.scheduleForNextExecution(abstractJobType);		
+	protected boolean scheduleForNextExecution(AbstractJobType abstractJobType) {
+		return Scheduler.scheduleForNextExecution(abstractJobType);		
 	}
 	
 //	public boolean processJobResultFromSch() {
@@ -104,15 +103,36 @@ public abstract class GenericInnerJob extends JobImpl {
 //		return false;
 //	}
 	
+	private boolean isInDepenedencyChain(String jobId) {
+		return !CoreFactory.getInstance().getNetTreeManagerInterface().getFreeJobs().containsKey(jobId);
+	}
+	
 	public void processJobResult() {
 
 		AbstractJobType abstractJobType = getAbstractJobType();
 
 		String jobId = abstractJobType.getId();
+		
+		if(isInDepenedencyChain(jobId)) {
+			// Do not touch, leave it to its master !
+			return;
+		}
 
 		LiveStateInfo liveStateInfo = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
+		
+		boolean isState = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS);
+		
+		
+		/**
+		 * if a job fails;
+		 * Two parameters; 
+		 * 		autoRetry and runEvenIfFailed conflicts. 
+		 * 		In this is case, the priority of runEvenIfFailed is higher so, the autoRetry is discarded
+		 */
+		 
+		boolean goOnError = (abstractJobType.getManagement().getCascadingConditions() != null && abstractJobType.getManagement().getCascadingConditions().getRunEvenIfFailed());
 
-		if (/* if not in dependency chain kontrolü eklenecek !!! */LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS)) {
+		if (isState || goOnError) {
 
 			JobHelper.setWorkDurations(this, startTime);
 
@@ -123,8 +143,9 @@ public abstract class GenericInnerJob extends JobImpl {
 				// Not implemented yet
 				break;
 			case Trigger.INT_TIME:
-				scheduleForNextExecution(abstractJobType);
-				setRenewByTime(abstractJobType);
+				if(scheduleForNextExecution(abstractJobType)) {
+					setRenewByTime(abstractJobType);
+				}
 				break;
 			case Trigger.INT_USER:
 				setRenewByUser(abstractJobType);
@@ -142,7 +163,7 @@ public abstract class GenericInnerJob extends JobImpl {
 
 			boolean stateCond = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.STOPPED, StatusName.BYUSER);
 
-			if (abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == JobAutoRetry.YES && !stateCond) {
+			if (abstractJobType.getManagement().getCascadingConditions() != null && abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == true && !stateCond) {
 				
 				if (retryCounter < abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getMaxCount().intValue()) {
 					CoreFactory.getLogger().info(CoreFactory.getMessage("ExternalProgram.11") + jobId);
