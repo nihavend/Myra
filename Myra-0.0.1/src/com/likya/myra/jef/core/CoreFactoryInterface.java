@@ -17,6 +17,7 @@ package com.likya.myra.jef.core;
 
 import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.OutputStrategy;
+import com.likya.myra.jef.utils.NetTreeManagerInterface;
 
 public interface CoreFactoryInterface {
 	
@@ -29,4 +30,6 @@ public interface CoreFactoryInterface {
 	public ConfigurationManager getConfigurationManager();
 
 	public OutputStrategy getOutputStrategy();
+	
+	public NetTreeManagerInterface getNetTreeManagerInterface();
 }
