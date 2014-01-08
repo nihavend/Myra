@@ -173,7 +173,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 
 			if (isPersistent()) {
 				JobQueueOperations.persistJobQueue(coreFactoryInterface.getConfigurationManager(), jobQueue);
-				JobQueueOperations.persistDisabledJobQueue(coreFactoryInterface.getConfigurationManager(), disabledJobQueue);
+				// JobQueueOperations.persistDisabledJobQueue(coreFactoryInterface.getConfigurationManager(), disabledJobQueue);
 			}
 
 			cleanUpQueueIssues();
