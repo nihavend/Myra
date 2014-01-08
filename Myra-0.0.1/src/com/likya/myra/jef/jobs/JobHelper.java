@@ -30,7 +30,6 @@ import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.jobprops.SimplePropertiesType;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.stateinfo.ReturnCodeListDocument.ReturnCodeList.OsType;
-import com.likya.xsd.myra.model.stateinfo.State;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.Status;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
@@ -95,7 +94,7 @@ public class JobHelper {
 		//		jobCalendar.set(Calendar.DAY_OF_MONTH, startTime.get(Calendar.DAY_OF_MONTH));
 
 		String timeZone = abstractJobType.getManagement().getTimeManagement().getTimeZone();
-		
+
 		Calendar returnCal = PeriodCalculations.addPeriod(Calendar.getInstance(), period, timeZone);
 
 		abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(returnCal);
@@ -230,13 +229,7 @@ public class JobHelper {
 		if ((abstractJobType.getStateInfos().getJobStatusList() != null) && (localStateCheck = StateUtils.contains(abstractJobType.getStateInfos().getJobStatusList(), processExitValue)) != null) {
 			statusName = localStateCheck.getStatusName();
 		} else {
-			State[] globaStates = CoreFactory.getInstance().getConfigurationManager().getGlobalStateDefinition().getGlobalStateArray();
-			Status mySubStateStatuses = StateUtils.globalContains(globaStates, StateName.FINISHED, SubstateName.COMPLETED, processExitValue);
-			if (mySubStateStatuses != null) {
-				statusName = mySubStateStatuses.getStatusName();
-			} else {
-				statusName = StatusName.FAILED;
-			}
+			statusName = StatusName.FAILED;
 		}
 
 		if (StatusName.FAILED.equals(statusName)) {
@@ -270,15 +263,15 @@ public class JobHelper {
 		//sendStatusChangeInfo();
 		return liveStateInfo;
 	}
-	
+
 	public static void resetJob(AbstractJobType abstractJobType) {
 		resetJob(abstractJobType, null);
 		return;
 	}
-	
+
 	public static void resetJob(AbstractJobType abstractJobType, LiveStateInfo liveStateInfo) {
 		if (Scheduler.scheduleForNextExecution(abstractJobType)) {
-			if(liveStateInfo == null) {
+			if (liveStateInfo == null) {
 				JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME);
 			}
 			OutputData outputData = OutputData.generateDefault(abstractJobType);
