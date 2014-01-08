@@ -20,7 +20,6 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 import com.likya.myra.commons.utils.XMLValidations;
-import com.likya.myra.jef.model.JobRuntimeProperties;
 import com.likya.xsd.myra.model.config.MyraConfigDocument;
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
 import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument.GlobalStateDefinition;
@@ -31,11 +30,11 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 
 	private final String fileToPersist = "Myra.recover";
 
-	private JobRuntimeProperties jobRuntimeProperties;
-
 	private GlobalStateDefinition globalStateDefinition;
 
 	private HashMap<Integer, String> groupList = new HashMap<Integer, String>();
+	
+	private boolean isRecovered = false;
 
 	public ConfigurationManagerImpl(MyraConfigDocument myraConfigDocument) {
 		super();
@@ -46,13 +45,6 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 
 		myraConfig = myraConfigDocument.getMyraConfig();
 
-		this.jobRuntimeProperties = new JobRuntimeProperties();
-
-	}
-
-	@Override
-	public JobRuntimeProperties getJobRuntimeProperties() {
-		return jobRuntimeProperties;
 	}
 
 	public MyraConfig getMyraConfig() {
@@ -77,6 +69,14 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 
 	public void setGroupList(HashMap<Integer, String> groupList) {
 		this.groupList = groupList;
+	}
+
+	public boolean isRecovered() {
+		return isRecovered;
+	}
+
+	public void setRecovered(boolean isRecovered) {
+		this.isRecovered = isRecovered;
 	}
 
 }
