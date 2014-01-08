@@ -7,11 +7,8 @@ import com.likya.myra.commons.utils.NetTreeResolver;
 import com.likya.myra.commons.utils.NetTreeResolver.NetTree;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.jobs.JobHelper;
-import com.likya.myra.jef.model.OutputData;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
-import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
-import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 
 public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 
@@ -63,12 +60,7 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 					if (isAllFinished) {
 						for (AbstractJobType abstractJobType : netTree.getMembers()) {
 							// System.err.println("Reset all NetTree members functionality not implemented yet !");
-							if (Scheduler.scheduleForNextExecution(abstractJobType)) {
-								JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME);
-								OutputData outputData = OutputData.generateDefault(abstractJobType);
-								CoreFactory.getInstance().getOutputStrategy().sendDataObject(outputData);
-								CoreFactory.getLogger().info("Job id :" + abstractJobType.getId() + " is scheduled for new time " + abstractJobType.getManagement().getTimeManagement().getJsPlannedTime());
-							}
+							JobHelper.resetJob(abstractJobType);
 						}
 						freq = 60000;
 					}
