@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.commons.collections.iterators.ArrayIterator;
-import org.apache.log4j.Logger;
 
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.ConfigurationManager;
@@ -325,7 +324,6 @@ public class JobQueueOperations {
 			try {
 				// abstractClass = Class.forName("com.likya.myra.jef.jobs.ExecuteInShell");
 				abstractClass = Class.forName(handlerUri);
-				jobRuntimeInterface.setLogger(Logger.getLogger(abstractClass));
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 				return null;
