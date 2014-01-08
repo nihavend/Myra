@@ -30,7 +30,7 @@ public abstract class JobImpl implements Runnable, Serializable {
 
 	private static final long serialVersionUID = 2540934879831919506L;
 
-	public Logger myLogger;
+	transient public Logger myLogger;
 	
 	protected int retryCounter = 0;
 
@@ -58,11 +58,7 @@ public abstract class JobImpl implements Runnable, Serializable {
 		this.abstractJobType = abstractJobType;
 		this.jobRuntimeProperties = jobRuntimeProperties;
 
-		if (jobRuntimeProperties.getLogger() != null) {
-			myLogger = jobRuntimeProperties.getLogger();
-		} else {
-			myLogger = Logger.getLogger(JobImpl.class);
-		}
+		myLogger = CoreFactory.getLogger();
 
 		outputStrategy = CoreFactory.getInstance().getOutputStrategy();
 		myraConfig = CoreFactory.getInstance().getConfigurationManager().getMyraConfig();
