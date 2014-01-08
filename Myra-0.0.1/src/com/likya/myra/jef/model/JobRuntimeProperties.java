@@ -20,14 +20,10 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import org.apache.log4j.Logger;
-
 public class JobRuntimeProperties implements JobRuntimeInterface, Serializable {
 	
 	private static final long serialVersionUID = -247742981750784916L;
 
-	private Logger myLogger;
-	
 	/**
 	 * null means job is not member of any NetTree, just free
 	 */
@@ -139,14 +135,6 @@ public class JobRuntimeProperties implements JobRuntimeInterface, Serializable {
 
 	public void setLogAnalyzeString(String logAnalyzeString) {
 		this.logAnalyzeString = logAnalyzeString;
-	}
-
-	public Logger getLogger() {
-		return myLogger;
-	}
-
-	public void setLogger(Logger myLogger) {
-		this.myLogger = myLogger;
 	}
 
 	public String getMemberIdOfNetTree() {
