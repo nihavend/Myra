@@ -18,7 +18,6 @@ package com.likya.myra.jef;
 import java.util.HashMap;
 
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
-import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument.GlobalStateDefinition;
 
 /**
  * @author serkan
@@ -30,10 +29,6 @@ import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument.GlobalSt
 public interface ConfigurationManager {
 
 	public MyraConfig getMyraConfig();
-
-	public GlobalStateDefinition getGlobalStateDefinition();
-	
-	public void setGlobalStateDefinition(GlobalStateDefinition globalStateDefinition);
 
 	public String getFileToPersist();
 
