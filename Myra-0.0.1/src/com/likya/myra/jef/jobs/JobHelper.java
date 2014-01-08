@@ -229,7 +229,11 @@ public class JobHelper {
 		if ((abstractJobType.getStateInfos().getJobStatusList() != null) && (localStateCheck = StateUtils.contains(abstractJobType.getStateInfos().getJobStatusList(), processExitValue)) != null) {
 			statusName = localStateCheck.getStatusName();
 		} else {
-			statusName = StatusName.FAILED;
+			if(processExitValue == 0) {
+				statusName = StatusName.SUCCESS;
+			} else {
+				statusName = StatusName.FAILED;
+			}
 		}
 
 		if (StatusName.FAILED.equals(statusName)) {
