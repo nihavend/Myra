@@ -16,8 +16,11 @@
 package com.likya.myra.jef.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -28,8 +31,10 @@ import java.util.Iterator;
 import org.apache.commons.collections.iterators.ArrayIterator;
 import org.apache.log4j.Logger;
 
+import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.core.CoreFactory;
+import com.likya.myra.jef.jobs.JobHelper;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.model.JobRuntimeProperties;
@@ -37,6 +42,10 @@ import com.likya.myra.jef.model.PersistObject;
 import com.likya.myra.jef.model.SortType;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.joblist.JobListDocument;
+import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
+import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
+import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
+import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 
 public class JobQueueOperations {
 
@@ -152,69 +161,153 @@ public class JobQueueOperations {
 
 	}
 
-//	public static HashMap<String, JobImpl> transformJobQueueOld(JobListDocument jobListDocument) {
-//
-//		HashMap<String, JobImpl> jobQueue = new HashMap<String, JobImpl>();
-//
-//		int remoteSchLength = jobListDocument.getJobList().getJobRemoteSchPropertiesArray().length;
-//		int simple = jobListDocument.getJobList().getJobSimplePropertiesArray().length;
-//
-//		int length = remoteSchLength + simple;
-//
-//		Object[] objectArray = new Object[length];
-//
-//		System.arraycopy(jobListDocument.getJobList().getJobRemoteSchPropertiesArray(), 0, objectArray, 0, remoteSchLength);
-//		System.arraycopy(jobListDocument.getJobList().getJobSimplePropertiesArray(), 0, objectArray, remoteSchLength, simple);
-//
-//		ArrayIterator jobArrayIterator = new ArrayIterator(objectArray);
-//
-//		while (jobArrayIterator.hasNext()) {
-//
-//			Object retObject = jobArrayIterator.next();
-//
-//			int jobType = -1;
-//			// Deneme amaçlı
-//			if (retObject instanceof RemoteSchProperties) {
-//				jobType = JobCommandType.INT_REMOTE_SHELL;
-//			} else if (retObject instanceof SimpleProperties) {
-//				jobType = JobCommandType.INT_BATCH_PROCESS;
-//			}
-//
-//			SimpleProperties simpleProperties = (SimpleProperties) (retObject);
-//
-//			JobRuntimeInterface jobRuntimeInterface = new JobRuntimeProperties();
-//
-//			JobImpl jobImpl = null;
-//
-//			switch (jobType) {
-//			case JobCommandType.INT_BATCH_PROCESS:
-//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
-//				((ExecuteInShell) jobImpl).setShell(true);
-//				break;
-//			case JobCommandType.INT_SYSTEM_COMMAND:
-//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
-//				((ExecuteInShell) jobImpl).setShell(false);
-//				break;
-//			case JobCommandType.INT_REMOTE_SHELL:
-//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
-//				break;
-//
-//			default:
-//				break;
-//			}
-//
-//			jobQueue.put(simpleProperties.getId(), jobImpl);
-//		}
-//
-//		return jobQueue;
-//	}
+	public static boolean recoverJobQueue(ConfigurationManager configurationManager, HashMap<String, JobImpl> jobQueue) {
+
+		CoreFactory.getLogger().info(CoreFactory.getMessage("JobQueueOperations.12"));
+
+		FileInputStream fis = null;
+		ObjectInputStream in = null;
+
+		try {
+			fis = new FileInputStream(configurationManager.getFileToPersist());
+			in = new ObjectInputStream(fis);
+			Object input = in.readObject();
+
+			PersistObject persistObject = (PersistObject) input;
+
+			if (!persistObject.getTlosVersion().equals(CoreFactory.getVersion())) {
+				CoreFactory.getLogger().error(CoreFactory.getMessage("JobQueueOperations.13"));
+				CoreFactory.getLogger().error(CoreFactory.getMessage("JobQueueOperations.14") + CoreFactory.getVersion() + CoreFactory.getMessage("JobQueueOperations.15") + persistObject.getTlosVersion() + CoreFactory.getMessage("JobQueueOperations.16")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				in.close();
+				return false;
+			}
+
+			jobQueue.putAll(persistObject.getJobQueue());
+
+			// grup listesi de recover dosyasindan okunuyor
+			configurationManager.setGroupList(persistObject.getGroupList());
+
+			in.close();
+
+			resetJobQueue(LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_SUCCESS), jobQueue);
+
+		} catch (FileNotFoundException fnf) {
+			return false;
+		} catch (IOException ex) {
+			ex.printStackTrace();
+			return false;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			try {
+				in.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			return false;
+		}
+
+		// dumpJobQueue(jobQueue);
+
+		CoreFactory.getLogger().info(CoreFactory.getMessage("JobQueueOperations.17"));
+
+		// CoreFactory.setRecovered(true);
+
+		return true;
+	}
+	
+	public static void normalizeJobQueue(HashMap<String, JobImpl> jobQueue) {
+		resetJobQueue(null, jobQueue);
+		return;
+	}
+
+	public static void resetJobQueue(LiveStateInfo exceptionLiveStateInfo, HashMap<String, JobImpl> jobQueue) {
+
+		for (JobImpl tmpJobImpl : jobQueue.values()) {
+
+			AbstractJobType abstractJobType = tmpJobImpl.getAbstractJobType();
+
+			if (exceptionLiveStateInfo != null && LiveStateInfoUtils.equalStates(exceptionLiveStateInfo, abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0))) {
+				continue;
+			}
+
+			JobHelper.resetJob(abstractJobType);
+
+			//			if (scheduledJob.getJobQueue() == null) {
+			//				/**
+			//				 * jobQueue transient olduğunudun, serialize etmiyor Recover
+			//				 * ederken, bu alan null geliyor. Bu nedenle null ise yeninde
+			//				 * okumak gerekiyor.
+			//				 */
+			//				scheduledJob.setJobQueue(jobQueue);
+			//			}
+		}
+
+		return;
+	}
+
+	//	public static HashMap<String, JobImpl> transformJobQueueOld(JobListDocument jobListDocument) {
+	//
+	//		HashMap<String, JobImpl> jobQueue = new HashMap<String, JobImpl>();
+	//
+	//		int remoteSchLength = jobListDocument.getJobList().getJobRemoteSchPropertiesArray().length;
+	//		int simple = jobListDocument.getJobList().getJobSimplePropertiesArray().length;
+	//
+	//		int length = remoteSchLength + simple;
+	//
+	//		Object[] objectArray = new Object[length];
+	//
+	//		System.arraycopy(jobListDocument.getJobList().getJobRemoteSchPropertiesArray(), 0, objectArray, 0, remoteSchLength);
+	//		System.arraycopy(jobListDocument.getJobList().getJobSimplePropertiesArray(), 0, objectArray, remoteSchLength, simple);
+	//
+	//		ArrayIterator jobArrayIterator = new ArrayIterator(objectArray);
+	//
+	//		while (jobArrayIterator.hasNext()) {
+	//
+	//			Object retObject = jobArrayIterator.next();
+	//
+	//			int jobType = -1;
+	//			// Deneme amaçlı
+	//			if (retObject instanceof RemoteSchProperties) {
+	//				jobType = JobCommandType.INT_REMOTE_SHELL;
+	//			} else if (retObject instanceof SimpleProperties) {
+	//				jobType = JobCommandType.INT_BATCH_PROCESS;
+	//			}
+	//
+	//			SimpleProperties simpleProperties = (SimpleProperties) (retObject);
+	//
+	//			JobRuntimeInterface jobRuntimeInterface = new JobRuntimeProperties();
+	//
+	//			JobImpl jobImpl = null;
+	//
+	//			switch (jobType) {
+	//			case JobCommandType.INT_BATCH_PROCESS:
+	//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
+	//				((ExecuteInShell) jobImpl).setShell(true);
+	//				break;
+	//			case JobCommandType.INT_SYSTEM_COMMAND:
+	//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
+	//				((ExecuteInShell) jobImpl).setShell(false);
+	//				break;
+	//			case JobCommandType.INT_REMOTE_SHELL:
+	//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
+	//				break;
+	//
+	//			default:
+	//				break;
+	//			}
+	//
+	//			jobQueue.put(simpleProperties.getId(), jobImpl);
+	//		}
+	//
+	//		return jobQueue;
+	//	}
 
 	public static HashMap<String, JobImpl> transformJobQueue(JobListDocument jobListDocument) {
 
 		HashMap<String, JobImpl> jobQueue = new HashMap<String, JobImpl>();
 
 		JobRuntimeInterface jobRuntimeInterface = new JobRuntimeProperties();
-		
+
 		Object[] objectArray = jobListDocument.getJobList().getGenericJobArray();
 
 		ArrayIterator jobArrayIterator = new ArrayIterator(objectArray);
@@ -222,7 +315,7 @@ public class JobQueueOperations {
 		while (jobArrayIterator.hasNext()) {
 
 			AbstractJobType abstractJobType = (AbstractJobType) jobArrayIterator.next();
-			
+
 			String handlerUri = abstractJobType.getHandlerURI();
 
 			Class<?> abstractClass;
@@ -236,7 +329,7 @@ public class JobQueueOperations {
 			}
 
 			JobImpl jobImpl = null;
-					
+
 			try {
 				jobImpl = (JobImpl) abstractClass.getDeclaredConstructor(new Class[] { AbstractJobType.class, JobRuntimeInterface.class }).newInstance(abstractJobType, jobRuntimeInterface);
 				jobImpl.getJobInfo();
@@ -260,23 +353,23 @@ public class JobQueueOperations {
 				e.printStackTrace();
 			}
 
-//			switch (jobType) {
-//			case JobCommandType.INT_BATCH_PROCESS:
-//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
-//				((ExecuteInShell) jobImpl).setShell(true);
-//				break;
-//			case JobCommandType.INT_SYSTEM_COMMAND:
-//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
-//				((ExecuteInShell) jobImpl).setShell(false);
-//				break;
-//			case JobCommandType.INT_REMOTE_SHELL:
-//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
-//				break;
-//
-//			default:
-//				break;
-//			}
-			
+			//			switch (jobType) {
+			//			case JobCommandType.INT_BATCH_PROCESS:
+			//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
+			//				((ExecuteInShell) jobImpl).setShell(true);
+			//				break;
+			//			case JobCommandType.INT_SYSTEM_COMMAND:
+			//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
+			//				((ExecuteInShell) jobImpl).setShell(false);
+			//				break;
+			//			case JobCommandType.INT_REMOTE_SHELL:
+			//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
+			//				break;
+			//
+			//			default:
+			//				break;
+			//			}
+
 			CoreFactory.getLogger().info("Transformed " + handlerUri + " Job Id : " + abstractJobType.getId());
 
 			jobQueue.put(abstractJobType.getId(), jobImpl);
@@ -284,31 +377,31 @@ public class JobQueueOperations {
 
 		return jobQueue;
 	}
-	
+
 	public static HashMap<String, AbstractJobType> toAbstractJobTypeList(HashMap<String, JobImpl> jobQueue) {
-		
+
 		HashMap<String, AbstractJobType> tmpList = new HashMap<String, AbstractJobType>();
-		
+
 		Iterator<String> jobsIterator = jobQueue.keySet().iterator();
 
 		while (jobsIterator.hasNext()) {
 			String jobKey = jobsIterator.next();
 			tmpList.put(jobKey, jobQueue.get(jobKey).getAbstractJobType());
 		}
-		
+
 		return tmpList;
 	}
-	
+
 	public static Collection<String> getKeyList(Collection<AbstractJobType> abstractJobTypeList) {
-		
+
 		ArrayList<String> jobKeys = new ArrayList<>();
 		Iterator<AbstractJobType> abstractJobTypeIterator = abstractJobTypeList.iterator();
-		
+
 		while (abstractJobTypeIterator.hasNext()) {
 			AbstractJobType abstractJobType = abstractJobTypeIterator.next();
 			jobKeys.add(abstractJobType.getId());
 		}
-		
+
 		return jobKeys;
 	}
 }
