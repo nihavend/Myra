@@ -15,14 +15,17 @@
  ******************************************************************************/
 package com.likya.myra.jef.model;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.apache.log4j.Logger;
 
-public class JobRuntimeProperties implements JobRuntimeInterface {
+public class JobRuntimeProperties implements JobRuntimeInterface, Serializable {
 	
+	private static final long serialVersionUID = -247742981750784916L;
+
 	private Logger myLogger;
 	
 	/**
