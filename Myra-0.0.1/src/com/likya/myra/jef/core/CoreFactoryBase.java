@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.likya.myra.jef.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
@@ -80,29 +81,25 @@ public class CoreFactoryBase {
 
 	protected void initializeFactory() throws Exception {
 
-		HashMap<String, JobImpl> jobQueue = null;
+		ArrayList<String> messages = new ArrayList<>();
+		
+		HashMap<String, JobImpl> jobQueue = new HashMap<String, JobImpl>();
 		AbstractJobType[] abstractJobTypes = null;
 		
-		if (configurationManager.getMyraConfig().getPersistent()) {
-			jobQueue = new HashMap<String, JobImpl>();
-			if(!JobQueueOperations.recoverJobQueue(configurationManager, jobQueue)) {
-				throw new Exception("Can not recover from the presisted file !");
-			}
-			if(jobQueue.size() == 0) {
-				throw new Exception("Recovered job queue size is 0 !");
-			}
+		if (configurationManager.getMyraConfig().getPersistent() && JobQueueOperations.recoverJobQueue(configurationManager, jobQueue, messages) && jobQueue.size() != 0) {
 			abstractJobTypes = (AbstractJobType[]) JobQueueOperations.toAbstractJobTypeList(jobQueue).values().toArray();
 		} else {
 			abstractJobTypes = jobListDocument.getJobList().getGenericJobArray();
 			if(abstractJobTypes.length == 0) {
 				throw new Exception("jobListDocument.getJobList size is 0 !");
 			}
-			jobQueue = JobQueueOperations.transformJobQueue(jobListDocument);
+			jobQueue.putAll(JobQueueOperations.transformJobQueue(jobListDocument));
 		}
 		
 		netTreeManagerInterface = new NetTreeManagerImp(abstractJobTypes);
 		updateNetTreeStatus(jobQueue);
 		controllerContainer.put("1", new SchedulerController((CoreFactoryInterface) this, jobQueue));
+		
 		
 	}
 
