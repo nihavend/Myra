@@ -22,15 +22,12 @@ import org.apache.log4j.Logger;
 import com.likya.myra.commons.utils.XMLValidations;
 import com.likya.xsd.myra.model.config.MyraConfigDocument;
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
-import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument.GlobalStateDefinition;
 
 public class ConfigurationManagerImpl implements ConfigurationManager {
 
 	private MyraConfig myraConfig;
 
 	private final String fileToPersist = "Myra.recover";
-
-	private GlobalStateDefinition globalStateDefinition;
 
 	private HashMap<Integer, String> groupList = new HashMap<Integer, String>();
 	
@@ -49,14 +46,6 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 
 	public MyraConfig getMyraConfig() {
 		return myraConfig;
-	}
-
-	public GlobalStateDefinition getGlobalStateDefinition() {
-		return globalStateDefinition;
-	}
-
-	public void setGlobalStateDefinition(GlobalStateDefinition globalStateDefinition) {
-		this.globalStateDefinition = globalStateDefinition;
 	}
 
 	public String getFileToPersist() {
