@@ -23,6 +23,7 @@ import com.likya.commons.utils.LocaleMessages;
 import com.likya.myra.commons.utils.DependencyOperations;
 import com.likya.myra.commons.utils.NetTreeResolver;
 import com.likya.myra.commons.utils.XMLValidations;
+import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.controller.ControllerInterface;
 import com.likya.myra.jef.controller.SchedulerController;
 import com.likya.myra.jef.jobs.JobImpl;
@@ -33,70 +34,89 @@ import com.likya.myra.jef.utils.NetTreeManagerInterface;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.joblist.JobListDocument;
 
-
 public class CoreFactoryBase {
-	
+
 	private static final String version = "0.0.1";
-	
+
 	protected final static String localePath = "com.likya.myra.resources.messages";
-	
+
 	private CoreStateInfo coreStateInfo = CoreStateInfo.STATE_STARTING;
-	
+
 	private static Logger logger = Logger.getLogger("Myra");
-	
+
+	private ConfigurationManager configurationManager;
+
 	private NetTreeManagerInterface netTreeManagerInterface;
-	
+
 	/**
 	 * For current version it is limited to one
 	 * For future releases, it may be extended
 	 * according to distribution strategy
-	 * @author serkan taş 
+	 * 
+	 * @author serkan taş
 	 */
-	
+
 	protected int numOfSchedulerControllers = 1;
-	
+
 	protected HashMap<String, ControllerInterface> controllerContainer;
-	
+
 	protected JobListDocument jobListDocument;
-	
+
 	protected boolean validateFactory() throws Exception {
-		
+
 		if (!XMLValidations.validateWithXSDAndLog(getLogger(), jobListDocument)) {
 			throw new Exception("JobList.xml is null or damaged !");
 		}
-		
+
 		HashMap<String, JobImpl> jobQueue = JobQueueOperations.transformJobQueue(jobListDocument);
 		HashMap<String, AbstractJobType> abstractJobTypeQueue = JobQueueOperations.toAbstractJobTypeList(jobQueue);
-		
-		if(!DependencyOperations.validateDependencyList(logger, abstractJobTypeQueue)) {
+
+		if (!DependencyOperations.validateDependencyList(logger, abstractJobTypeQueue)) {
 			throw new Exception("JobList.xml is is not  valid !");
 		}
-		
+
 		return true;
 	}
-	
-	private void initializeFactory() {
+
+	protected void initializeFactory() throws Exception {
+
+		HashMap<String, JobImpl> jobQueue = null;
+		AbstractJobType[] abstractJobTypes = null;
 		
-		netTreeManagerInterface = new NetTreeManagerImp(jobListDocument.getJobList().getGenericJobArray());
-		
-		for (int counter = 0; counter < numOfSchedulerControllers; counter++) {
-			HashMap<String, JobImpl> jobQueue = JobQueueOperations.transformJobQueue(jobListDocument);
-			updateNetTreeStatus(jobQueue);
-			controllerContainer.put(counter + "", new SchedulerController((CoreFactoryInterface) this, jobQueue));
+		if (configurationManager.getMyraConfig().getPersistent()) {
+			jobQueue = new HashMap<String, JobImpl>();
+			if(!JobQueueOperations.recoverJobQueue(configurationManager, jobQueue)) {
+				throw new Exception("Can not recover from the presisted file !");
+			}
+			if(jobQueue.size() == 0) {
+				throw new Exception("Recovered job queue size is 0 !");
+			}
+			abstractJobTypes = (AbstractJobType[]) JobQueueOperations.toAbstractJobTypeList(jobQueue).values().toArray();
+		} else {
+			abstractJobTypes = jobListDocument.getJobList().getGenericJobArray();
+			if(abstractJobTypes.length == 0) {
+				throw new Exception("jobListDocument.getJobList size is 0 !");
+			}
+			jobQueue = JobQueueOperations.transformJobQueue(jobListDocument);
 		}
-	}
-	
-	private void updateNetTreeStatus(HashMap<String, JobImpl> jobQueue) {
 		
+		netTreeManagerInterface = new NetTreeManagerImp(abstractJobTypes);
+		updateNetTreeStatus(jobQueue);
+		controllerContainer.put("1", new SchedulerController((CoreFactoryInterface) this, jobQueue));
+		
+	}
+
+	private void updateNetTreeStatus(HashMap<String, JobImpl> jobQueue) {
+
 		for (NetTreeResolver.NetTree netTreeMap : netTreeManagerInterface.getNetTreeMap().values()) {
-			
-			for(AbstractJobType abstractJobType : netTreeMap.getMembers()) {
-				if(jobQueue.containsKey(abstractJobType.getId())) {
+
+			for (AbstractJobType abstractJobType : netTreeMap.getMembers()) {
+				if (jobQueue.containsKey(abstractJobType.getId())) {
 					JobImpl jobImpl = jobQueue.get(abstractJobType.getId());
 					jobImpl.getJobRuntimeProperties().setMemberIdOfNetTree(netTreeMap.getVirtualId());
 				}
 			}
-			
+
 			// System.err.println("netTree.virtualId : " + netTree.getVirtualId());
 			// System.err.println("netTree.members.size : " + netTree.getMembers().size());
 		}
@@ -104,8 +124,6 @@ public class CoreFactoryBase {
 	}
 
 	protected void startControllers() {
-		
-		initializeFactory();
 
 		// TODO Evaluate distribution strategy
 
@@ -118,22 +136,22 @@ public class CoreFactoryBase {
 		// if (tlosParameters.isPersistent()) {
 		// 	JobQueueOperations.recoverDisabledJobQueue(tlosParameters, disabledJobQueue, jobQueue);
 		// }
-		
+
 		for (String key : controllerContainer.keySet()) {
-			
+
 			Thread controller = new Thread(controllerContainer.get(key));
 			controller.setName(this.getClass().getName() + "_" + key);
 			controller.start();
-			
+
 		}
-		
+
 		netTreeManagerInterface.startMe();
 	}
-	
+
 	public static Logger getLogger() {
 		return logger;
 	}
-	
+
 	protected static void registerMessageBundle() {
 		LocaleMessages.registerBundle(localePath);
 		getLogger().info(CoreFactory.getMessage("Pinara.37") + localePath);
@@ -142,7 +160,7 @@ public class CoreFactoryBase {
 	public static String getMessage(String key) {
 		return LocaleMessages.getString(localePath, key);
 	}
-	
+
 	protected HashMap<String, ControllerInterface> getControllerContainer() {
 		return controllerContainer;
 	}
@@ -167,7 +185,15 @@ public class CoreFactoryBase {
 		CoreFactoryBase.logger = logger;
 	}
 
+	public ConfigurationManager getConfigurationManager() {
+		return configurationManager;
+	}
+
 	public NetTreeManagerInterface getNetTreeManagerInterface() {
 		return netTreeManagerInterface;
+	}
+
+	protected void setConfigurationManager(ConfigurationManager configurationManager) {
+		this.configurationManager = configurationManager;
 	}
 }
