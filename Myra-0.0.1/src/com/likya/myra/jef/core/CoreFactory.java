@@ -22,7 +22,6 @@ import org.apache.xmlbeans.XmlException;
 
 import com.likya.commons.utils.FileUtils;
 import com.likya.myra.commons.utils.XMLValidations;
-import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.InputStrategy;
 import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.controller.ControllerInterface;
@@ -33,8 +32,6 @@ import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument;
 public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface {
 
 	private static CoreFactory coreFactory;
-
-	private ConfigurationManager configurationManager;
 
 	private ManagementOperations managementOperations;
 
@@ -56,7 +53,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		
 		controllerContainer = new HashMap<String, ControllerInterface>();
 
-		this.configurationManager = inputStrategy.getConfigurationManager();
+		setConfigurationManager(inputStrategy.getConfigurationManager());
 		
 		String configFile = "globalStates.xml";
 
@@ -66,7 +63,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 			if (!XMLValidations.validateWithXSDAndLog(Logger.getRootLogger(), globalStateDefinitionDocument)) {
 				throw new XmlException(configFile + " is null or damaged !");
 			}
-			configurationManager.setGlobalStateDefinition(globalStateDefinitionDocument.getGlobalStateDefinition());
+			getConfigurationManager().setGlobalStateDefinition(globalStateDefinitionDocument.getGlobalStateDefinition());
 		} catch (XmlException e) {
 			e.printStackTrace();
 		}
@@ -105,6 +102,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 	protected void start() throws Throwable {
 		if (coreFactory != null) {
 			if (validateFactory()) {
+				initializeFactory();
 				startControllers();
 			} else {
 				throw new Exception();
@@ -113,10 +111,6 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 			throw new MyraException();
 		}
 
-	}
-
-	public ConfigurationManager getConfigurationManager() {
-		return configurationManager;
 	}
 
 	public ManagementOperations getManagementOperations() {
