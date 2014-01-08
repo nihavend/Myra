@@ -161,7 +161,7 @@ public class JobQueueOperations {
 
 	}
 
-	public static boolean recoverJobQueue(ConfigurationManager configurationManager, HashMap<String, JobImpl> jobQueue) {
+	public static boolean recoverJobQueue(ConfigurationManager configurationManager, HashMap<String, JobImpl> jobQueue, ArrayList<String> messages) {
 
 		CoreFactory.getLogger().info(CoreFactory.getMessage("JobQueueOperations.12"));
 
@@ -192,9 +192,11 @@ public class JobQueueOperations {
 			resetJobQueue(LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_SUCCESS), jobQueue);
 
 		} catch (FileNotFoundException fnf) {
+			messages.add(fnf.getMessage());
 			return false;
 		} catch (IOException ex) {
 			ex.printStackTrace();
+			messages.add(ex.getMessage());
 			return false;
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -203,6 +205,7 @@ public class JobQueueOperations {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
+			messages.add(e.getMessage());
 			return false;
 		}
 
