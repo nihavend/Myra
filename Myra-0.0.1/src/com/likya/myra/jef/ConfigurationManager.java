@@ -17,7 +17,6 @@ package com.likya.myra.jef;
 
 import java.util.HashMap;
 
-import com.likya.myra.jef.model.JobRuntimeProperties;
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
 import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument.GlobalStateDefinition;
 
@@ -32,8 +31,6 @@ public interface ConfigurationManager {
 
 	public MyraConfig getMyraConfig();
 
-	public JobRuntimeProperties getJobRuntimeProperties();
-
 	public GlobalStateDefinition getGlobalStateDefinition();
 	
 	public void setGlobalStateDefinition(GlobalStateDefinition globalStateDefinition);
@@ -43,5 +40,9 @@ public interface ConfigurationManager {
 	public HashMap<Integer, String> getGroupList();
 
 	public void setGroupList(HashMap<Integer, String> groupList);
+	
+	public boolean isRecovered();
+
+	public void setRecovered(boolean isRecovered);
 
 }
