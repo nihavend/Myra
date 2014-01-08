@@ -41,8 +41,6 @@ import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 
 public class SchedulerController extends BaseSchedulerController implements ControllerInterface {
 
-	private boolean isPersistent = false;
-
 	public SchedulerController(CoreFactoryInterface coreFactoryInterface, HashMap<String, JobImpl> jobQueue) {
 		super(coreFactoryInterface, jobQueue);
 	}
@@ -52,13 +50,21 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 		
 		Logger logger = CoreFactory.getLogger();
 
-		ArrayList<SortType> jobIndex = JobQueueOperations.createProrityIndex(jobQueue);
-		Collections.sort(jobIndex);
 
 		logger.info("Starting : ");
 		logger.debug(CoreFactory.getMessage("MyraServer.38"));
 		logger.info(CoreFactory.getMessage("MyraServer.39") + jobQueue.size());
 
+		if (coreFactoryInterface.getConfigurationManager().getMyraConfig().getNormalize() && !coreFactoryInterface.getConfigurationManager().isRecovered()) {
+			logger.info(CoreFactory.getMessage("MyraServer.40"));
+			JobQueueOperations.normalizeJobQueue(jobQueue);
+			logger.info(CoreFactory.getMessage("MyraServer.41"));
+			coreFactoryInterface.getConfigurationManager().setRecovered(false);
+		}
+
+		ArrayList<SortType> jobIndex = JobQueueOperations.createProrityIndex(jobQueue);
+		Collections.sort(jobIndex);
+		
 		while (executionPermission) {
 
 			try {
@@ -79,6 +85,10 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 					JobImpl scheduledJob = jobQueue.get(mySortType.getJobKey());
 
 					AbstractJobType abstractJobType = scheduledJob.getAbstractJobType();
+					
+					if(!abstractJobType.getBaseJobInfos().getJsIsActive()) {
+						continue;
+					}
 
 					DependencyList dependencyList = abstractJobType.getDependencyList();
 
@@ -161,7 +171,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 				e.printStackTrace();
 			}
 
-			if (isPersistent) {
+			if (isPersistent()) {
 				JobQueueOperations.persistJobQueue(coreFactoryInterface.getConfigurationManager(), jobQueue);
 				JobQueueOperations.persistDisabledJobQueue(coreFactoryInterface.getConfigurationManager(), disabledJobQueue);
 			}
