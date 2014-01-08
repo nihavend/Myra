@@ -17,8 +17,6 @@ package com.likya.myra.jef.model;
 
 import java.util.Calendar;
 
-import org.apache.log4j.Logger;
-
 public interface JobRuntimeInterface {
 	
 	public Calendar getCompletionDate();
@@ -41,9 +39,6 @@ public interface JobRuntimeInterface {
 	
 	public String getLogAnalyzeString();
 	public void setLogAnalyzeString(String logAnalyzeString);
-	
-	public Logger getLogger();
-	public void setLogger(Logger myLogger);
 	
 	public String getMemberIdOfNetTree();
 	public void setMemberIdOfNetTree(String memberIdOfNetTree);
