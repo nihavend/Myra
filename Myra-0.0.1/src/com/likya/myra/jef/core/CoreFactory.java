@@ -17,17 +17,11 @@ package com.likya.myra.jef.core;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlException;
-
-import com.likya.commons.utils.FileUtils;
-import com.likya.myra.commons.utils.XMLValidations;
 import com.likya.myra.jef.InputStrategy;
 import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.controller.ControllerInterface;
 import com.likya.myra.jef.model.InstanceNotFoundException;
 import com.likya.myra.jef.model.MyraException;
-import com.likya.xsd.myra.model.stateinfo.GlobalStateDefinitionDocument;
 
 public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface {
 
@@ -55,19 +49,6 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 
 		setConfigurationManager(inputStrategy.getConfigurationManager());
 		
-		String configFile = "globalStates.xml";
-
-		StringBuffer xmlString = FileUtils.readFile(this.getClass(), configFile);
-		try {
-			GlobalStateDefinitionDocument globalStateDefinitionDocument = GlobalStateDefinitionDocument.Factory.parse(xmlString.toString());
-			if (!XMLValidations.validateWithXSDAndLog(Logger.getRootLogger(), globalStateDefinitionDocument)) {
-				throw new XmlException(configFile + " is null or damaged !");
-			}
-			getConfigurationManager().setGlobalStateDefinition(globalStateDefinitionDocument.getGlobalStateDefinition());
-		} catch (XmlException e) {
-			e.printStackTrace();
-		}
-
 		this.managementOperations = new ManagementOperationsImpl(this);
 
 		this.monitoringOperations = new MonitoringOperationsImpl(this);
