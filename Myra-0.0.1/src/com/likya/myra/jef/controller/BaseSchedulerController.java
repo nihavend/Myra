@@ -43,6 +43,8 @@ public class BaseSchedulerController {
 	protected int cycleFrequency = 1000;
 	
 	private boolean thresholdOverflow = false;
+	
+	private boolean isPersistent = false;
 
 	protected CoreFactoryInterface coreFactoryInterface;
 
@@ -50,6 +52,7 @@ public class BaseSchedulerController {
 		super();
 		this.coreFactoryInterface = coreFactoryInterface;
 		this.jobQueue = jobQueue;
+		this.isPersistent = coreFactoryInterface.getConfigurationManager().getMyraConfig().getPersistent();
 	}
 
 	
@@ -345,5 +348,10 @@ public class BaseSchedulerController {
 
 	public boolean isThresholdOverflow() {
 		return thresholdOverflow;
+	}
+
+
+	public boolean isPersistent() {
+		return isPersistent;
 	}
 }
