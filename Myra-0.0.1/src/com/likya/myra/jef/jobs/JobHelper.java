@@ -34,9 +34,6 @@ import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.Status;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
-import com.likya.xsd.myra.model.wlagen.JsRealTimeDocument.JsRealTime;
-import com.likya.xsd.myra.model.wlagen.StartTimeDocument.StartTime;
-import com.likya.xsd.myra.model.wlagen.StopTimeDocument.StopTime;
 
 public class JobHelper {
 
@@ -63,10 +60,7 @@ public class JobHelper {
 		String endLog = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.14") + MyraDateUtils.getDate(endTime.getTime());
 		String duration = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.15") + MyraDateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
 
-		StopTime stopTimeTemp = StopTime.Factory.newInstance();
-		stopTimeTemp.setTime(endTime);
-		stopTimeTemp.setDate(endTime);
-		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStopTime(stopTimeTemp);
+		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStopTime(endTime);
 
 		jobClassName.getJobRuntimeProperties().setCompletionDate(endTime);
 		// getJobProperties().setCompletionDateTime(endTime);
@@ -81,7 +75,7 @@ public class JobHelper {
 
 	}
 
-	protected static void setJsPlannedTimeForStart(AbstractJobType abstractJobType, long period) {
+	public static void setJsPlannedTimeForStart(AbstractJobType abstractJobType, long period) {
 
 		// System.err.println("1 : " + CommonDateUtils.getDate(startTime.getTime()));
 
@@ -148,24 +142,13 @@ public class JobHelper {
 	}
 
 	protected static void setJsRealTimeForStart(AbstractJobType abstractJobType, Calendar startTime) {
-
-		JsRealTime jobRealTime;
-
-		jobRealTime = JsRealTime.Factory.newInstance();
-		StartTime startTimeTemp = StartTime.Factory.newInstance();
-		startTimeTemp.setTime(startTime);
-		startTimeTemp.setDate(startTime);
-		abstractJobType.getManagement().getTimeManagement().setJsRealTime(jobRealTime);
+		// System.err.println("Beofer : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime().getTime().getTime()));
+		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStartTime(startTime);
+		// System.err.println("Beofer : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime().getTime().getTime()));
 	}
 
 	protected static void setJsRealTimeForStop(AbstractJobType abstractJobType, Calendar stopTime) {
-
-		StopTime stopTimeTemp = StopTime.Factory.newInstance();
-		stopTimeTemp.setTime(stopTime);
-		stopTimeTemp.setDate(stopTime);
-
-		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStopTime(stopTimeTemp);
-
+		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStopTime(stopTime);
 	}
 
 	public static String removeSlashAtTheEnd(SimplePropertiesType simpleProperties, String jobPath, String jobCommand) {
@@ -276,7 +259,7 @@ public class JobHelper {
 	public static void resetJob(AbstractJobType abstractJobType, LiveStateInfo liveStateInfo) {
 		if (Scheduler.scheduleForNextExecution(abstractJobType)) {
 			if (liveStateInfo == null) {
-				JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME);
+				JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_IDLED, StatusName.INT_BYTIME);
 			}
 			OutputData outputData = OutputData.generateDefault(abstractJobType);
 			CoreFactory.getInstance().getOutputStrategy().sendDataObject(outputData);
