@@ -63,12 +63,12 @@ public abstract class GenericInnerJob extends JobImpl {
 	}
 
 	protected void setRenewByTime(AbstractJobType abstractJobType) {
-		JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME);
+		JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_IDLED, StatusName.INT_BYTIME);
 		sendOutputData();
 	}
 
 	protected void setRenewByUser(AbstractJobType abstractJobType) {
-		JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYUSER);
+		JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_IDLED, StatusName.INT_BYUSER);
 		sendOutputData();
 	}
 	
