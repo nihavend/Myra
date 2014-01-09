@@ -25,6 +25,7 @@ import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
+import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 
 public abstract class JobImpl implements Runnable, Serializable {
 
@@ -71,6 +72,10 @@ public abstract class JobImpl implements Runnable, Serializable {
 		processJobResult();
 
 		cleanUp();
+	}
+	
+	public LiveStateInfo getLastStateInfo() {
+		return getAbstractJobType().getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
 	}
 
 	protected void sendOutputData(Object object) {
