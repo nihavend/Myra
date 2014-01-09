@@ -16,9 +16,7 @@
 package com.likya.myra.jef.controller;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -47,9 +45,8 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 
 	@Override
 	public void run() {
-		
-		Logger logger = CoreFactory.getLogger();
 
+		Logger logger = CoreFactory.getLogger();
 
 		logger.info("Starting : ");
 		logger.debug(CoreFactory.getMessage("MyraServer.38"));
@@ -64,7 +61,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 
 		ArrayList<SortType> jobIndex = JobQueueOperations.createProrityIndex(jobQueue);
 		Collections.sort(jobIndex);
-		
+
 		while (executionPermission) {
 
 			try {
@@ -85,42 +82,63 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 					JobImpl scheduledJob = jobQueue.get(mySortType.getJobKey());
 
 					AbstractJobType abstractJobType = scheduledJob.getAbstractJobType();
-					
-					if(!abstractJobType.getBaseJobInfos().getJsIsActive()) {
+
+					if (!abstractJobType.getBaseJobInfos().getJsIsActive()) {
 						continue;
 					}
 
 					DependencyList dependencyList = abstractJobType.getDependencyList();
 
-					// ArrayList<DependencyInfo> dependentJobList = scheduledJob.getJobProperties().getJobDependencyInfoList();
-
-					// if (scheduledJob instanceof ExternalProgram) {
-					// if (scheduledJob.getJobProperties().getStatus() == JobProperties.READY) {
-
 					LiveStateInfo liveStateInfo = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
 
 					try {
-
-						if (LiveStateInfoUtils.equalStates(liveStateInfo, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_BYTIME)) {
-							// Waiting for time to execute
-							Date scheduledTime = abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime();
-							Date currentTime = Calendar.getInstance().getTime();
-
-							if (scheduledTime.before(currentTime)) {
-								if (checkDependency(scheduledJob, dependencyList)) {
-									executeJob(scheduledJob);
-								} else {
-									// Time ok but dependency, so change status !
-									liveStateInfo.setStatusName(StatusName.WAITING);
-								}
-							}
-
-						} else if (LiveStateInfoUtils.equalStates(liveStateInfo, StateName.INT_PENDING, SubstateName.INT_READY, StatusName.INT_WAITING)) {
-							// Waiting for dependency to execute
-							if (checkDependency(scheduledJob, dependencyList)) {
+						if (dependencyList == null) {
+							if (LiveStateInfoUtils.equalStatesPIT(liveStateInfo) && hasTimeCome(abstractJobType)) {
 								executeJob(scheduledJob);
 							}
+						} else {
+							if (LiveStateInfoUtils.equalStatesPIT(liveStateInfo) || LiveStateInfoUtils.equalStatesPRW(liveStateInfo)) {
+								if (checkDependency(scheduledJob, dependencyList)) {
+									if (isTimeSensitive(dependencyList)) {
+										if (!dependencyList.getSensInfo().getSensTime().getRelativeStart()) {
+											if (hasTimeCome(abstractJobType)) {
+												executeJob(scheduledJob);
+											}
+										} else { // Relative Time Sensitive
+											handleTimeSensitivity(abstractJobType, dependencyList);
+											if (hasTimeCome(abstractJobType)) {
+												executeJob(scheduledJob);
+											}
+										}
+									} else {
+										executeJob(scheduledJob);
+									}
+								}
+							}
 						}
+
+						//						if (LiveStateInfoUtils.equalStatesPIT(liveStateInfo)) {
+						//							// Waiting for time to execute
+						//							Date scheduledTime = abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime();
+						//							Date currentTime = Calendar.getInstance().getTime();
+						//
+						//							if (scheduledTime.before(currentTime)) {
+						//								if (checkDependency(scheduledJob, dependencyList)) {
+						//									executeJob(scheduledJob);
+						//								} else {
+						//									// Time ok but dependency, so change status !
+						//									liveStateInfo.setSubstateName(SubstateName.IDLED);
+						//									liveStateInfo.setStatusName(StatusName.WAITING);
+						//								}
+						//							}
+						//
+						//						} else if (LiveStateInfoUtils.equalStatesPIW(liveStateInfo)) {
+						//
+						//							// Waiting for dependency to execute
+						//							if (checkDependency(scheduledJob, dependencyList)) {
+						//								executeJob(scheduledJob);
+						//							}
+						//						}
 
 					} catch (UnresolvedDependencyException ude) {
 						LiveStateInfoUtils.insertNewLiveStateInfo(scheduledJob.getAbstractJobType(), StateName.INT_CANCELLED, SubstateName.INT_STOPPED, StatusName.INT_BYEVENT);
