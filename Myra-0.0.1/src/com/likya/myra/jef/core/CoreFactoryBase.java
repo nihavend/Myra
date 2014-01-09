@@ -88,6 +88,8 @@ public class CoreFactoryBase {
 		
 		if (configurationManager.getMyraConfig().getPersistent() && JobQueueOperations.recoverJobQueue(configurationManager, jobQueue, messages) && jobQueue.size() != 0) {
 			// TODO abstractJobTypes = (AbstractJobType[]) JobQueueOperations.toAbstractJobTypeList(jobQueue).values().toArray();
+			// Yukarısı çözülene dek aşağıyı kullanıyoruz
+			abstractJobTypes = jobListDocument.getJobList().getGenericJobArray();
 		} else {
 			abstractJobTypes = jobListDocument.getJobList().getGenericJobArray();
 			if(abstractJobTypes.length == 0) {
