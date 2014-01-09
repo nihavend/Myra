@@ -17,25 +17,23 @@
 package com.likya.myra.jef.model;
 
 import java.io.Serializable;
+import java.util.Calendar;
 
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.StateInfosDocument.StateInfos;
-import com.likya.xsd.myra.model.wlagen.StartTimeDocument.StartTime;
-import com.likya.xsd.myra.model.wlagen.StopTimeDocument.StopTime;
 
 public class OutputData implements Serializable {
 
 	private static final long serialVersionUID = -6075964245318352700L;
-	
+
 	private String jobId;
 	private String handleUri;
 	private String treeId;
 	private String groupName;
-	
-	
-	private StartTime startTime;
-	private StopTime stopTime;
-	
+
+	private Calendar startTime;
+	private Calendar stopTime;
+
 	private StateInfos stateInfos;
 
 	public String getJobId() {
@@ -70,22 +68,6 @@ public class OutputData implements Serializable {
 		this.groupName = groupName;
 	}
 
-	public StartTime getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(StartTime startTime) {
-		this.startTime = startTime;
-	}
-
-	public StopTime getStopTime() {
-		return stopTime;
-	}
-
-	public void setStopTime(StopTime stopTime) {
-		this.stopTime = stopTime;
-	}
-
 	public StateInfos getStateInfos() {
 		return stateInfos;
 	}
@@ -93,9 +75,25 @@ public class OutputData implements Serializable {
 	public void setStateInfos(StateInfos stateInfos) {
 		this.stateInfos = stateInfos;
 	}
-	
+
+	public Calendar getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Calendar startTime) {
+		this.startTime = startTime;
+	}
+
+	public Calendar getStopTime() {
+		return stopTime;
+	}
+
+	public void setStopTime(Calendar stopTime) {
+		this.stopTime = stopTime;
+	}
+
 	public static OutputData generateDefault(AbstractJobType abstractJobType) {
-		
+
 		OutputData outputData = new OutputData();
 
 		outputData.setGroupName("");
@@ -105,7 +103,7 @@ public class OutputData implements Serializable {
 		outputData.setStopTime(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStopTime());
 		outputData.setTreeId("treeId");
 		outputData.setStateInfos(abstractJobType.getStateInfos());
-		
+
 		return outputData;
 
 	}
