@@ -266,5 +266,13 @@ public class JobHelper {
 			CoreFactory.getLogger().info("Job id :" + abstractJobType.getId() + " is scheduled for new time " + abstractJobType.getManagement().getTimeManagement().getJsPlannedTime());
 		}
 	}
+	
+	public static LiveStateInfo getLastStateInfo(AbstractJobType abstractJobType) {
+		return abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
+	}
+	
+	public static LiveStateInfo getLastStateInfo(JobImpl jobImpl) {
+		return getLastStateInfo(jobImpl.getAbstractJobType());
+	}
 
 }
