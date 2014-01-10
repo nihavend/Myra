@@ -86,22 +86,49 @@ public class BaseSchedulerController {
 		return false;
 
 	}
-
+	
 	/**
 	 * @param dependencyArray
 	 * @return true if at least one of the dependent jobs's status is different from PENDING-IDLED
 	 */
-	protected boolean atLeastOneParentNOTPI(Item[] dependencyArray) {
+	protected boolean atLeastOneParentNOTPI(AbstractJobType abstractJobType, String indent) {
+		
+		// System.err.println(indent + " Checking for job " + abstractJobType.getId());
+		
+		DependencyList dependencyList = abstractJobType.getDependencyList();
 
-		for (Item item : dependencyArray) {
-			AbstractJobType depJob = jobQueue.get(item.getJsId()).getAbstractJobType();
-			LiveStateInfo liveStateInfo = depJob.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
-			if (!LiveStateInfoUtils.equalStates(liveStateInfo, StateName.PENDING, SubstateName.IDLED)) {
-				return true;
+		boolean isFound = false;
+		
+		for (Item item : dependencyList.getItemArray()) {
+			AbstractJobType innerAbstractJobType = jobQueue.get(item.getJsId()).getAbstractJobType();
+			indent = "	" + indent;
+			// System.err.println(indent + " Checking for inner job " + innerAbstractJobType.getId());
+			if(innerAbstractJobType.getDependencyList() != null && innerAbstractJobType.getDependencyList().sizeOfItemArray() > 0) {
+				// System.err.println(indent + " Has dependency, recursing... ");
+				if(atLeastOneParentNOTPI(innerAbstractJobType, "	" + indent)) {
+					isFound = true;
+					// System.err.println(indent + " Evraka ");
+					break;
+				}
+			} else {
+				// System.err.println(indent + " No dependency ");
+				LiveStateInfo innerLiveStateInfo = JobHelper.getLastStateInfo(innerAbstractJobType);
+				if (!LiveStateInfoUtils.equalStates(innerLiveStateInfo, StateName.PENDING, SubstateName.IDLED)) {
+					isFound = true;
+					// System.err.println(indent + " Evraka ");
+					break;
+				}
 			}
 		}
+		
+		if(isFound) {
+			// System.err.println(indent + " found case for job " + abstractJobType.getId() + " Setting PRI !");
+			LiveStateInfo liveStateInfo = JobHelper.getLastStateInfo(abstractJobType);
+			liveStateInfo.setSubstateName(SubstateName.READY);
+			liveStateInfo.setStatusName(StatusName.WAITING);
+		}			
 
-		return false;
+		return isFound;
 	}
 
 	/**
@@ -143,127 +170,6 @@ public class BaseSchedulerController {
 		System.err.println("After : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime()));
 	}
 
-	protected void cleanUpQueueIssues() {
-
-		//		// Hepsi T-tekrarlı ise ve blocker değilse check yapma direk çık
-		//		// Hepsi S-standart veya S-T Karışık ise
-		//		// 1. T-ler için blocker değilse hiç bir şey yapma
-		//		// 2. S-ler için if(Hepsi Non-Blocker ise succ-skip-fail ise reset) else
-		//		// (succ-skip reset)
-		//
-		//		boolean resetQueue = false;
-		//
-		//		boolean isAllRepetitive = JobQueueOperations.isAllRepetitive(jobQueue);
-		//		boolean isAllDisabled = JobQueueOperations.isAllDisabled(jobQueue);
-		//
-		//		boolean isAllStandart = JobQueueOperations.isAllStandart(jobQueue);
-		//		// boolean isAllStandartBlocker =
-		//		// JobQueueOperations.isAllStandartBlocker(jobQueue);
-		//		boolean isAllStandartNonBlocker = JobQueueOperations.isAllStandartNonBlocker(jobQueue);
-		//
-		//		boolean isAllSuccessOrSkip = JobQueueOperations.isAllSuccessOrSkip(jobQueue);
-		//		boolean isAllSuccessOrSkipOrFail = JobQueueOperations.isAllSuccessOrSkipOrFail(jobQueue);
-		//
-		//		if (isAllRepetitive || isAllDisabled) {
-		//			// Do nothing
-		//		} else if (isAllStandart) {
-		//			// S-ler için if(Hepsi Non-Blocker ise succ-skip-fail ise reset)
-		//			// else (succ-skip reset)
-		//			if (isAllStandartNonBlocker) {
-		//				if (isAllSuccessOrSkipOrFail) {
-		//					// reset queue
-		//					resetQueue = true;
-		//				}
-		//			} else {
-		//				// blocker ise için success fail ise true
-		//				// non-blocker ise success fail skip ise true
-		//				if (isAllSuccessOrSkip) {
-		//					// reset
-		//					resetQueue = true;
-		//				}
-		//			}
-		//		} else {
-		//			Iterator<Job> jobsIterator = jobQueue.values().iterator();
-		//
-		//			while (jobsIterator.hasNext()) {
-		//				Job scheduledJob = jobsIterator.next();
-		//
-		//				int myJobsStatus = scheduledJob.getJobProperties().getStatus();
-		//
-		//				if (myJobsStatus != JobProperties.DISABLED) {
-		//
-		//					if (scheduledJob instanceof RepetitiveExternalProgram) {
-		//						if (!scheduledJob.getJobProperties().isBlocker()) {
-		//							// do nothing
-		//						} else {
-		//							if (isAllSuccessOrSkip) {
-		//								// reset queue
-		//								resetQueue = resetQueue || true;
-		//							} else {
-		//								resetQueue = resetQueue && false;
-		//							}
-		//						}
-		//					} else if (scheduledJob instanceof ExternalProgram) {
-		//						if (isAllStandartNonBlocker) {
-		//							if (isAllSuccessOrSkip) {
-		//								// reset queue
-		//								resetQueue = resetQueue || true;
-		//							} else {
-		//								resetQueue = resetQueue && false;
-		//							}
-		//						} else {
-		//							// blocker ise için success fail ise true
-		//							// non-blocker ise success fail skip ise true
-		//							if (isAllSuccessOrSkip) {
-		//								// reset
-		//								resetQueue = resetQueue || true;
-		//							} else {
-		//								resetQueue = resetQueue && false;
-		//							}
-		//						}
-		//					}
-		//
-		//				}
-		//			}
-
-		//		if (resetQueue) {
-		//			JobQueueOperations.resetJobQueue(jobQueue);
-		//			getScenarioRuntimeProperties().setCurrentState(ScenarioRuntimeProperties.STATE_WAITING);
-		//			getScenarioRuntimeProperties().setEndTime(Calendar.getInstance().getTime());
-		//			if (tlosParameters.isNormalizable()) {
-		//				schedulerLogger.info(LocaleMessages.getString("TlosServer.43"));
-		//				JobQueueOperations.normalizeJobQueue(jobQueue);
-		//				schedulerLogger.info(LocaleMessages.getString("TlosServer.44"));
-		//			}
-		//			if (tlosParameters.isMail()) {
-		//				tlosMailServer.sendMail(new EndOfCycleMail(jobQueue));
-		//			}
-		//			if (tlosParameters.isSms()) {
-		//				tlosSMSServer.sendSMS(new SMSType(LocaleMessages.getString("TlosServer.45") + TlosServer.getTlosParameters().getScenarioName() + LocaleMessages.getString("TlosServer.46"))); //$NON-NLS-2$
-		//			}
-		//			if (loadTest) {
-		//				++loadTestTurnCount;
-		//				schedulerLogger.info(LocaleMessages.getString("TlosServer.47") + loadTestTurnCount);
-		//				setUpForTest();
-		//				try {
-		//					Thread.sleep(3000);
-		//				} catch (InterruptedException e) {
-		//					e.printStackTrace();
-		//				}
-		//			}
-		//		}
-	}
-
-	//	private static void cleanCyclecDeps(Job meJob, JobRuntimeProperties jobRuntimeProperties, int status) {
-	//		if (meJob != null && DependencyOperations.hasDependentWithStatus(jobRuntimeProperties.getJobSimpleProperties().getId(), status) && jobProperties.getStatus() == status) {
-	//			// Bu kod muhtemelen cyclic bağımlılık ayıklaması yapıyor
-	//			// Benim beklediklerimden beni bekleyen var ise, onları skip yapıp ben devam ediyorum
-	//			// TlosServer.getTlosCommInterface().skipJob(true, meJob.getJobProperties().getKey().toString());
-	//			CoreFactory.getInstance().getJobOperations().skipJob(jobRuntimeProperties.getJobSimpleProperties().getId());
-	//		}
-	//	}
-
-	// protected boolean checkDependency(Job meJob, ArrayList<DependencyInfo> jobDependencyInfoList) {
 	protected boolean checkDependency(JobImpl meJob, DependencyList dependencyList) throws UnresolvedDependencyException {
 
 		if (dependencyList == null || dependencyList.getItemArray().length == 0) {
@@ -273,12 +179,6 @@ public class BaseSchedulerController {
 		String dependencyExpression = dependencyList.getDependencyExpression().trim().toUpperCase();
 
 		Item[] dependencyArray = dependencyList.getItemArray();
-
-		LiveStateInfo liveStateInfo = meJob.getLastStateInfo();
-		if (LiveStateInfoUtils.equalStatesPIT(liveStateInfo) && atLeastOneParentNOTPI(dependencyArray)) {
-			liveStateInfo.setSubstateName(SubstateName.READY);
-			liveStateInfo.setStatusName(StatusName.WAITING);
-		}
 
 		boolean retValue = JobDependencyResolver.isResolved(CoreFactory.getLogger(), meJob.getAbstractJobType(), dependencyExpression, dependencyArray, JobQueueOperations.toAbstractJobTypeList(jobQueue));
 
