@@ -16,15 +16,19 @@
 package com.likya.myra.jef.controller;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import org.apache.commons.collections.CollectionUtils;
 
 import com.likya.myra.commons.model.UnresolvedDependencyException;
 import com.likya.myra.commons.utils.JobDependencyResolver;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.commons.utils.PeriodCalculations;
+import com.likya.myra.commons.utils.StateFilter;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.CoreFactoryInterface;
 import com.likya.myra.jef.jobs.JobHelper;
@@ -86,26 +90,26 @@ public class BaseSchedulerController {
 		return false;
 
 	}
-	
+
 	/**
 	 * @param dependencyArray
 	 * @return true if at least one of the dependent jobs's status is different from PENDING-IDLED
 	 */
 	protected boolean atLeastOneParentNOTPI(AbstractJobType abstractJobType, String indent) {
-		
+
 		// System.err.println(indent + " Checking for job " + abstractJobType.getId());
-		
+
 		DependencyList dependencyList = abstractJobType.getDependencyList();
 
 		boolean isFound = false;
-		
+
 		for (Item item : dependencyList.getItemArray()) {
 			AbstractJobType innerAbstractJobType = jobQueue.get(item.getJsId()).getAbstractJobType();
 			indent = "	" + indent;
 			// System.err.println(indent + " Checking for inner job " + innerAbstractJobType.getId());
-			if(innerAbstractJobType.getDependencyList() != null && innerAbstractJobType.getDependencyList().sizeOfItemArray() > 0) {
+			if (innerAbstractJobType.getDependencyList() != null && innerAbstractJobType.getDependencyList().sizeOfItemArray() > 0) {
 				// System.err.println(indent + " Has dependency, recursing... ");
-				if(atLeastOneParentNOTPI(innerAbstractJobType, "	" + indent)) {
+				if (atLeastOneParentNOTPI(innerAbstractJobType, "	" + indent)) {
 					isFound = true;
 					// System.err.println(indent + " Evraka ");
 					break;
@@ -120,13 +124,13 @@ public class BaseSchedulerController {
 				}
 			}
 		}
-		
-		if(isFound) {
+
+		if (isFound && LiveStateInfoUtils.equalStatesPIT(JobHelper.getLastStateInfo(abstractJobType))) {
 			// System.err.println(indent + " found case for job " + abstractJobType.getId() + " Setting PRI !");
 			LiveStateInfo liveStateInfo = JobHelper.getLastStateInfo(abstractJobType);
 			liveStateInfo.setSubstateName(SubstateName.READY);
 			liveStateInfo.setStatusName(StatusName.WAITING);
-		}			
+		}
 
 		return isFound;
 	}
@@ -261,7 +265,7 @@ public class BaseSchedulerController {
 		int lowerLimit = myraConfig.getLowerThreshold();
 		int higherLimit = myraConfig.getHigherThreshold();
 
-		if (lowerLimit >= higherLimit) {
+		if (lowerLimit > higherLimit) {
 			return false;
 		}
 
@@ -283,12 +287,20 @@ public class BaseSchedulerController {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public int getNumOfActiveJobs() {
 
-		int numOfWorkingJobs = 0; // getNumOfJobsInStatus(JobProperties.WORKING);
-		int numOfTimeoutJobs = 0; // getNumOfJobsInStatus(JobProperties.TIMEOUT);
+		StateName.Enum filterStates[] = { StateName.RUNNING };
 
-		return numOfWorkingJobs + numOfTimeoutJobs;
+		HashMap<String, AbstractJobType> abstractJobTypeList = JobQueueOperations.toAbstractJobTypeList(jobQueue);
+
+		Collection<AbstractJobType> filteredList;
+
+		filteredList = CollectionUtils.select(abstractJobTypeList.values(), new StateFilter(filterStates).anyPredicate());
+		
+		// System.err.println("filteredList.size() : " + filteredList.size());
+
+		return filteredList.size();
 	}
 
 	public int getNumOfJobsInStatus(int status) {
