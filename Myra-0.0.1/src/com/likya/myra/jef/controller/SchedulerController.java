@@ -209,8 +209,6 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 				// JobQueueOperations.persistDisabledJobQueue(coreFactoryInterface.getConfigurationManager(), disabledJobQueue);
 			}
 
-			cleanUpQueueIssues();
-
 			try {
 				Thread.sleep(cycleFrequency);
 			} catch (InterruptedException e) {
