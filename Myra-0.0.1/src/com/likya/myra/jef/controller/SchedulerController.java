@@ -26,6 +26,7 @@ import com.likya.myra.commons.model.UnresolvedDependencyException;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.CoreFactoryInterface;
+import com.likya.myra.jef.jobs.JobHelper;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.model.SortType;
@@ -89,7 +90,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 
 					DependencyList dependencyList = abstractJobType.getDependencyList();
 
-					LiveStateInfo liveStateInfo = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
+					LiveStateInfo liveStateInfo = JobHelper.getLastStateInfo(scheduledJob);
 
 					try {
 						if (dependencyList == null) {
@@ -103,15 +104,29 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 										if (!dependencyList.getSensInfo().getSensTime().getRelativeStart()) {
 											if (hasTimeCome(abstractJobType)) {
 												executeJob(scheduledJob);
+											} else {
+												liveStateInfo.setSubstateName(SubstateName.IDLED);
+												liveStateInfo.setStatusName(StatusName.BYTIME);
 											}
 										} else { // Relative Time Sensitive
 											handleTimeSensitivity(abstractJobType, dependencyList);
 											if (hasTimeCome(abstractJobType)) {
 												executeJob(scheduledJob);
+											} else {
+												liveStateInfo.setSubstateName(SubstateName.IDLED);
+												liveStateInfo.setStatusName(StatusName.BYTIME);
 											}
 										}
 									} else {
 										executeJob(scheduledJob);
+									}
+								} else {
+									if (LiveStateInfoUtils.equalStatesPIT(liveStateInfo)) { 
+										// long startTime = Calendar.getInstance().getTimeInMillis();
+										// boolean lastRes = 
+										atLeastOneParentNOTPI(abstractJobType, ">>");
+										// System.err.println("Fark :" + (Calendar.getInstance().getTimeInMillis() - startTime));
+										// System.err.println(lastRes);
 									}
 								}
 							}
