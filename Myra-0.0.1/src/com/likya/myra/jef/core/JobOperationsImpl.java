@@ -15,12 +15,11 @@
  ******************************************************************************/
 package com.likya.myra.jef.core;
 
-import com.likya.myra.jef.OutputStrategy;
+import com.likya.myra.commons.utils.LiveStateInfoUtils;
+import com.likya.myra.jef.jobs.ChangeLSI;
 import com.likya.myra.jef.jobs.JobHelper;
-import com.likya.myra.jef.model.OutputData;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
-import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 
 public class JobOperationsImpl implements JobOperations {
@@ -30,11 +29,6 @@ public class JobOperationsImpl implements JobOperations {
 	public JobOperationsImpl(CoreFactory coreFactory) {
 		super();
 		this.coreFactory = coreFactory;
-	}
-
-	protected void sendOutputData(Object object) {
-		OutputStrategy outputStrategy = coreFactory.getOutputStrategy();
-		outputStrategy.sendDataObject(object);
 	}
 
 	@Override
@@ -94,18 +88,14 @@ public class JobOperationsImpl implements JobOperations {
 
 			AbstractJobType abstractJobType = coreFactory.getMonitoringOperations().getJobQueue().get(jobName).getAbstractJobType();
 			
-			JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_CANCELLED, SubstateName.INT_DEACTIVATED, StatusName.INT_BYUSER);
+			ChangeLSI.forValue(abstractJobType, LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_DEACTIVATED));
 			
-			OutputData outputData = OutputData.generateDefault(abstractJobType);
-			
-			sendOutputData(outputData);
-
 //			TODO yeni yapıda bu iş nasıl olacak ?
 //			synchronized (TlosServer.getDisabledJobQueue()) {
 //				TlosServer.getDisabledJobQueue().put(jobName, jobName);
 //			}
 			
-			CoreFactory.getLogger().info(CoreFactory.getMessage("TlosCommInterface.19") + jobName + " : " + abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0).toString());
+			CoreFactory.getLogger().info(CoreFactory.getMessage("TlosCommInterface.19") + jobName + " : " + JobHelper.getLastStateInfo(abstractJobType));
 		}
 	}
 
