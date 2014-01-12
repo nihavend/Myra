@@ -19,8 +19,9 @@ package com.likya.myra.jef.model;
 import java.io.Serializable;
 import java.util.Calendar;
 
+import com.likya.myra.jef.jobs.JobHelper;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
-import com.likya.xsd.myra.model.stateinfo.StateInfosDocument.StateInfos;
+import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 
 public class OutputData implements Serializable {
 
@@ -34,7 +35,7 @@ public class OutputData implements Serializable {
 	private Calendar startTime;
 	private Calendar stopTime;
 
-	private StateInfos stateInfos;
+	private LiveStateInfo liveStateInfo;
 
 	public String getJobId() {
 		return jobId;
@@ -68,14 +69,6 @@ public class OutputData implements Serializable {
 		this.groupName = groupName;
 	}
 
-	public StateInfos getStateInfos() {
-		return stateInfos;
-	}
-
-	public void setStateInfos(StateInfos stateInfos) {
-		this.stateInfos = stateInfos;
-	}
-
 	public Calendar getStartTime() {
 		return startTime;
 	}
@@ -92,6 +85,14 @@ public class OutputData implements Serializable {
 		this.stopTime = stopTime;
 	}
 
+	public LiveStateInfo getLiveStateInfo() {
+		return liveStateInfo;
+	}
+
+	public void setLiveStateInfo(LiveStateInfo liveStateInfo) {
+		this.liveStateInfo = liveStateInfo;
+	}
+	
 	public static OutputData generateDefault(AbstractJobType abstractJobType) {
 
 		OutputData outputData = new OutputData();
@@ -102,7 +103,7 @@ public class OutputData implements Serializable {
 		outputData.setStartTime(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime());
 		outputData.setStopTime(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStopTime());
 		outputData.setTreeId("treeId");
-		outputData.setStateInfos(abstractJobType.getStateInfos());
+		outputData.setLiveStateInfo(JobHelper.getLastStateInfo(abstractJobType));
 
 		return outputData;
 
