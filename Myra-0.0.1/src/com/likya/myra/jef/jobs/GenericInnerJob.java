@@ -23,7 +23,6 @@ import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
-import com.likya.myra.jef.model.OutputData;
 import com.likya.myra.jef.utils.Scheduler;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
@@ -43,33 +42,27 @@ public abstract class GenericInnerJob extends JobImpl {
 	}
 
 	protected void setRunning(AbstractJobType abstractJobType) {
-		JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_IN);
-		sendOutputData();
+		ChangeLSI.forValue(abstractJobType, StateName.RUNNING, SubstateName.ON_RESOURCE, StatusName.TIME_IN);
 	}
 
 	protected void setOfCodeMessage(AbstractJobType abstractJobType, int code, String message) {
-		JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, code, message);
-		sendOutputData();
+		ChangeLSI.forValue(abstractJobType, StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS, code, message);
 	}
 
 	protected void setFailedOfLog(AbstractJobType abstractJobType) {
-		JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, "Log da bulunan kelime yüzünden !");
-		sendOutputData();
+		ChangeLSI.forValue(abstractJobType, StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, "Log da bulunan kelime yüzünden !");
 	}
 
 	protected void setFailedOfMessage(AbstractJobType abstractJobType, String message) {
-		JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_FINISHED, SubstateName.INT_COMPLETED, StatusName.INT_FAILED, message);
-		sendOutputData();
+		ChangeLSI.forValue(abstractJobType, StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, message);
 	}
 
 	protected void setRenewByTime(AbstractJobType abstractJobType) {
-		JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_IDLED, StatusName.INT_BYTIME);
-		sendOutputData();
+		ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
 	}
 
 	protected void setRenewByUser(AbstractJobType abstractJobType) {
-		JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_IDLED, StatusName.INT_BYUSER);
-		sendOutputData();
+		// ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYUSER);
 	}
 	
 	protected boolean scheduleForNextExecution(AbstractJobType abstractJobType) {
@@ -155,7 +148,7 @@ public abstract class GenericInnerJob extends JobImpl {
 				break;
 			}
 
-			CoreFactory.getLogger().info(CoreFactory.getMessage("ExternalProgram.9") + jobId + " => " + liveStateInfo.getStatusName().toString());
+			CoreFactory.getLogger().info(CoreFactory.getMessage("ExternalProgram.9") + jobId + " => " + (liveStateInfo.getStatusName() == null ? "" : liveStateInfo.getStatusName().toString()));
 
 		} else {
 
@@ -218,13 +211,6 @@ public abstract class GenericInnerJob extends JobImpl {
 		//		}
 
 		return cmd;
-	}
-
-	protected void sendOutputData() {
-
-		OutputData outputData = OutputData.generateDefault(getAbstractJobType());
-
-		super.sendOutputData(outputData);
 	}
 
 }
