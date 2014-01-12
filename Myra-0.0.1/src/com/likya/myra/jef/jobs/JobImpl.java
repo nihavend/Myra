@@ -73,10 +73,6 @@ public abstract class JobImpl implements Runnable, Serializable {
 		cleanUp();
 	}
 	
-	protected void sendOutputData(Object object) {
-		outputStrategy.sendDataObject(object);
-	}
-	
 	public AbstractJobType getAbstractJobType() {
 		return abstractJobType;
 	}
