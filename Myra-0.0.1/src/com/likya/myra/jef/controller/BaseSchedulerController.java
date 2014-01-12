@@ -193,7 +193,7 @@ public class BaseSchedulerController {
 	protected void executeJob(JobImpl scheduledJob) throws InterruptedException {
 
 		if (!checkDangerGroupZoneIntrusion(scheduledJob)) {
-			// schedulerLogger.debug("Grup kısıtı nedeni ile çalışmıyor ! ==> " + scheduledJob.getJobProperties().getKey());
+			CoreFactory.getLogger().debug("Grup kısıtı nedeni ile çalışmıyor ! ==> " + scheduledJob.getAbstractJobType().getId());
 			return;
 		}
 
@@ -203,19 +203,12 @@ public class BaseSchedulerController {
 		//		}
 
 		CoreFactory.getLogger().debug(CoreFactory.getMessage("Myra.66"));
-		//		logger.debug(scheduledJob.getJobProperties().toString());
-
-		LiveStateInfoUtils.insertNewLiveStateInfo(scheduledJob.getAbstractJobType(), StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_IN);
 
 		Thread starterThread = new Thread(scheduledJob);
-		//		if (scheduledJob.getJobProperties().isManuel()) {
-		//			starterThread.setName("TlosLite-M-" + scheduledJob.getJobProperties().getKey());
-		//		} else {
-		//			starterThread.setName("TlosLite-S-" + scheduledJob.getJobProperties().getKey());
-		//		}
+
 		scheduledJob.setMyExecuter(starterThread);
-		// // starterThread.setDaemon(true);
-		// starterThread.start();
+		starterThread.setDaemon(true);
+
 		scheduledJob.getMyExecuter().start();
 
 		return;
@@ -296,11 +289,17 @@ public class BaseSchedulerController {
 
 		Collection<AbstractJobType> filteredList;
 
-		filteredList = CollectionUtils.select(abstractJobTypeList.values(), new StateFilter(filterStates).anyPredicate());
-		
+		int listSize = 0;
+
+		try {
+			filteredList = CollectionUtils.select(abstractJobTypeList.values(), new StateFilter(filterStates).anyPredicate());
+			listSize = filteredList.size();
+		} catch (NullPointerException n) {
+			n.printStackTrace();
+		}
 		// System.err.println("filteredList.size() : " + filteredList.size());
 
-		return filteredList.size();
+		return listSize;
 	}
 
 	public int getNumOfJobsInStatus(int status) {
@@ -320,17 +319,20 @@ public class BaseSchedulerController {
 		return counter;
 	}
 
-	public static boolean checkDangerGroupZoneIntrusion(JobImpl currentJob) {
+	public boolean checkDangerGroupZoneIntrusion(JobImpl currentJob) {
+		
+		AbstractJobType myAbstractJobType = currentJob.getAbstractJobType();
+		
+		for (JobImpl tmpJobImpl : jobQueue.values()) {
+			AbstractJobType tmpAbstractJobType = tmpJobImpl.getAbstractJobType();
+			if(myAbstractJobType.getDangerZoneGroupId() != null && myAbstractJobType.getDangerZoneGroupId().equals(tmpAbstractJobType.getDangerZoneGroupId())) {
+				StateName.RUNNING.equals(JobHelper.getLastStateInfo(tmpAbstractJobType).getStateName());
+				return false;
+			}
+		}
 
-		//		JobProperties currentJobProperties = currentJob.getJobProperties();
-		//
-		//		for (Job myJob : jobQueue.values()) {
-		//			JobProperties myJobProperties = myJob.getJobProperties();
-		//			if (currentJobProperties.getDangerZoneGroup() != null && currentJobProperties.getDangerZoneGroup().equals(myJobProperties.getDangerZoneGroup()) && (myJobProperties.getStatus() == JobProperties.WORKING)) {
-		//				return false;
-		//			}
-		//		}
 		return true;
+	
 	}
 
 	public HashMap<String, JobImpl> getJobQueue() {
