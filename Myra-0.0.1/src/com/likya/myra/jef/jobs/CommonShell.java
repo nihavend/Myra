@@ -92,7 +92,7 @@ public abstract class CommonShell extends GenericInnerJob {
 			stopMyDogBarking();
 		}
 
-		sendOutputData();
+		// sendOutputData();
 
 		setMyExecuter(null);
 
