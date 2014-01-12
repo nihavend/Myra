@@ -63,7 +63,7 @@ public class ExecuteInShell extends CommonShell {
 		// restore to the value derived from sernayobilgileri file.
 		//			getJobProperties().setJobParamList(getJobProperties().getJobParamListPerm());
 
-		sendOutputData();
+		// sendOutputData();
 
 		setMyExecuter(null);
 		process = null;
@@ -168,28 +168,33 @@ public class ExecuteInShell extends CommonShell {
 				setOfCodeMessage(abstractJobType, statusName.intValue(), jobRuntimeInterface.getMessageBuffer().toString());
 			}
 
-		} catch (InterruptedException e) {
+		} catch (Throwable e) {
 
 			errorGobbler.interrupt();
 			outputGobbler.interrupt();
-			if (ValidPlatforms.getOSName() != null && ValidPlatforms.getOSName().contains(ValidPlatforms.OS_WINDOWS)) {
-				try {
-					// System.out.println("Killing windows process tree...");
-					WinProcess winProcess = new WinProcess(process);
-					winProcess.killRecursively();
-					// System.out.println("Killed.");
-				} catch (Exception e1) {
-					e1.printStackTrace();
+			
+			if(e instanceof InterruptedException) {
+				
+				if (ValidPlatforms.getOSName() != null && ValidPlatforms.getOSName().contains(ValidPlatforms.OS_WINDOWS)) {
+					try {
+						// System.out.println("Killing windows process tree...");
+						WinProcess winProcess = new WinProcess(process);
+						winProcess.killRecursively();
+						// System.out.println("Killed.");
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
 				}
+				// Stop the process from running
+				CoreFactory.getLogger().warn(CoreFactory.getMessage("ExternalProgram.8") + jobId); //$NON-NLS-1$
+
+				// process.waitFor() komutu thread'in interrupt statusunu temizlemedigi icin 
+				// asagidaki sekilde temizliyoruz
+				Thread.interrupted();
+
+				process.destroy();
 			}
-			// Stop the process from running
-			CoreFactory.getLogger().warn(CoreFactory.getMessage("ExternalProgram.8") + jobId); //$NON-NLS-1$
-
-			// process.waitFor() komutu thread'in interrupt statusunu temizlemedigi icin 
-			// asagidaki sekilde temizliyoruz
-			Thread.interrupted();
-
-			process.destroy();
+			
 			setFailedOfMessage(abstractJobType, e.getMessage());
 
 		}
