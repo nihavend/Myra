@@ -24,7 +24,6 @@ import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.commons.utils.PeriodCalculations;
 import com.likya.myra.commons.utils.StateUtils;
 import com.likya.myra.jef.core.CoreFactory;
-import com.likya.myra.jef.model.OutputData;
 import com.likya.myra.jef.utils.Scheduler;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.jobprops.SimplePropertiesType;
@@ -238,19 +237,6 @@ public class JobHelper {
 
 	}
 
-	public static LiveStateInfo insertNewLiveStateInfo(AbstractJobType abstractJobType, int enumStateName, int enumSubstateName, int enumStatusName) {
-		LiveStateInfo liveStateInfo = LiveStateInfoUtils.insertNewLiveStateInfo(abstractJobType, enumStateName, enumSubstateName, enumStatusName);
-		//sendStatusChangeInfo();
-		return liveStateInfo;
-	}
-
-	public static LiveStateInfo insertNewLiveStateInfo(AbstractJobType abstractJobType, int enumStateName, int enumSubstateName, int enumStatusName, String retCodeDesc) {
-		LiveStateInfo liveStateInfo = LiveStateInfoUtils.insertNewLiveStateInfo(abstractJobType, enumStateName, enumSubstateName, enumStatusName);
-		liveStateInfo.addNewReturnCode().setDesc(retCodeDesc);
-		//sendStatusChangeInfo();
-		return liveStateInfo;
-	}
-
 	public static void resetJob(AbstractJobType abstractJobType) {
 		resetJob(abstractJobType, null);
 		return;
@@ -259,10 +245,9 @@ public class JobHelper {
 	public static void resetJob(AbstractJobType abstractJobType, LiveStateInfo liveStateInfo) {
 		if (Scheduler.scheduleForNextExecution(abstractJobType)) {
 			if (liveStateInfo == null) {
-				JobHelper.insertNewLiveStateInfo(abstractJobType, StateName.INT_PENDING, SubstateName.INT_IDLED, StatusName.INT_BYTIME);
+				liveStateInfo = LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_IDLED, StatusName.INT_BYTIME);
 			}
-			OutputData outputData = OutputData.generateDefault(abstractJobType);
-			CoreFactory.getInstance().getOutputStrategy().sendDataObject(outputData);
+			ChangeLSI.forValue(abstractJobType, liveStateInfo);
 			CoreFactory.getLogger().info("Job id :" + abstractJobType.getId() + " is scheduled for new time " + abstractJobType.getManagement().getTimeManagement().getJsPlannedTime());
 		}
 	}
