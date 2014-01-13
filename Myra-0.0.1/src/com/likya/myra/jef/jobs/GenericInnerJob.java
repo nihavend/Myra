@@ -29,18 +29,19 @@ import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
+import com.likya.xsd.myra.model.wlagen.CascadingConditionsDocument.CascadingConditions;
 import com.likya.xsd.myra.model.wlagen.TriggerDocument.Trigger;
 
 public abstract class GenericInnerJob extends JobImpl {
-	
+
 	private static final long serialVersionUID = -680353114457170591L;
-	
+
 	protected Calendar startTime;
 
 	public GenericInnerJob(AbstractJobType abstractJobType, JobRuntimeInterface jobRuntimeProperties) {
 		super(abstractJobType, jobRuntimeProperties);
 	}
-
+	
 	protected void setRunning(AbstractJobType abstractJobType) {
 		ChangeLSI.forValue(abstractJobType, StateName.RUNNING, SubstateName.ON_RESOURCE, StatusName.TIME_IN);
 	}
@@ -57,72 +58,69 @@ public abstract class GenericInnerJob extends JobImpl {
 		ChangeLSI.forValue(abstractJobType, StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, message);
 	}
 
-	protected void setRenewByTime(AbstractJobType abstractJobType) {
+	public void setRenewByTime(AbstractJobType abstractJobType) {
 		ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
 	}
 
 	protected void setRenewByUser(AbstractJobType abstractJobType) {
-		// ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYUSER);
+		ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYUSER);
 	}
-	
-	protected boolean scheduleForNextExecution(AbstractJobType abstractJobType) {
-		return Scheduler.scheduleForNextExecution(abstractJobType);		
+
+	public boolean scheduleForNextExecution(AbstractJobType abstractJobType) {
+		return Scheduler.scheduleForNextExecution(abstractJobType);
 	}
-	
-//	public boolean processJobResultFromSch() {
-//
-//		AbstractJobType abstractJobType = getAbstractJobType();
-//		
-//		LiveStateInfo lastState = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
-//
-//		if (lastState.getStateName().equals(StateName.FINISHED)) {
-//
-//			String logStr = "islem bitirildi : " + abstractJobType.getId() + " => ";
-//			logStr += StateName.FINISHED.toString() + ":" + lastState.getSubstateName().toString() + ":" + lastState.getStatusName().toString();
-//			myLogger.info(" >>>>" + logStr + "<<<<");
-//
-//		} else {
-//
-//			if (Boolean.parseBoolean(abstractJobType.getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry().toString()) && retryFlag) {
-//				myLogger.info(" >> " + logLabel + " : Job Failed ! Restarting " + abstractJobType.getBaseJobInfos().getJsName());
-//				setRenewByTime(abstractJobType);
-//				return true;
-//			} else {
-//				myLogger.info(" >>" + logLabel + ">> " + abstractJobType.getId() + ":Job Failed ! ");
-//				myLogger.debug(" >>" + logLabel + ">> " + abstractJobType.getId() + " : Job Failed !");
-//			}
-//		}
-//
-//		return false;
-//	}
-	
+
+	//	public boolean processJobResultFromSch() {
+	//
+	//		AbstractJobType abstractJobType = getAbstractJobType();
+	//		
+	//		LiveStateInfo lastState = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
+	//
+	//		if (lastState.getStateName().equals(StateName.FINISHED)) {
+	//
+	//			String logStr = "islem bitirildi : " + abstractJobType.getId() + " => ";
+	//			logStr += StateName.FINISHED.toString() + ":" + lastState.getSubstateName().toString() + ":" + lastState.getStatusName().toString();
+	//			myLogger.info(" >>>>" + logStr + "<<<<");
+	//
+	//		} else {
+	//
+	//			if (Boolean.parseBoolean(abstractJobType.getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry().toString()) && retryFlag) {
+	//				myLogger.info(" >> " + logLabel + " : Job Failed ! Restarting " + abstractJobType.getBaseJobInfos().getJsName());
+	//				setRenewByTime(abstractJobType);
+	//				return true;
+	//			} else {
+	//				myLogger.info(" >>" + logLabel + ">> " + abstractJobType.getId() + ":Job Failed ! ");
+	//				myLogger.debug(" >>" + logLabel + ">> " + abstractJobType.getId() + " : Job Failed !");
+	//			}
+	//		}
+	//
+	//		return false;
+	//	}
+
 	private boolean isInDepenedencyChain(String jobId) {
 		return !CoreFactory.getInstance().getNetTreeManagerInterface().getFreeJobs().containsKey(jobId);
 	}
-	
+
 	public void processJobResult() {
 
 		AbstractJobType abstractJobType = getAbstractJobType();
 
 		String jobId = abstractJobType.getId();
-		
-		if(isInDepenedencyChain(jobId)) {
+
+		if (isInDepenedencyChain(jobId)) {
 			// Do not touch, leave it to its master !
 			return;
 		}
 
 		LiveStateInfo liveStateInfo = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
-		
+
 		boolean isState = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS);
-		
-		
+
 		/**
-		 * if a job fails;
-		 * Two parameters; 
-		 * 		autoRetry and runEvenIfFailed conflicts. 
-		 * 		In this is case, the priority of runEvenIfFailed is higher so, the autoRetry is discarded
+		 * if a job fails; Two parameters; autoRetry and runEvenIfFailed conflicts. In this is case,
+		 * the priority of runEvenIfFailed is higher so, the autoRetry is discarded
 		 */
-		 
+
 		boolean goOnError = (abstractJobType.getManagement().getCascadingConditions() != null && abstractJobType.getManagement().getCascadingConditions().getRunEvenIfFailed());
 
 		if (isState || goOnError) {
@@ -136,7 +134,7 @@ public abstract class GenericInnerJob extends JobImpl {
 				// Not implemented yet
 				break;
 			case Trigger.INT_TIME:
-				if(scheduleForNextExecution(abstractJobType)) {
+				if (scheduleForNextExecution(abstractJobType)) {
 					setRenewByTime(abstractJobType);
 				}
 				break;
@@ -154,10 +152,44 @@ public abstract class GenericInnerJob extends JobImpl {
 
 			JobHelper.setWorkDurations(this, startTime);
 
-			boolean stateCond = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.STOPPED, StatusName.BYUSER);
+			boolean manuelStop = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.STOPPED, StatusName.BYUSER);
 
-			if (abstractJobType.getManagement().getCascadingConditions() != null && abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == true && !stateCond) {
-				
+			if (!manuelStop) {
+
+				CascadingConditions cascadingConditions = abstractJobType.getManagement().getCascadingConditions();
+
+				if (cascadingConditions != null && cascadingConditions.getJobAutoRetryInfo().getJobAutoRetry()) {
+
+					boolean retryCondition = true;
+
+					if (cascadingConditions.getJobAutoRetryInfo().getLiveStateInfo() != null) {
+						retryCondition = LiveStateInfoUtils.equalStates(liveStateInfo, cascadingConditions.getJobAutoRetryInfo().getLiveStateInfo());
+					}
+
+					if (retryCondition) {
+						
+						if (retryCounter < cascadingConditions.getJobAutoRetryInfo().getMaxCount().intValue()) {
+
+							CoreFactory.getLogger().info(CoreFactory.getMessage("ExternalProgram.11") + jobId);
+							retryCounter++;
+
+							long stepTime = MyraDateUtils.getDurationInMilliSecs(abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getStep());
+
+							JobHelper.setJsPlannedTimeForStart(abstractJobType, stepTime);
+							setRenewByTime(abstractJobType);
+
+						} else {
+							// reset counter and leave for normal scheduling
+							retryCounter = 0;
+						}
+					
+					}
+				}
+			}
+
+			/*
+			if (abstractJobType.getManagement().getCascadingConditions() != null && abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == true && !manuelStop) {
+
 				if (retryCounter < abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getMaxCount().intValue()) {
 					CoreFactory.getLogger().info(CoreFactory.getMessage("ExternalProgram.11") + jobId);
 					retryCounter++;
@@ -172,15 +204,16 @@ public abstract class GenericInnerJob extends JobImpl {
 					// reset counter and leave for normal scheduling
 					retryCounter = 0;
 				}
-			
+
 			}
+			*/
 
 			CoreFactory.getLogger().info(jobId + CoreFactory.getMessage("ExternalProgram.12"));
 			CoreFactory.getLogger().debug(jobId + CoreFactory.getMessage("ExternalProgram.13"));
 
 		}
 	}
-	
+
 	public void reportLog(JobImpl jobClass, Date startTime, Date endTime) {
 
 		//		String jobClassName = "JOBSTATS|";
