@@ -52,7 +52,7 @@ public abstract class JobImpl implements Runnable, Serializable {
 	protected abstract void cleanUp();
 
 	protected abstract void startWathcDogTimer();
-	protected abstract void stopMyDogBarking();
+	public abstract void stopMyDogBarking();
 
 	public JobImpl(AbstractJobType abstractJobType, JobRuntimeInterface jobRuntimeProperties) {
 		this.abstractJobType = abstractJobType;
