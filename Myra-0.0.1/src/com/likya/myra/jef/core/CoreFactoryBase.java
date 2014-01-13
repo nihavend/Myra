@@ -153,7 +153,6 @@ public class CoreFactoryBase {
 
 	protected static void registerMessageBundle() {
 		LocaleMessages.registerBundle(localePath);
-		getLogger().info(CoreFactory.getMessage("Pinara.37") + localePath);
 	}
 
 	public static String getMessage(String key) {
