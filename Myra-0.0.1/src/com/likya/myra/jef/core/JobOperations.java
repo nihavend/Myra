@@ -24,8 +24,6 @@ public interface JobOperations {
 
 	public void skipJob(String jobName);
 
-	public void skipJob(boolean isForced, String jobName);
-
 	public void stopJob(String jobName);
 
 	public void pauseJob(String jobName);
