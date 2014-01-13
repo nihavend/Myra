@@ -50,13 +50,13 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 		Logger logger = CoreFactory.getLogger();
 
 		logger.info("Starting : ");
-		logger.debug(CoreFactory.getMessage("MyraServer.38"));
-		logger.info(CoreFactory.getMessage("MyraServer.39") + jobQueue.size());
+		logger.debug(CoreFactory.getMessage("Myra.38"));
+		logger.info(CoreFactory.getMessage("Myra.39") + jobQueue.size());
 
 		if (coreFactoryInterface.getConfigurationManager().getMyraConfig().getNormalize() && !coreFactoryInterface.getConfigurationManager().isRecovered()) {
-			logger.info(CoreFactory.getMessage("MyraServer.40"));
+			logger.info(CoreFactory.getMessage("Myra.40"));
 			JobQueueOperations.normalizeJobQueue(jobQueue);
-			logger.info(CoreFactory.getMessage("MyraServer.41"));
+			logger.info(CoreFactory.getMessage("Myra.41"));
 			coreFactoryInterface.getConfigurationManager().setRecovered(false);
 		}
 
@@ -69,8 +69,8 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 
 				Iterator<SortType> indexIterator = jobIndex.iterator();
 
-				logger.debug("Job Queue Size " + jobQueue.size());
-				logger.debug("Job Index Size " + jobIndex.size());
+				// logger.debug("Job Queue Size " + jobQueue.size());
+				// logger.debug("Job Index Size " + jobIndex.size());
 
 				while (indexIterator.hasNext()) {
 
