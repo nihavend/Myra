@@ -31,6 +31,7 @@ import com.likya.myra.commons.utils.PeriodCalculations;
 import com.likya.myra.commons.utils.StateFilter;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.CoreFactoryInterface;
+import com.likya.myra.jef.jobs.ChangeLSI;
 import com.likya.myra.jef.jobs.JobHelper;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.utils.JobQueueOperations;
@@ -192,8 +193,8 @@ public class BaseSchedulerController {
 
 	protected void executeJob(JobImpl scheduledJob) throws InterruptedException {
 
-		if (!checkDangerGroupZoneIntrusion(scheduledJob)) {
-			CoreFactory.getLogger().debug("Grup kısıtı nedeni ile çalışmıyor ! ==> " + scheduledJob.getAbstractJobType().getId());
+		if (inDangerGroupZoneIntrusion(scheduledJob)) {
+			CoreFactory.getLogger().debug("Tehlikeli Grup kısıtı nedeni ile çalışmıyor ! ==> " + scheduledJob.getAbstractJobType().getId());
 			return;
 		}
 
@@ -202,6 +203,8 @@ public class BaseSchedulerController {
 		//			getScenarioRuntimeProperties().setStartTime(Calendar.getInstance().getTime());
 		//		}
 
+		ChangeLSI.forValue(scheduledJob.getAbstractJobType(), StateName.RUNNING, SubstateName.STAGE_IN);
+		
 		CoreFactory.getLogger().debug(CoreFactory.getMessage("Myra.66"));
 
 		Thread starterThread = new Thread(scheduledJob);
@@ -319,20 +322,38 @@ public class BaseSchedulerController {
 		return counter;
 	}
 
-	public boolean checkDangerGroupZoneIntrusion(JobImpl currentJob) {
-		
+	public boolean inDangerGroupZoneIntrusion(JobImpl currentJob) {
+
 		AbstractJobType myAbstractJobType = currentJob.getAbstractJobType();
-		
+
+		String dangerZoneGroupId = myAbstractJobType.getDangerZoneGroupId();
+
+		if (dangerZoneGroupId == null) {
+			return false;
+		}
+
 		for (JobImpl tmpJobImpl : jobQueue.values()) {
+
 			AbstractJobType tmpAbstractJobType = tmpJobImpl.getAbstractJobType();
-			if(myAbstractJobType.getDangerZoneGroupId() != null && myAbstractJobType.getDangerZoneGroupId().equals(tmpAbstractJobType.getDangerZoneGroupId())) {
-				StateName.RUNNING.equals(JobHelper.getLastStateInfo(tmpAbstractJobType).getStateName());
-				return false;
+
+			if (tmpAbstractJobType.getId().equals(myAbstractJobType.getId())) {
+				// self intrusion, discarding
+				continue;
+			}
+
+			if (dangerZoneGroupId.equals(tmpAbstractJobType.getDangerZoneGroupId())) {
+				// System.err.println("Job " + myAbstractJobType.getId() + " and " + tmpAbstractJobType.getId() + " are in same group >> " + tmpAbstractJobType.getDangerZoneGroupId());
+				// System.err.println("Job " + myAbstractJobType.getId() + " statu : " + myAbstractJobType.getStateInfos());
+				// System.err.println("Job " +  tmpAbstractJobType.getId() + " statu : " + tmpAbstractJobType.getStateInfos());
+				if (StateName.RUNNING.equals(JobHelper.getLastStateInfo(tmpAbstractJobType).getStateName())) {
+					// System.err.println("Can not execute !!!!!!!!!!!");
+					return true;
+				}
 			}
 		}
 
-		return true;
-	
+		return false;
+
 	}
 
 	public HashMap<String, JobImpl> getJobQueue() {
