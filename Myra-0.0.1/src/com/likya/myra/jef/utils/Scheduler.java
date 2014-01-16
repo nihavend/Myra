@@ -49,7 +49,7 @@ public class Scheduler {
 
 		if (nextPeriodTime == null) {
 			Calendar selectedSchedule = regularSchedule(abstractJobType);
-			if (selectedSchedule != null && selectedSchedule.after(Calendar.getInstance())) {
+			if (selectedSchedule != null && selectedSchedule.after(Calendar.getInstance()) && !selectedSchedule.after(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStopTime())) {
 				abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(selectedSchedule);
 				// yeni zamana kuruldu
 			} else {
