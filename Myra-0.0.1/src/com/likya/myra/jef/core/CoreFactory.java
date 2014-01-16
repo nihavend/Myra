@@ -20,6 +20,7 @@ import java.util.HashMap;
 import com.likya.myra.jef.InputStrategy;
 import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.controller.ControllerInterface;
+import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.model.InstanceNotFoundException;
 import com.likya.myra.jef.model.MyraException;
 
@@ -92,6 +93,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 			throw new MyraException();
 		}
 
+		setExecutionState(CoreStateInfo.STATE_WORKING);
 	}
 
 	public ManagementOperations getManagementOperations() {
