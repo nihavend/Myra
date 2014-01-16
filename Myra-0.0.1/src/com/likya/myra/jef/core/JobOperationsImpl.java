@@ -15,74 +15,185 @@
  ******************************************************************************/
 package com.likya.myra.jef.core;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+
+import org.apache.log4j.Logger;
+
+import com.likya.myra.commons.utils.DependencyOperations;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.jobs.ChangeLSI;
+import com.likya.myra.jef.jobs.GenericInnerJob;
 import com.likya.myra.jef.jobs.JobHelper;
+import com.likya.myra.jef.jobs.JobImpl;
+import com.likya.myra.jef.utils.JobQueueOperations;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
+import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 
 public class JobOperationsImpl implements JobOperations {
 	
 	private CoreFactory coreFactory;
+	private Logger logger = CoreFactory.getLogger();
 	
 	public JobOperationsImpl(CoreFactory coreFactory) {
 		super();
 		this.coreFactory = coreFactory;
 	}
 
-	@Override
-	public void retryExecution(String jobName) {
-		// TODO Auto-generated method stub
+	public void retryExecution(String jobId) {
+		
+		logger.info(CoreFactory.getMessage("TlosCommInterface.0") + jobId);
+		
+		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
+
+			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
+			
+			boolean isRetryable = LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED) || LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.FINISHED, SubstateName.STOPPED);
+			
+			if(isRetryable) {
+				((GenericInnerJob) myJob).setRenewByTime(myJob.getAbstractJobType());
+				logger.info(CoreFactory.getMessage("TlosCommInterface.1") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+			}
+			
+		}
 		
 	}
 
-	@Override
-	public void setSuccess(String jobName) {
-		// TODO Auto-generated method stub
+	public void setSuccess(String jobId) {
+		
+		logger.info(CoreFactory.getMessage("TlosCommInterface.3") + jobId);
+		
+		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
+			
+			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
+			
+			boolean isSuccessable = LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.PENDING, SubstateName.PAUSED) || LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED);
+			
+			if(isSuccessable) {
+				if(((GenericInnerJob) myJob).scheduleForNextExecution(myJob.getAbstractJobType())) {
+					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS);
+					logger.info(CoreFactory.getMessage("TlosCommInterface.4") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+				} else {
+					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, "set success yaparken bir hata oluştu !");
+				}
+			}
+		}
 		
 	}
 
-	@Override
-	public void skipJob(String jobName) {
-		// TODO Auto-generated method stub
+	public void skipJob(String jobId) {
+		
+		logger.info(CoreFactory.getMessage("TlosCommInterface.6") + jobId);
+		
+		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
+			
+			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
+			
+			boolean isSkipable = LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.PENDING, SubstateName.PAUSED) || LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED);
+
+			if(isSkipable) {
+				if(((GenericInnerJob) myJob).scheduleForNextExecution(myJob.getAbstractJobType())) {
+					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.SKIPPED);
+					logger.info(CoreFactory.getMessage("TlosCommInterface.7") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+				} else {
+					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, "set success yaparken bir hata oluştu !");
+				}
+			}
+
+		}
 		
 	}
 
-	@Override
-	public void skipJob(boolean isForced, String jobName) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void stopJob(String jobName) {
-		// TODO Auto-generated method stub
+		
+		logger.info(CoreFactory.getMessage("TlosCommInterface.9") + jobName);
+		
+		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobName)) {
+			
+			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobName);
+			
+			boolean isStopable = LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.RUNNING);
+
+			if(isStopable) {
+				myJob.stopMyDogBarking();
+				ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.STOPPED);
+				Thread executerThread = myJob.getMyExecuter();
+				if (executerThread != null) {
+					myJob.getMyExecuter().interrupt();
+					myJob.setMyExecuter(null);
+				}
+				logger.info(CoreFactory.getMessage("TlosCommInterface.10") + jobName + " : " + JobHelper.getLastStateInfo(myJob));
+			}
+
+		}
 		
 	}
 
-	@Override
-	public void pauseJob(String jobName) {
-		// TODO Auto-generated method stub
+	public void pauseJob(String jobId) {
+		
+		logger.info(CoreFactory.getMessage("TlosCommInterface.12") + jobId);
+		
+		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
+			
+			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
+			
+			boolean isPausable = LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.PENDING, SubstateName.READY, StatusName.WAITING) ;
+			
+			if(isPausable) {
+				ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.PENDING, SubstateName.PAUSED);
+				logger.info(CoreFactory.getMessage("TlosCommInterface.13") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+			}
+			
+		}
 		
 	}
 
-	@Override
-	public void resumeJob(String jobName) {
-		// TODO Auto-generated method stub
+	public void resumeJob(String jobId) {
 		
+		logger.info(CoreFactory.getMessage("TlosCommInterface.15") + jobId);
+		
+		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
+			
+			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
+			
+			boolean isResumable = LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.PENDING, SubstateName.PAUSED);
+			
+			if(isResumable) {
+				ChangeLSI.forValue(myJob.getAbstractJobType(), JobHelper.getLastStateInfo(myJob));
+				logger.info(CoreFactory.getMessage("TlosCommInterface.16") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+			}
+
+		}
 	}
 
-	@Override
-	public void startJob(String jobName) {
-		// TODO Auto-generated method stub
+	public void startJob(String jobId) {
+		
+		logger.info(CoreFactory.getMessage("TlosCommInterface.18") + jobId);
+
+		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
+
+			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
+			
+			
+			boolean isStartable = LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.PENDING) && (myJob.getAbstractJobType().getDependencyList() == null || myJob.getAbstractJobType().getDependencyList().sizeOfItemArray() == 0);
+			
+			if(isStartable) {
+				updateStartConditionsOfDepChain(jobId,  Calendar.getInstance());
+				ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
+			}
+			
+			logger.info(CoreFactory.getMessage("TlosCommInterface.19") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+		}
 		
 	}
 
 	@Override
 	public void disableJob(String jobName) {
 		
-		CoreFactory.getLogger().info(CoreFactory.getMessage("TlosCommInterface.35") + jobName);
+		logger.info(CoreFactory.getMessage("TlosCommInterface.35") + jobName);
 
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobName)) {
 
@@ -99,10 +210,23 @@ public class JobOperationsImpl implements JobOperations {
 		}
 	}
 
-	@Override
-	public void enableJob(String jobName) {
-		// TODO Auto-generated method stub
+	public void enableJob(String jobId) {
 		
+		logger.info(CoreFactory.getMessage("TlosCommInterface.36") + jobId);
+
+		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
+
+			AbstractJobType abstractJobType = coreFactory.getMonitoringOperations().getJobQueue().get(jobId).getAbstractJobType();
+			
+			if(LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_DEACTIVATED))) {
+				ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
+			}
+			//			synchronized (TlosServer.getDisabledJobQueue()) {
+			//				TlosServer.getDisabledJobQueue().remove(jobName);
+			//			}
+			
+			logger.info(CoreFactory.getMessage("TlosCommInterface.36") + jobId + " : " + JobHelper.getLastStateInfo(abstractJobType));
+		}
 	}
 
 	@Override
@@ -110,5 +234,32 @@ public class JobOperationsImpl implements JobOperations {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	private void updateStartConditionsOfDepChain(String jobId, Calendar myDate) {
+		
+		
+		HashMap<String, AbstractJobType> abstractJobTypeList = JobQueueOperations.toAbstractJobTypeList(coreFactory.getMonitoringOperations().getJobQueue());
+		
+		ArrayList<AbstractJobType> dependencyList = DependencyOperations.getDependencyList(abstractJobTypeList, jobId);
+		
+		if (dependencyList == null) {
+			return;
+		}
+		
+		for(AbstractJobType abstractJobType : dependencyList) {
+			
+			if(abstractJobType.getDependencyList().getSensInfo() == null || abstractJobType.getDependencyList().getSensInfo().getSensTime() == null) {
+				continue;
+			}
+			
+			String tmpJobId = abstractJobType.getId();
+			ArrayList<AbstractJobType> tempJobList = DependencyOperations.getDependencyList(abstractJobTypeList, tmpJobId);
+			if ((tempJobList != null) && (tempJobList.size() > 0)) {
+				updateStartConditionsOfDepChain(tmpJobId, myDate);
+			}
+			abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStartTime(myDate);
+		}
 
+	}
+	
 }
