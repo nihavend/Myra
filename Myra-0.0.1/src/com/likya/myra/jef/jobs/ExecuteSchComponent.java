@@ -129,6 +129,9 @@ public class ExecuteSchComponent extends CommonShell {
 			session.disconnect();
 
 			int processExitValue = channel.getExitStatus();
+			
+			Calendar endTime = Calendar.getInstance();
+			JobHelper.setJsRealTimeForStop(abstractJobType, endTime);
 
 			myLogger.info(" >>" + logLabel + jobId + " islemi sonlandi, islem bitis degeri : " + processExitValue);
 
@@ -140,7 +143,7 @@ public class ExecuteSchComponent extends CommonShell {
 
 			JobHelper.writeErrorLogFromOutputs(myLogger, logClassName, stringBufferForOUTPUT, stringBufferForERROR);
 
-			setOfCodeMessage(abstractJobType, statusName.intValue(), descStr.toString());
+			setOfCodeMessage(abstractJobType, statusName, processExitValue, descStr.toString());
 
 		} catch (InterruptedException e) {
 
