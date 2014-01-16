@@ -105,28 +105,39 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 											if (hasTimeCome(abstractJobType)) {
 												executeJob(scheduledJob);
 											} else {
-												liveStateInfo.setSubstateName(SubstateName.IDLED);
-												liveStateInfo.setStatusName(StatusName.BYTIME);
+												if (!LiveStateInfoUtils.equalStatesPIT(liveStateInfo)) {
+													liveStateInfo.setSubstateName(SubstateName.IDLED);
+													liveStateInfo.setStatusName(StatusName.BYTIME);
+												}
 											}
 										} else { // Relative Time Sensitive
-											handleTimeSensitivity(abstractJobType, dependencyList);
+											if(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime() == null) { 
+												handleTimeSensitivity(abstractJobType, dependencyList);
+											}
 											if (hasTimeCome(abstractJobType)) {
 												executeJob(scheduledJob);
 											} else {
-												liveStateInfo.setSubstateName(SubstateName.IDLED);
-												liveStateInfo.setStatusName(StatusName.BYTIME);
+												if (!LiveStateInfoUtils.equalStatesPIT(liveStateInfo)) {
+													liveStateInfo.setSubstateName(SubstateName.IDLED);
+													liveStateInfo.setStatusName(StatusName.BYTIME);
+												}
 											}
 										}
 									} else {
 										executeJob(scheduledJob);
 									}
 								} else {
-									if (LiveStateInfoUtils.equalStatesPIT(liveStateInfo)) { 
+									if (!LiveStateInfoUtils.equalStatesPRW(liveStateInfo)) {
+										if (isTimeSensitive(dependencyList) && dependencyList.getSensInfo().getSensTime().getRelativeStart()) {
+											abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(null);
+										}
 										// long startTime = Calendar.getInstance().getTimeInMillis();
 										// boolean lastRes = 
-										atLeastOneParentNOTPI(abstractJobType, ">>");
+										// atLeastOneParentNOTPI(abstractJobType, ">>");
 										// System.err.println("Fark :" + (Calendar.getInstance().getTimeInMillis() - startTime));
 										// System.err.println(lastRes);
+										liveStateInfo.setSubstateName(SubstateName.READY);
+										liveStateInfo.setStatusName(StatusName.WAITING);
 									}
 								}
 							}
