@@ -118,7 +118,10 @@ public class BaseSchedulerController {
 			} else {
 				// System.err.println(indent + " No dependency ");
 				LiveStateInfo innerLiveStateInfo = JobHelper.getLastStateInfo(innerAbstractJobType);
-				if (!LiveStateInfoUtils.equalStates(innerLiveStateInfo, StateName.PENDING, SubstateName.IDLED)) {
+
+				boolean isState = LiveStateInfoUtils.equalStates(innerLiveStateInfo, StateName.PENDING, SubstateName.IDLED);
+
+				if (!isState) {
 					isFound = true;
 					// System.err.println(indent + " Evraka ");
 					break;
@@ -138,19 +141,19 @@ public class BaseSchedulerController {
 
 	/**
 	 * @param dependencyArray
-	 * @return the maximum date of the dependent jobs
+	 * @return the maximum end date of the dependent jobs
 	 */
 	protected Calendar getMaxBaseDate(Item[] dependencyArray) {
 
-		Calendar maxBaseDate = jobQueue.get(dependencyArray[0].getJsId()).getAbstractJobType().getManagement().getTimeManagement().getJsRealTime().getStartTime();
+		Calendar maxBaseDate = jobQueue.get(dependencyArray[0].getJsId()).getAbstractJobType().getManagement().getTimeManagement().getJsRealTime().getStopTime();
 
 		// System.err.println("Current : " + MyraDateUtils.getDate(maxBaseDate.getTime()));
 		for (Item item : dependencyArray) {
 			AbstractJobType depJob = jobQueue.get(item.getJsId()).getAbstractJobType();
-			Calendar startTime = depJob.getManagement().getTimeManagement().getJsRealTime().getStartTime();
+			Calendar stopTime = depJob.getManagement().getTimeManagement().getJsRealTime().getStopTime();
 			// System.err.println("Dep Job : " + item.getJsId() + " Time " + MyraDateUtils.getDate(maxBaseDate.getTime()));
-			if (startTime.after(maxBaseDate)) {
-				maxBaseDate = startTime;
+			if (stopTime.after(maxBaseDate)) {
+				maxBaseDate = stopTime;
 			}
 		}
 
@@ -168,11 +171,13 @@ public class BaseSchedulerController {
 	 */
 	protected void handleTimeSensitivity(AbstractJobType abstractJobType, DependencyList dependencyList) {
 		Calendar newTime = getMaxBaseDate(dependencyList.getItemArray());
-		abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(newTime);
+		// System.err.println("Before : " + MyraDateUtils.getDate(newTime.getTime()));
 		SensInfo sensInfo = dependencyList.getSensInfo();
-		System.err.println("Before : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime()));
-		JobHelper.setJsPlannedTimeForStart(abstractJobType, PeriodCalculations.getDurationInMilliSecs(sensInfo.getSensTime().getDelay()));
-		System.err.println("After : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime()));
+		// System.err.println("Before : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime()));
+		String timeZone = abstractJobType.getManagement().getTimeManagement().getTimeZone();
+		Calendar returnCal = PeriodCalculations.addPeriod(newTime, PeriodCalculations.getDurationInMilliSecs(sensInfo.getSensTime().getDelay()), timeZone);
+		abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(returnCal);
+		// System.err.println("After : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime()));
 	}
 
 	protected boolean checkDependency(JobImpl meJob, DependencyList dependencyList) throws UnresolvedDependencyException {
@@ -204,7 +209,7 @@ public class BaseSchedulerController {
 		//		}
 
 		ChangeLSI.forValue(scheduledJob.getAbstractJobType(), StateName.RUNNING, SubstateName.STAGE_IN);
-		
+
 		CoreFactory.getLogger().debug(CoreFactory.getMessage("Myra.66"));
 
 		Thread starterThread = new Thread(scheduledJob);
