@@ -16,13 +16,11 @@
 package com.likya.myra.jef.jobs;
 
 import java.io.IOException;
-import java.util.Calendar;
 
 import org.apache.log4j.Logger;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
-import com.likya.commons.utils.DateUtils;
 import com.likya.myra.commons.grabber.StreamGrabber;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
@@ -64,33 +62,33 @@ public abstract class CommonShell extends GenericInnerJob {
 		// TL den gelen....
 		// restore to the value derived from sernayobilgileri file.
 		// getJobProperties().setJobParamList(getJobProperties().getJobParamListPerm());
-
+//
 		AbstractJobType abstractJobType = getAbstractJobType();
-
-		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Error for " + abstractJobType.getBaseJobInfos().getJsName());
+//
+		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Error for " + abstractJobType.getId());
 		stopErrorGobbler(CoreFactory.getLogger());
-
-		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Output for " + abstractJobType.getBaseJobInfos().getJsName());
+//
+		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Output for " + abstractJobType.getId());
 		stopOutputGobbler(CoreFactory.getLogger());
-
-		Calendar endTime = Calendar.getInstance();
-
-		long timeDiff = endTime.getTime().getTime() - startTime.getTime().getTime();
-
-		String endLog = abstractJobType.getBaseJobInfos().getJsName() + ":Bitis zamani : " + DateUtils.getDate(endTime.getTime());
-		String duration = abstractJobType.getBaseJobInfos().getJsName() + ": islem suresi : " + DateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
-		getJobRuntimeProperties().setCompletionDate(endTime);
-		getJobRuntimeProperties().setWorkDuration(DateUtils.getUnFormattedElapsedTime((int) timeDiff / 1000));
-
-		JobHelper.setJsRealTimeForStop(abstractJobType, endTime);
-
-		CoreFactory.getLogger().info(" >>" + logLabel + ">> " + endLog);
-		CoreFactory.getLogger().info(" >>" + logLabel + ">> " + duration);
-
-		if (watchDogTimer != null) {
-			CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Watchdog for " + abstractJobType.getBaseJobInfos().getJsName());
-			stopMyDogBarking();
-		}
+//
+//		Calendar endTime = Calendar.getInstance();
+//
+//		long timeDiff = endTime.getTime().getTime() - startTime.getTime().getTime();
+//
+//		String endLog = abstractJobType.getBaseJobInfos().getJsName() + ":Bitis zamani : " + DateUtils.getDate(endTime.getTime());
+//		String duration = abstractJobType.getBaseJobInfos().getJsName() + ": islem suresi : " + DateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
+//		getJobRuntimeProperties().setCompletionDate(endTime);
+//		getJobRuntimeProperties().setWorkDuration(DateUtils.getUnFormattedElapsedTime((int) timeDiff / 1000));
+//
+//		JobHelper.setJsRealTimeForStop(abstractJobType, endTime);
+//
+//		CoreFactory.getLogger().info(" >>" + logLabel + ">> " + endLog);
+//		CoreFactory.getLogger().info(" >>" + logLabel + ">> " + duration);
+//
+//		if (watchDogTimer != null) {
+//			CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Watchdog for " + abstractJobType.getBaseJobInfos().getJsName());
+//			stopMyDogBarking();
+//		}
 
 		// sendOutputData();
 
