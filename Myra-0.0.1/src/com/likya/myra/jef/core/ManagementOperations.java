@@ -21,8 +21,6 @@ public interface ManagementOperations {
 
 	public void start() throws Throwable;
 
-	public void shutDown();
-	
 	public void suspend();
 
 	public void resume();
