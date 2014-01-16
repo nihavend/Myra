@@ -55,19 +55,19 @@ public class ExecuteInShell extends CommonShell {
 
 	}
 
-	protected void cleanUp() {
-
-		stopErrorGobbler(myLogger);
-		stopOutputGobbler(myLogger);
-		
-		// restore to the value derived from sernayobilgileri file.
-		//			getJobProperties().setJobParamList(getJobProperties().getJobParamListPerm());
-
-		// sendOutputData();
-
-		setMyExecuter(null);
-		process = null;
-	}
+//	protected void cleanUp() {
+//
+//		stopErrorGobbler(myLogger);
+//		stopOutputGobbler(myLogger);
+//		
+//		// restore to the value derived from sernayobilgileri file.
+//		//			getJobProperties().setJobParamList(getJobProperties().getJobParamListPerm());
+//
+//		// sendOutputData();
+//
+//		setMyExecuter(null);
+//		process = null;
+//	}
 
 	public void startProcess(Calendar startTime) throws IOException {
 
@@ -136,7 +136,11 @@ public class ExecuteInShell extends CommonShell {
 			process.waitFor();
 
 			int processExitValue = process.exitValue();
-			CoreFactory.getLogger().info(jobId + CoreFactory.getMessage("ExternalProgram.6") + processExitValue); //$NON-NLS-1$
+			
+			Calendar endTime = Calendar.getInstance();
+			JobHelper.setJsRealTimeForStop(abstractJobType, endTime);
+			
+			CoreFactory.getLogger().info(jobId + CoreFactory.getMessage("ExternalProgram.6") + processExitValue);
 
 			String errStr = jobRuntimeInterface.getLogAnalyzeString();
 			boolean hasErrorInLog = false;
@@ -165,7 +169,7 @@ public class ExecuteInShell extends CommonShell {
 			if (errStr != null && hasErrorInLog) {
 				setFailedOfLog(abstractJobType);
 			} else {
-				setOfCodeMessage(abstractJobType, statusName.intValue(), jobRuntimeInterface.getMessageBuffer().toString());
+				setOfCodeMessage(abstractJobType, statusName, processExitValue, jobRuntimeInterface.getMessageBuffer().toString());
 			}
 
 		} catch (Throwable e) {
