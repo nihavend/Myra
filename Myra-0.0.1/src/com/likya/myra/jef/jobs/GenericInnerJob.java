@@ -46,8 +46,8 @@ public abstract class GenericInnerJob extends JobImpl {
 		ChangeLSI.forValue(abstractJobType, StateName.RUNNING, SubstateName.ON_RESOURCE, StatusName.TIME_IN);
 	}
 
-	protected void setOfCodeMessage(AbstractJobType abstractJobType, int code, String message) {
-		ChangeLSI.forValue(abstractJobType, StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS, code, message);
+	protected void setOfCodeMessage(AbstractJobType abstractJobType, StatusName.Enum statusName, int resultCode, String message) {
+		ChangeLSI.forValue(abstractJobType, StateName.FINISHED, SubstateName.COMPLETED, statusName, resultCode, message);
 	}
 
 	protected void setFailedOfLog(AbstractJobType abstractJobType) {
