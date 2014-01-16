@@ -96,5 +96,9 @@ public abstract class JobImpl implements Runnable, Serializable {
 	public Logger getMyLogger() {
 		return myLogger;
 	}
+	
+	public String toString() {
+		return "[JobId:" + getAbstractJobType().getId() + "][" + JobHelper.getLastStateInfo(getAbstractJobType()) + "]";
+	}
 
 }
