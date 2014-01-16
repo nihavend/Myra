@@ -18,23 +18,23 @@ package com.likya.myra.jef.core;
 
 public interface JobOperations {
 	
-	public void retryExecution(String jobName);
+	public void retryExecution(String jobId);
 
-	public void setSuccess(String jobName);
+	public void setSuccess(String jobId);
 
-	public void skipJob(String jobName);
+	public void skipJob(String jobId);
 
-	public void stopJob(String jobName);
+	public void stopJob(String jobId);
 
-	public void pauseJob(String jobName);
+	public void pauseJob(String jobId);
 
-	public void resumeJob(String jobName);
+	public void resumeJob(String jobId);
 
-	public void startJob(String jobName);
+	public void startJob(String jobId);
 
-	public void disableJob(String jobName);
+	public void disableJob(String jobId);
 
-	public void enableJob(String jobName);
+	public void enableJob(String jobId);
 
-	public String setJobInputParam(String jobName, String parameterList) ;
+	public String setJobInputParam(String jobId, String parameterList) ;
 }
