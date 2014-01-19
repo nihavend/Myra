@@ -16,9 +16,9 @@
 
 package com.likya.myra.jef.utils;
 
-import java.util.Arrays;
 import java.util.Calendar;
 
+import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.commons.utils.PeriodCalculations;
 import com.likya.myra.commons.utils.RestrictedDailyIterator;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
@@ -48,6 +48,11 @@ public class Scheduler {
 		Calendar nextPeriodTime = PeriodCalculations.forward(abstractJobType);
 
 		if (nextPeriodTime == null) {
+			Calendar c = abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime();
+			// System.err.println(c);
+			c.add(Calendar.DAY_OF_MONTH, 1);
+			abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(c);
+			// System.err.println(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime());
 			Calendar selectedSchedule = regularSchedule(abstractJobType);
 			if (selectedSchedule != null && selectedSchedule.after(Calendar.getInstance())) {
 				abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(selectedSchedule);
@@ -65,15 +70,20 @@ public class Scheduler {
 
 		Calendar jsPlannedStartTime = abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime();
 
-		Calendar selectedSchedule = null;
+		Calendar selectedSchedule = Calendar.getInstance();
 
 		ScheduleInfo scheduleInfo = abstractJobType.getScheduleInfo();
 
 		int daysOfWeek[] = scheduleInfo.getDaysOfWeekIntTypeArray();
+		
+		int hourOfPlannedTime = jsPlannedStartTime.get(Calendar.HOUR_OF_DAY);
+		int minuteOfPlannedTime = jsPlannedStartTime.get(Calendar.MINUTE);
+		int secondOfPlannedTime = jsPlannedStartTime.get(Calendar.SECOND);
+		
 
-		RestrictedDailyIterator restrictedDailyIterator = new RestrictedDailyIterator(jsPlannedStartTime.get(Calendar.HOUR_OF_DAY), jsPlannedStartTime.get(Calendar.MINUTE), jsPlannedStartTime.get(Calendar.SECOND), daysOfWeek);
+		RestrictedDailyIterator restrictedDailyIterator = new RestrictedDailyIterator(hourOfPlannedTime, minuteOfPlannedTime, secondOfPlannedTime, daysOfWeek);
 		Calendar restCal = restrictedDailyIterator.next();
-		selectedSchedule = restCal;
+		selectedSchedule.setTime(restCal.getTime());
 
 		DaysOfMonth daysOfMonth = scheduleInfo.getDaysOfMonth();
 
@@ -85,27 +95,37 @@ public class Scheduler {
 			
 			String lastDay = daysOfMonth.getLastDayOfMonth();
 			
-			if (Arrays.binarySearch(dayList, Calendar.DAY_OF_MONTH) > 0) {
-				if (jsPlannedStartTime.before(selectedSchedule)) {
-					// System.err.println("selectedSchedule : " + MyraDateUtils.getDate(selectedSchedule.getTime()));
-					// System.err.println("jsPlannedStartTime : " + MyraDateUtils.getDate(jsPlannedStartTime.getTime()));
-					selectedSchedule = jsPlannedStartTime;
+			if (dayList.length > 0) {
+				restrictedDailyIterator = new RestrictedDailyIterator(hourOfPlannedTime, minuteOfPlannedTime, secondOfPlannedTime, dayList);
+				restCal = restrictedDailyIterator.next(Calendar.DAY_OF_MONTH);
+				if (restCal.before(selectedSchedule)) {
+					selectedSchedule.setTime(restCal.getTime());
 				}
-			} else if (firstDay != null && !firstDay.equals("")) {
-				Calendar localCal = Calendar.getInstance();
-				int lastDayOfMonth = localCal.getActualMaximum(Calendar.DAY_OF_MONTH);
-				localCal.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
-				if (localCal.before(selectedSchedule)) {
-					selectedSchedule = localCal;
+			} 
+			
+			if (firstDay != null) {
+				int firstDayOfMonth = 1;
+				restCal = MyraDateUtils.setTimePart(jsPlannedStartTime);
+				restCal.set(Calendar.MONTH, restCal.get(Calendar.MONTH) + 1);
+				restCal.set(Calendar.DAY_OF_MONTH, firstDayOfMonth);
+				if (restCal.before(selectedSchedule)) {
+					selectedSchedule.setTime(restCal.getTime());
 				}
-			} if (lastDay != null && !lastDay.equals("")) {
-				Calendar localCal = Calendar.getInstance();
-				int lastDayOfMonth = localCal.getActualMinimum(Calendar.DAY_OF_MONTH);
-				localCal.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
-				if (localCal.before(selectedSchedule)) {
-					selectedSchedule = localCal;
+			} 
+				
+			if (lastDay != null) {
+				int lastDayOfMonth = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
+				if(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == lastDayOfMonth) {
+					restCal.set(Calendar.MONTH, restCal.get(Calendar.MONTH) + 1);
+					lastDayOfMonth = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
+				}
+				restCal = MyraDateUtils.setTimePart(jsPlannedStartTime);
+				restCal.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
+				if (restCal.before(selectedSchedule)) {
+					selectedSchedule.setTime(restCal.getTime());
 				}
 			}
+			
 		}
 
 		// System.err.println(MyraDateUtils.getDate(selectedSchedule.getTime()));
