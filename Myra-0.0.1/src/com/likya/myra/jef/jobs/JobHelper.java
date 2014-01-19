@@ -55,9 +55,11 @@ public class JobHelper {
 
 		Calendar endTime = Calendar.getInstance();
 		long timeDiff = endTime.getTime().getTime() - startTime.getTime().getTime();
+		
+		int durationList[] = MyraDateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
 
 		String endLog = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.14") + MyraDateUtils.getDate(endTime.getTime());
-		String duration = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.15") + MyraDateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
+		String duration = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.15") + durationList[0] + " saat " + durationList[1] + " dakika " + durationList[2] + " saniye";
 
 		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStopTime(endTime);
 
