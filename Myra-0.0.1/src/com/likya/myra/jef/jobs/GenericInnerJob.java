@@ -135,6 +135,8 @@ public abstract class GenericInnerJob extends JobImpl {
 				break;
 			case Trigger.INT_TIME:
 				if (scheduleForNextExecution(abstractJobType)) {
+					String startTime = MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime());
+					CoreFactory.getLogger().info("Job [" + abstractJobType.getId() + "] bir sonraki zamana kuruldu : " + startTime);
 					setRenewByTime(abstractJobType);
 				}
 				break;
