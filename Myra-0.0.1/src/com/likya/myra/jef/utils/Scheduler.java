@@ -76,7 +76,7 @@ public class Scheduler {
 
 	private static Calendar regularSchedule(AbstractJobType abstractJobType) {
 
-		Calendar jsPlannedStartTime = abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime();
+		Calendar jsPlannedStartTime = abstractJobType.getManagement().getTimeManagement().getBornedPlannedTime().getStartTime();
 
 		Calendar selectedSchedule = null;
 
