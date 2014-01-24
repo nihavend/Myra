@@ -253,6 +253,25 @@ public class JobHelper {
 			CoreFactory.getLogger().info("Job id :" + abstractJobType.getId() + " is scheduled for new time " + abstractJobType.getManagement().getTimeManagement().getJsPlannedTime());
 		}
 	}
+
+	public static LiveStateInfo getStateInfo(AbstractJobType abstractJobType, int index) {
+		return abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(index);
+	}
+	
+	/**
+	 * @param jobImpl
+	 * @param index
+	 * @return the state values stored in the given index, the most last value has the index 0
+	 */
+	
+	public static LiveStateInfo getStateInfo(JobImpl jobImpl, int index) {
+		return getStateInfo(jobImpl.getAbstractJobType(), index);
+	}
+	
+	/**
+	 * @param abstractJobType
+	 * @return the state values stored in the given index, the most last value has the index 0
+	 */
 	
 	public static LiveStateInfo getLastStateInfo(AbstractJobType abstractJobType) {
 		return abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);

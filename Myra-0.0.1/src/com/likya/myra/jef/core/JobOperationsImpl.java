@@ -162,7 +162,7 @@ public class JobOperationsImpl implements JobOperations {
 			boolean isResumable = LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.PENDING, SubstateName.PAUSED);
 			
 			if(isResumable) {
-				ChangeLSI.forValue(myJob.getAbstractJobType(), JobHelper.getLastStateInfo(myJob));
+				ChangeLSI.forValue(myJob.getAbstractJobType(), JobHelper.getStateInfo(myJob, 1));
 				logger.info(CoreFactory.getMessage("Myra.317") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 			}
 
