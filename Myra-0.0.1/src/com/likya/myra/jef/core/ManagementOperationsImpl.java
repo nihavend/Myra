@@ -49,17 +49,17 @@ public class ManagementOperationsImpl implements ManagementOperations {
 
 	public void suspend() {
 		if (coreFactory.getExecutionState() == CoreStateInfo.STATE_WORKING) {
-			logger.info(CoreFactory.getMessage("TlosCommInterface.21"));
+			logger.info(CoreFactory.getMessage("Myra.321"));
 			coreFactory.setExecutionState(CoreStateInfo.STATE_SUSPENDED);
-			logger.info(CoreFactory.getMessage("TlosCommInterface.22"));
+			logger.info(CoreFactory.getMessage("Myra.322"));
 		}
 	}
 
 	public void resume() {
 		if (coreFactory.getExecutionState() == CoreStateInfo.STATE_SUSPENDED) {
-			logger.info(CoreFactory.getMessage("TlosCommInterface.23")); //$NON-NLS-1$
+			logger.info(CoreFactory.getMessage("Myra.323"));
 			coreFactory.setExecutionState(CoreStateInfo.STATE_WORKING);
-			logger.info(CoreFactory.getMessage("TlosCommInterface.24")); //$NON-NLS-1$
+			logger.info(CoreFactory.getMessage("Myra.324"));
 		}
 	}
 
