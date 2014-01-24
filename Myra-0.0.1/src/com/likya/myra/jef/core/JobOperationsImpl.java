@@ -45,7 +45,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void retryExecution(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("TlosCommInterface.0") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.300") + jobId);
 		
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 
@@ -55,7 +55,7 @@ public class JobOperationsImpl implements JobOperations {
 			
 			if(isRetryable) {
 				((GenericInnerJob) myJob).setRenewByTime(myJob.getAbstractJobType());
-				logger.info(CoreFactory.getMessage("TlosCommInterface.1") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+				logger.info(CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 			}
 			
 		}
@@ -64,7 +64,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void setSuccess(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("TlosCommInterface.3") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.303") + jobId);
 		
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 			
@@ -75,7 +75,7 @@ public class JobOperationsImpl implements JobOperations {
 			if(isSuccessable) {
 				if(((GenericInnerJob) myJob).scheduleForNextExecution(myJob.getAbstractJobType())) {
 					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS);
-					logger.info(CoreFactory.getMessage("TlosCommInterface.4") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+					logger.info(CoreFactory.getMessage("Myra.304") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 				} else {
 					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, "set success yaparken bir hata oluştu !");
 				}
@@ -86,7 +86,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void skipJob(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("TlosCommInterface.6") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.306") + jobId);
 		
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 			
@@ -97,7 +97,7 @@ public class JobOperationsImpl implements JobOperations {
 			if(isSkipable) {
 				if(((GenericInnerJob) myJob).scheduleForNextExecution(myJob.getAbstractJobType())) {
 					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.SKIPPED);
-					logger.info(CoreFactory.getMessage("TlosCommInterface.7") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+					logger.info(CoreFactory.getMessage("Myra.307") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 				} else {
 					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, "set success yaparken bir hata oluştu !");
 				}
@@ -109,7 +109,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void stopJob(String jobName) {
 		
-		logger.info(CoreFactory.getMessage("TlosCommInterface.9") + jobName);
+		logger.info(CoreFactory.getMessage("Myra.309") + jobName);
 		
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobName)) {
 			
@@ -125,7 +125,7 @@ public class JobOperationsImpl implements JobOperations {
 					myJob.getMyExecuter().interrupt();
 					myJob.setMyExecuter(null);
 				}
-				logger.info(CoreFactory.getMessage("TlosCommInterface.10") + jobName + " : " + JobHelper.getLastStateInfo(myJob));
+				logger.info(CoreFactory.getMessage("Myra.310") + jobName + " : " + JobHelper.getLastStateInfo(myJob));
 			}
 
 		}
@@ -134,17 +134,17 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void pauseJob(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("TlosCommInterface.12") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.312") + jobId);
 		
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 			
 			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
 			
-			boolean isPausable = LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.PENDING, SubstateName.READY, StatusName.WAITING) ;
+			boolean isPausable = LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.PENDING) ;
 			
 			if(isPausable) {
 				ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.PENDING, SubstateName.PAUSED);
-				logger.info(CoreFactory.getMessage("TlosCommInterface.13") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+				logger.info(CoreFactory.getMessage("Myra.313") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 			}
 			
 		}
@@ -153,7 +153,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void resumeJob(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("TlosCommInterface.15") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.315") + jobId);
 		
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 			
@@ -163,7 +163,7 @@ public class JobOperationsImpl implements JobOperations {
 			
 			if(isResumable) {
 				ChangeLSI.forValue(myJob.getAbstractJobType(), JobHelper.getLastStateInfo(myJob));
-				logger.info(CoreFactory.getMessage("TlosCommInterface.16") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+				logger.info(CoreFactory.getMessage("Myra.316") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 			}
 
 		}
@@ -171,7 +171,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void startJob(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("TlosCommInterface.18") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.318") + jobId);
 
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 
@@ -181,11 +181,13 @@ public class JobOperationsImpl implements JobOperations {
 			boolean isStartable = LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.PENDING) && (myJob.getAbstractJobType().getDependencyList() == null || myJob.getAbstractJobType().getDependencyList().sizeOfItemArray() == 0);
 			
 			if(isStartable) {
-				updateStartConditionsOfDepChain(jobId,  Calendar.getInstance());
+				Calendar nowDateTime = Calendar.getInstance();
+				updateStartConditionsOfDepChain(jobId,  nowDateTime);
+				myJob.getAbstractJobType().getManagement().getTimeManagement().getJsPlannedTime().setStartTime(nowDateTime);
 				ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
 			}
 			
-			logger.info(CoreFactory.getMessage("TlosCommInterface.19") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+			logger.info(CoreFactory.getMessage("Myra.319") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 		}
 		
 	}
@@ -193,7 +195,7 @@ public class JobOperationsImpl implements JobOperations {
 	@Override
 	public void disableJob(String jobName) {
 		
-		logger.info(CoreFactory.getMessage("TlosCommInterface.35") + jobName);
+		logger.info(CoreFactory.getMessage("Myra.335") + jobName);
 
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobName)) {
 
@@ -206,26 +208,26 @@ public class JobOperationsImpl implements JobOperations {
 //				TlosServer.getDisabledJobQueue().put(jobName, jobName);
 //			}
 			
-			CoreFactory.getLogger().info(CoreFactory.getMessage("TlosCommInterface.19") + jobName + " : " + JobHelper.getLastStateInfo(abstractJobType));
+			CoreFactory.getLogger().info(CoreFactory.getMessage("Myra.319") + jobName + " : " + JobHelper.getLastStateInfo(abstractJobType));
 		}
 	}
 
 	public void enableJob(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("TlosCommInterface.36") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.336") + jobId);
 
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 
 			AbstractJobType abstractJobType = coreFactory.getMonitoringOperations().getJobQueue().get(jobId).getAbstractJobType();
 			
-			if(LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_DEACTIVATED))) {
+			if(LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.DEACTIVATED)) {
 				ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
 			}
 			//			synchronized (TlosServer.getDisabledJobQueue()) {
 			//				TlosServer.getDisabledJobQueue().remove(jobName);
 			//			}
 			
-			logger.info(CoreFactory.getMessage("TlosCommInterface.36") + jobId + " : " + JobHelper.getLastStateInfo(abstractJobType));
+			logger.info(CoreFactory.getMessage("Myra.336") + jobId + " : " + JobHelper.getLastStateInfo(abstractJobType));
 		}
 	}
 
@@ -257,7 +259,7 @@ public class JobOperationsImpl implements JobOperations {
 			if ((tempJobList != null) && (tempJobList.size() > 0)) {
 				updateStartConditionsOfDepChain(tmpJobId, myDate);
 			}
-			abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStartTime(myDate);
+			abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(myDate);
 		}
 
 	}
