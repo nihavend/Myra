@@ -45,7 +45,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void retryExecution(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("Myra.310") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.302") + CoreFactory.getMessage("Myra.300") + jobId);
 		
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 
@@ -55,7 +55,7 @@ public class JobOperationsImpl implements JobOperations {
 			
 			if(isRetryable) {
 				((GenericInnerJob) myJob).setRenewByTime(myJob.getAbstractJobType());
-				logger.info(CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+				logger.info(CoreFactory.getMessage("Myra.302") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 			}
 			
 		}
@@ -64,7 +64,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void setSuccess(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("Myra.303") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.303") + CoreFactory.getMessage("Myra.300") + jobId);
 		
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 			
@@ -75,7 +75,7 @@ public class JobOperationsImpl implements JobOperations {
 			if(isSuccessable) {
 				if(((GenericInnerJob) myJob).scheduleForNextExecution(myJob.getAbstractJobType())) {
 					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS);
-					logger.info(CoreFactory.getMessage("Myra.304") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+					logger.info(CoreFactory.getMessage("Myra.303") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 				} else {
 					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, "set success yaparken bir hata oluştu !");
 				}
@@ -86,7 +86,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void skipJob(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("Myra.306") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.304") + CoreFactory.getMessage("Myra.300") + jobId);
 		
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 			
@@ -97,7 +97,7 @@ public class JobOperationsImpl implements JobOperations {
 			if(isSkipable) {
 				if(((GenericInnerJob) myJob).scheduleForNextExecution(myJob.getAbstractJobType())) {
 					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.SKIPPED);
-					logger.info(CoreFactory.getMessage("Myra.307") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+					logger.info(CoreFactory.getMessage("Myra.304") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 				} else {
 					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, "set success yaparken bir hata oluştu !");
 				}
@@ -109,7 +109,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void stopJob(String jobName) {
 		
-		logger.info(CoreFactory.getMessage("Myra.309") + jobName);
+		logger.info(CoreFactory.getMessage("Myra.305") + CoreFactory.getMessage("Myra.300") + jobName);
 		
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobName)) {
 			
@@ -125,7 +125,7 @@ public class JobOperationsImpl implements JobOperations {
 					myJob.getMyExecuter().interrupt();
 					myJob.setMyExecuter(null);
 				}
-				logger.info(CoreFactory.getMessage("Myra.310") + jobName + " : " + JobHelper.getLastStateInfo(myJob));
+				logger.info(CoreFactory.getMessage("Myra.305") + CoreFactory.getMessage("Myra.301") + jobName + " : " + JobHelper.getLastStateInfo(myJob));
 			}
 
 		}
@@ -134,7 +134,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void pauseJob(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("Myra.312") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.316") + CoreFactory.getMessage("Myra.300") + jobId);
 		
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 			
@@ -144,7 +144,7 @@ public class JobOperationsImpl implements JobOperations {
 			
 			if(isPausable) {
 				ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.PENDING, SubstateName.PAUSED);
-				logger.info(CoreFactory.getMessage("Myra.313") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+				logger.info(CoreFactory.getMessage("Myra.316") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 			}
 			
 		}
@@ -153,7 +153,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void resumeJob(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("Myra.315") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.317") + CoreFactory.getMessage("Myra.300") + jobId);
 		
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 			
@@ -163,7 +163,7 @@ public class JobOperationsImpl implements JobOperations {
 			
 			if(isResumable) {
 				ChangeLSI.forValue(myJob.getAbstractJobType(), JobHelper.getLastStateInfo(myJob));
-				logger.info(CoreFactory.getMessage("Myra.316") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+				logger.info(CoreFactory.getMessage("Myra.317") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 			}
 
 		}
@@ -171,7 +171,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void startJob(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("Myra.318") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.318") + CoreFactory.getMessage("Myra.300") + jobId);
 
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 
@@ -187,7 +187,7 @@ public class JobOperationsImpl implements JobOperations {
 				ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
 			}
 			
-			logger.info(CoreFactory.getMessage("Myra.319") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+			logger.info(CoreFactory.getMessage("Myra.318") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 		}
 		
 	}
@@ -195,7 +195,7 @@ public class JobOperationsImpl implements JobOperations {
 	@Override
 	public void disableJob(String jobName) {
 		
-		logger.info(CoreFactory.getMessage("Myra.335") + jobName);
+		logger.info(CoreFactory.getMessage("Myra.319") + CoreFactory.getMessage("Myra.300") + jobName);
 
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobName)) {
 
@@ -208,13 +208,13 @@ public class JobOperationsImpl implements JobOperations {
 //				TlosServer.getDisabledJobQueue().put(jobName, jobName);
 //			}
 			
-			CoreFactory.getLogger().info(CoreFactory.getMessage("Myra.319") + jobName + " : " + JobHelper.getLastStateInfo(abstractJobType));
+			CoreFactory.getLogger().info(CoreFactory.getMessage("Myra.319") + CoreFactory.getMessage("Myra.301") + jobName + " : " + JobHelper.getLastStateInfo(abstractJobType));
 		}
 	}
 
 	public void enableJob(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("Myra.336") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.310") + CoreFactory.getMessage("Myra.300") + jobId);
 
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 
@@ -227,7 +227,7 @@ public class JobOperationsImpl implements JobOperations {
 			//				TlosServer.getDisabledJobQueue().remove(jobName);
 			//			}
 			
-			logger.info(CoreFactory.getMessage("Myra.336") + jobId + " : " + JobHelper.getLastStateInfo(abstractJobType));
+			logger.info(CoreFactory.getMessage("Myra.310") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(abstractJobType));
 		}
 	}
 
