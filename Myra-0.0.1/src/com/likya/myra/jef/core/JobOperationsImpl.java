@@ -45,7 +45,7 @@ public class JobOperationsImpl implements JobOperations {
 
 	public void retryExecution(String jobId) {
 		
-		logger.info(CoreFactory.getMessage("Myra.300") + jobId);
+		logger.info(CoreFactory.getMessage("Myra.310") + jobId);
 		
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 
