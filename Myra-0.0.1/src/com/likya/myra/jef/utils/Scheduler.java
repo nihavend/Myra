@@ -23,6 +23,7 @@ import java.util.Calendar;
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.commons.utils.PeriodCalculations;
 import com.likya.myra.commons.utils.RestrictedDailyIterator;
+import com.likya.myra.jef.core.CoreFactory;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.jobprops.DaysOfMonthDocument.DaysOfMonth;
 import com.likya.xsd.myra.model.jobprops.ScheduleInfoDocument.ScheduleInfo;
@@ -98,6 +99,7 @@ public class Scheduler {
 			restrictedDailyIterator = new RestrictedDailyIterator(hourOfPlannedTime, minuteOfPlannedTime, secondOfPlannedTime, daysOfWeek);
 			restCal = restrictedDailyIterator.next();
 			floatingSchedules.add(restCal);
+			CoreFactory.getLogger().debug("Option for daysOfWeek : " + MyraDateUtils.getDate(restCal));
 		}
 
 		DaysOfMonth daysOfMonth = scheduleInfo.getDaysOfMonth();
@@ -114,6 +116,7 @@ public class Scheduler {
 				restrictedDailyIterator = new RestrictedDailyIterator(hourOfPlannedTime, minuteOfPlannedTime, secondOfPlannedTime, dayList);
 				restCal = restrictedDailyIterator.next(Calendar.DAY_OF_MONTH);
 				floatingSchedules.add(restCal);
+				CoreFactory.getLogger().debug("Option for daysOfMonth : " + MyraDateUtils.getDate(restCal));
 			}
 
 			if (firstDay != null) {
@@ -122,6 +125,7 @@ public class Scheduler {
 				restCal.set(Calendar.MONTH, restCal.get(Calendar.MONTH) + 1);
 				restCal.set(Calendar.DAY_OF_MONTH, firstDayOfMonth);
 				floatingSchedules.add(restCal);
+				CoreFactory.getLogger().debug("Option for firstDayOfMonth : " + MyraDateUtils.getDate(restCal));
 			}
 
 			if (lastDay != null) {
@@ -133,6 +137,7 @@ public class Scheduler {
 				restCal = MyraDateUtils.setTimePart(jsPlannedStartTime);
 				restCal.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
 				floatingSchedules.add(restCal);
+				CoreFactory.getLogger().debug("Option for lastDayOfMonth : " + MyraDateUtils.getDate(restCal));
 			}
 
 		}
@@ -154,6 +159,7 @@ public class Scheduler {
 		if (sortedCals.length > 0) {
 			selectedSchedule = Calendar.getInstance();
 			selectedSchedule.setTime(sortedCals[0].getTime());
+			CoreFactory.getLogger().debug("Minimum of options : " + MyraDateUtils.getDate(restCal));
 		}
 
 		return selectedSchedule;
