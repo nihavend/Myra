@@ -159,7 +159,7 @@ public class Scheduler {
 		if (sortedCals.length > 0) {
 			selectedSchedule = Calendar.getInstance();
 			selectedSchedule.setTime(sortedCals[0].getTime());
-			CoreFactory.getLogger().debug("Minimum of options : " + MyraDateUtils.getDate(restCal));
+			CoreFactory.getLogger().debug("Minimum of options : " + MyraDateUtils.getDate(selectedSchedule));
 		}
 
 		return selectedSchedule;
