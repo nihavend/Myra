@@ -250,7 +250,7 @@ public class JobHelper {
 				liveStateInfo = LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_IDLED, StatusName.INT_BYTIME);
 			}
 			ChangeLSI.forValue(abstractJobType, liveStateInfo);
-			CoreFactory.getLogger().info("Job id :" + abstractJobType.getId() + " is scheduled for new time " + abstractJobType.getManagement().getTimeManagement().getJsPlannedTime());
+			CoreFactory.getLogger().info("Job id :" + abstractJobType.getId() + " is scheduled for new time " + abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime());
 		}
 	}
 
