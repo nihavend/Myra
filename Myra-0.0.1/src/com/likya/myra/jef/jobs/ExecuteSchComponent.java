@@ -106,7 +106,7 @@ public class ExecuteSchComponent extends CommonShell {
 		Channel channel = session.openChannel("exec");
 		((ChannelExec) channel).setCommand(jobCommand);
 
-		channel.setInputStream(System.in);
+		// channel.setInputStream(System.in);
 
 		((ChannelExec) channel).setErrStream(System.err);
 
