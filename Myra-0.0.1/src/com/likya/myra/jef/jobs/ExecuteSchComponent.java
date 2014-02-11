@@ -87,12 +87,12 @@ public class ExecuteSchComponent extends CommonShell {
 		ExecuteRShellParams executeRShellParams = ((RemoteSchProperties) abstractJobType).getExecuteRShellParams();
 
 		String host = executeRShellParams.getIpAddress() != null ? executeRShellParams.getIpAddress() : executeRShellParams.getHostName(); // "192.168.1.39";
-		String user = executeRShellParams.getUserName(); // "likya";
-		String password = executeRShellParams.getUserPassword(); // "likya";
-		int port = executeRShellParams.getPort(); // "22";
+		String user = executeRShellParams.getUserName();
+		String password = executeRShellParams.getRshellPassword(); 
+		int port = executeRShellParams.getPort();
 		String fileSeperator = executeRShellParams.getFileSeperator();
 
-		jobCommand = jobPath + fileSeperator + jobCommand; // "/home/likya/murat/Agent/jobs/job1.sh";
+		jobCommand = jobPath + fileSeperator + jobCommand;
 
 		Session session = jsch.getSession(user, host, port);
 
