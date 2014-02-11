@@ -25,6 +25,7 @@ import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
+import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 
 public abstract class JobImpl implements Runnable, Serializable {
 
@@ -98,7 +99,9 @@ public abstract class JobImpl implements Runnable, Serializable {
 	}
 	
 	public String toString() {
-		return "[JobId:" + getAbstractJobType().getId() + "][" + JobHelper.getLastStateInfo(getAbstractJobType()) + "]";
+		// return "[JobId:" + getAbstractJobType().getId() + "][" + JobHelper.getLastStateInfo(getAbstractJobType()) + "]";
+		LiveStateInfo liveStateInfo = JobHelper.getLastStateInfo(getAbstractJobType());
+		return "[JobId:" + getAbstractJobType().getId() + "][" + liveStateInfo.getLSIDateTime() + "][" + liveStateInfo.getStateName() + ":" + liveStateInfo.getSubstateName() + ":" + liveStateInfo.getStatusName() + "]";
 	}
 
 }
