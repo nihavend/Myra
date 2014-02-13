@@ -3,6 +3,7 @@ package com.likya.myra.jef.core;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.jobs.JobHelper;
 import com.likya.myra.jef.jobs.JobImpl;
+import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
@@ -36,6 +37,36 @@ public class Commandability {
 	public static boolean isStartable(JobImpl myJob) {
 		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.PENDING) && (myJob.getAbstractJobType().getDependencyList() == null || myJob.getAbstractJobType().getDependencyList().sizeOfItemArray() == 0);
 	}
+	
+	public static boolean isRetryable(AbstractJobType abstractJobType) {
+		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED) || LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.STOPPED);
+	}
+
+	public static boolean isSuccessable(AbstractJobType abstractJobType) {
+		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.PAUSED) || LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED);
+	}
+
+	public static boolean isSkipable(AbstractJobType abstractJobType) {
+		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.PAUSED) || LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED);
+	}
+
+	public static boolean isStopable(AbstractJobType abstractJobType) {
+		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.RUNNING);
+	}
+
+	public static boolean isPausable(AbstractJobType abstractJobType) {
+		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.PENDING);
+	}
+
+	public static boolean isResumable(AbstractJobType abstractJobType) {
+		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.PAUSED);
+	}
+
+	public static boolean isStartable(AbstractJobType abstractJobType) {
+		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.PENDING) && (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0);
+	}
+
+	
 
 	// TODO ?? public boolean isDisablable(JobImpl myJob);
 	
