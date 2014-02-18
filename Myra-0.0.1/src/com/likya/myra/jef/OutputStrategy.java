@@ -18,5 +18,5 @@ package com.likya.myra.jef;
 public interface OutputStrategy {
 
 	public void sendDataObject(Object dataObject);
-
+  
 }
