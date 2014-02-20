@@ -101,20 +101,23 @@ public class ExecuteSchComponent extends CommonShell {
 		session.setConfig(config);
 
 		session.setPassword(password);
-		session.connect();
-
-		Channel channel = session.openChannel("exec");
-		((ChannelExec) channel).setCommand(jobCommand);
-
-		// channel.setInputStream(System.in);
-
-		((ChannelExec) channel).setErrStream(System.err);
-
-		channel.connect();
-
-		initGrabbers(channel, jobId, myLogger, myraConfig.getLogbuffersize());
+		
+		Channel channel = null;
 
 		try {
+			
+			session.connect(20000);
+
+			channel = session.openChannel("exec");
+			((ChannelExec) channel).setCommand(jobCommand);
+
+			// channel.setInputStream(System.in);
+
+			((ChannelExec) channel).setErrStream(System.err);
+
+			channel.connect();
+
+			initGrabbers(channel, jobId, myLogger, myraConfig.getLogbuffersize());
 
 			while (true) {
 
@@ -149,8 +152,13 @@ public class ExecuteSchComponent extends CommonShell {
 
 			myLogger.warn(" >>" + logLabel + ">> " + logClassName + " : Job timed-out terminating " + abstractJobType.getBaseJobInfos().getJsName());
 
-			channel.disconnect();
-			session.disconnect();
+			if(channel != null && channel.isConnected()) {
+				channel.disconnect();
+			}
+			
+			if(session.isConnected()) {
+				session.disconnect();
+			}
 
 		}
 	}
