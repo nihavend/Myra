@@ -26,6 +26,7 @@ import com.likya.myra.jef.controller.SchedulerController;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.utils.JobQueueOperations;
+import com.likya.myra.jef.utils.NetTreeManagerImp.NetTreeMonitor;
 
 public class ManagementOperationsImpl implements ManagementOperations {
 
@@ -101,6 +102,21 @@ public class ManagementOperationsImpl implements ManagementOperations {
 
 	public void forceFullShutDown() {
 
+		try {
+			HashMap<String, NetTreeMonitor> netTreeHashMap = coreFactory.getNetTreeManagerInterface().getNetTreeMonitorMap();
+
+			for (NetTreeMonitor netTreeMonitor : netTreeHashMap.values()) {
+				Thread executerThread = netTreeMonitor.getMyExecuter();
+				if (executerThread != null) {
+					netTreeMonitor.setLoop(false);
+					netTreeMonitor.getMyExecuter().interrupt();
+				}
+			}
+
+		} catch (Throwable t) {
+			// Do nothing
+		}
+		
 		Iterator<JobImpl> jobsIterator = coreFactory.getMonitoringOperations().getJobQueue().values().iterator();
 
 		while (jobsIterator.hasNext()) {
