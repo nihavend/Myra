@@ -67,6 +67,8 @@ public abstract class JobImpl implements Runnable, Serializable {
 
 	public final void run() {
 		
+		Thread.currentThread().setName("JobImpl_" + abstractJobType.getId());
+		
 		localRun();
 		
 		processJobResult();
