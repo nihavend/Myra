@@ -46,7 +46,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 
 	@Override
 	public void run() {
-
+		Thread.currentThread().setName("SchedulerController_" + System.currentTimeMillis());
 		Logger logger = CoreFactory.getLogger();
 
 		logger.info("Starting : ");
