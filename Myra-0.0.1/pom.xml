@@ -22,6 +22,11 @@
 	<name>Myra</name>
 	<description>Myra Job Scheduling and Execution Framework</description>
 
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+	
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
