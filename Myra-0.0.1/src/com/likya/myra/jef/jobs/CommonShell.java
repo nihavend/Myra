@@ -85,10 +85,10 @@ public abstract class CommonShell extends GenericInnerJob {
 //		CoreFactory.getLogger().info(" >>" + logLabel + ">> " + endLog);
 //		CoreFactory.getLogger().info(" >>" + logLabel + ">> " + duration);
 //
-//		if (watchDogTimer != null) {
-//			CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Watchdog for " + abstractJobType.getBaseJobInfos().getJsName());
-//			stopMyDogBarking();
-//		}
+		if (watchDogTimer != null) {
+			CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Watchdog for " + abstractJobType.getBaseJobInfos().getJsName());
+			stopMyDogBarking();
+		}
 
 		// sendOutputData();
 
