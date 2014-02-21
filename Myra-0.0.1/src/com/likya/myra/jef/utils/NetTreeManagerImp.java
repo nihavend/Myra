@@ -17,7 +17,7 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 	private HashMap<String, NetTree> netTreeMap = new HashMap<String, NetTree>();
 	private HashMap<String, AbstractJobType> freeJobs = new HashMap<String, AbstractJobType>();
 
-	private Thread myThread;
+	transient private Thread myExecuter;
 
 	public NetTreeManagerImp(AbstractJobType[] abscAbstractJobTypes) {
 		super();
@@ -30,8 +30,10 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 		}
 	}
 
-	private class NetTreeMonitor implements Runnable {
+	public class NetTreeMonitor implements Runnable {
 
+		transient private Thread myExecuter;
+		
 		private boolean loop = true;
 
 		private NetTreeResolver.NetTree netTree;
@@ -42,6 +44,9 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 		}
 
 		public void run() {
+			
+			Thread.currentThread().setName("NetTreeMonitor_" + netTree.getVirtualId());
+			
 			int freq = 1000;
 			while (loop) {
 				try {
@@ -67,23 +72,43 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 
 					Thread.sleep(freq);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					CoreFactory.getLogger().info(e.getMessage());
 				}
 			}
+		}
+
+		public Thread getMyExecuter() {
+			return myExecuter;
+		}
+
+		public void setMyExecuter(Thread myExecuter) {
+			this.myExecuter = myExecuter;
+		}
+
+		public void setLoop(boolean loop) {
+			this.loop = loop;
 		}
 
 	}
 
 	public void startMe() {
-		myThread = new Thread(this);
-		myThread.start();
+		myExecuter = new Thread(this);
+		myExecuter.start();
 	}
 
 	public void run() {
+		
+		Thread.currentThread().setName("NetTreeManagerImp" + System.currentTimeMillis());
+		
 		for (NetTreeResolver.NetTree netTree : netTreeMap.values()) {
 			NetTreeMonitor netTreeMonitor = new NetTreeMonitor(netTree);
 			netTreeMonitorMap.put(netTree.getVirtualId(), netTreeMonitor);
-			new Thread(netTreeMonitor).start();
+			
+			Thread starterThread = new Thread(netTreeMonitor);
+			netTreeMonitor.setMyExecuter(starterThread);
+			starterThread.setDaemon(true);
+			
+			netTreeMonitor.getMyExecuter().start();
 		}
 
 	}
@@ -94,6 +119,14 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 
 	public HashMap<String, AbstractJobType> getFreeJobs() {
 		return freeJobs;
+	}
+
+	public HashMap<String, NetTreeMonitor> getNetTreeMonitorMap() {
+		return  netTreeMonitorMap;
+	}
+
+	public Thread getMyExecuter() {
+		return myExecuter;
 	}
 
 }
