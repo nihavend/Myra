@@ -33,46 +33,51 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 	public class NetTreeMonitor implements Runnable {
 
 		transient private Thread myExecuter;
-		
+
 		private boolean loop = true;
 
-		private NetTreeResolver.NetTree netTree;
+		// private NetTreeResolver.NetTree netTree;
 
-		public NetTreeMonitor(NetTreeResolver.NetTree netTree) {
+		public NetTreeMonitor(/*NetTreeResolver.NetTree netTree*/) {
 			super();
-			this.netTree = netTree;
+			// this.netTree = netTree;
 		}
 
 		public void run() {
-			
-			Thread.currentThread().setName("NetTreeMonitor_" + netTree.getVirtualId());
-			
+
+			Thread.currentThread().setName("NetTreeMonitor_" + System.currentTimeMillis()/*netTree.getVirtualId()*/);
+
 			int freq = 1000;
 			while (loop) {
-				try {
-					boolean isAllFinished = true;
-					for (AbstractJobType abstractJobType : netTree.getMembers()) {
-						boolean isFinished = LiveStateInfoUtils.equalStates(abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0), StateName.FINISHED);
-						boolean isPending = LiveStateInfoUtils.equalStates(abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0), StateName.PENDING);
-						if (!isFinished) {
-							isAllFinished = false;
-						}
-						if (!isPending) {
-							freq = 1000;
-						}
-					}
 
-					if (isAllFinished) {
+				for (NetTreeResolver.NetTree netTree : netTreeMap.values()) {
+
+					try {
+						boolean isAllFinished = true;
 						for (AbstractJobType abstractJobType : netTree.getMembers()) {
-							// System.err.println("Reset all NetTree members functionality not implemented yet !");
-							JobHelper.resetJob(abstractJobType);
+							boolean isFinished = LiveStateInfoUtils.equalStates(abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0), StateName.FINISHED);
+							boolean isPending = LiveStateInfoUtils.equalStates(abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0), StateName.PENDING);
+							if (!isFinished) {
+								// TODO Buradaki çalışma mantığı tekrar gözden geçirilmeli !
+								isAllFinished = false;
+							}
+							if (!isPending) {
+								freq = 1000;
+							}
 						}
-						freq = 60000;
-					}
 
-					Thread.sleep(freq);
-				} catch (InterruptedException e) {
-					CoreFactory.getLogger().info(e.getMessage());
+						if (isAllFinished) {
+							for (AbstractJobType abstractJobType : netTree.getMembers()) {
+								// System.err.println("Reset all NetTree members functionality not implemented yet !");
+								JobHelper.resetJob(abstractJobType);
+							}
+							freq = 60000;
+						}
+
+						Thread.sleep(freq);
+					} catch (InterruptedException e) {
+						CoreFactory.getLogger().info(e.getMessage());
+					}
 				}
 			}
 		}
@@ -97,19 +102,19 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 	}
 
 	public void run() {
-		
+
 		Thread.currentThread().setName("NetTreeManagerImp" + System.currentTimeMillis());
 		
-		for (NetTreeResolver.NetTree netTree : netTreeMap.values()) {
-			NetTreeMonitor netTreeMonitor = new NetTreeMonitor(netTree);
-			netTreeMonitorMap.put(netTree.getVirtualId(), netTreeMonitor);
-			
+		//for (NetTreeResolver.NetTree netTree : netTreeMap.values()) {
+			NetTreeMonitor netTreeMonitor = new NetTreeMonitor(/*netTree*/);
+			//netTreeMonitorMap.put(netTree.getVirtualId(), netTreeMonitor);
+
 			Thread starterThread = new Thread(netTreeMonitor);
 			netTreeMonitor.setMyExecuter(starterThread);
 			starterThread.setDaemon(true);
-			
+
 			netTreeMonitor.getMyExecuter().start();
-		}
+		//}
 
 	}
 
@@ -122,7 +127,7 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 	}
 
 	public HashMap<String, NetTreeMonitor> getNetTreeMonitorMap() {
-		return  netTreeMonitorMap;
+		return netTreeMonitorMap;
 	}
 
 	public Thread getMyExecuter() {
