@@ -107,12 +107,10 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 		
 		//for (NetTreeResolver.NetTree netTree : netTreeMap.values()) {
 			NetTreeMonitor netTreeMonitor = new NetTreeMonitor(/*netTree*/);
-			//netTreeMonitorMap.put(netTree.getVirtualId(), netTreeMonitor);
-
 			Thread starterThread = new Thread(netTreeMonitor);
 			netTreeMonitor.setMyExecuter(starterThread);
 			starterThread.setDaemon(true);
-
+			netTreeMonitorMap.put(netTreeMonitor.myExecuter.getName(), netTreeMonitor);
 			netTreeMonitor.getMyExecuter().start();
 		//}
 
