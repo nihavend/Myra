@@ -28,9 +28,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.iterators.ArrayIterator;
 
+import com.likya.myra.commons.utils.JobListFilter;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
+import com.likya.myra.commons.utils.StateFilter;
 import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.jobs.JobHelper;
@@ -404,5 +408,49 @@ public class JobQueueOperations {
 		}
 
 		return jobKeys;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static Collection<AbstractJobType> getJobList(HashMap<String, AbstractJobType> abstractJobTypeList, Predicate predicate) {
+		
+		Collection<AbstractJobType> filteredList = CollectionUtils.select(abstractJobTypeList.values(), predicate);
+		
+		return filteredList;
+	}
+	
+	public static Collection<AbstractJobType> getJobListForImpl(HashMap<String, JobImpl> jobQueue, Predicate predicate) {
+		
+		HashMap<String, AbstractJobType> abstractJobTypeList = JobQueueOperations.toAbstractJobTypeList(jobQueue);
+		
+		return getJobList(abstractJobTypeList, predicate);
+	}
+	
+	public static Collection<AbstractJobType> getJobList(HashMap<String, AbstractJobType> abstractJobTypeList, StateName.Enum filterStates[]) {
+		
+		JobListFilter jobListFilter = new StateFilter(filterStates);
+		
+		return getJobList(abstractJobTypeList, jobListFilter.anyPredicate());
+	}
+	
+	public static Collection<AbstractJobType> getJobListForImpl(HashMap<String, JobImpl> jobQueue, StateName.Enum filterStates[]) {
+		
+		JobListFilter jobListFilter = new StateFilter(filterStates);
+		
+		return getJobListForImpl(jobQueue, jobListFilter.anyPredicate());
+	}
+	
+	public static Collection<AbstractJobType> getJobList(ArrayList<AbstractJobType> abstractJobTypeList, StateName.Enum filterStates[]) {
+
+		JobListFilter jobListFilter = new StateFilter(filterStates);
+
+		return getJobList(abstractJobTypeList, jobListFilter.anyPredicate());
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static Collection<AbstractJobType> getJobList(ArrayList<AbstractJobType> abstractJobTypeList, Predicate predicate) {
+
+		Collection<AbstractJobType> filteredList = CollectionUtils.select(abstractJobTypeList, predicate);
+
+		return filteredList;
 	}
 }
