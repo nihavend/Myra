@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 
 import com.likya.myra.jef.controller.ControllerInterface;
@@ -56,7 +55,6 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public Collection<AbstractJobType> getJobList(Predicate predicate) {
 		
 		HashMap<String, ControllerInterface> controllerContainer = coreFactory.getControllerContainer();
@@ -65,13 +63,8 @@ public class MonitoringOperationsImpl implements MonitoringOperations {
 
 		ControllerInterface controllerInterface = ((ControllerInterface) controllerArray.get(0));
 		
-		HashMap<String, AbstractJobType> abstractJobTypeList = JobQueueOperations.toAbstractJobTypeList(controllerInterface.getJobQueue());
+		return JobQueueOperations.getJobListForImpl(controllerInterface.getJobQueue(), predicate);
 		
-		Collection<AbstractJobType> filteredList;
-		
-		filteredList = CollectionUtils.select(abstractJobTypeList.values(), predicate);
-		
-		return filteredList;
 	}
 
 	public boolean isThresholdOverflow() {
