@@ -73,7 +73,7 @@ public class CoreFactoryBase {
 		HashMap<String, AbstractJobType> abstractJobTypeQueue = JobQueueOperations.toAbstractJobTypeList(jobQueue);
 
 		if (!DependencyOperations.validateDependencyList(logger, abstractJobTypeQueue)) {
-			throw new Exception("JobList.xml is is not  valid !");
+			throw new Exception("JobList.xml is dependency definitions are not  valid !");
 		}
 
 		return true;
