@@ -119,7 +119,7 @@ public class JobOperationsImpl implements JobOperations {
 
 			if(isStopable) {
 				myJob.stopMyDogBarking();
-				ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.STOPPED);
+				ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.STOPPED, StatusName.BYUSER);
 				Thread executerThread = myJob.getMyExecuter();
 				if (executerThread != null) {
 					myJob.getMyExecuter().interrupt();
