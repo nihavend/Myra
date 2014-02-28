@@ -16,9 +16,12 @@
 
 package com.likya.myra.jef.utils;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+
+import org.apache.xmlbeans.GDuration;
 
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.commons.utils.PeriodCalculations;
@@ -26,6 +29,7 @@ import com.likya.myra.commons.utils.RestrictedDailyIterator;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.jobprops.DaysOfMonthDocument.DaysOfMonth;
+import com.likya.xsd.myra.model.jobprops.PeriodInfoDocument.PeriodInfo;
 import com.likya.xsd.myra.model.jobprops.ScheduleInfoDocument.ScheduleInfo;
 
 public class Scheduler {
@@ -33,10 +37,10 @@ public class Scheduler {
 	public static boolean scheduleForNextExecution(AbstractJobType abstractJobType) {
 
 		boolean retValue = true;
-
-		if (abstractJobType.getManagement().getPeriodInfo() != null) {
-			retValue = periodicSchedule(abstractJobType);
-		} else {
+		
+		PeriodInfo periodInfo = abstractJobType.getManagement().getPeriodInfo();
+		// TODO Special care for daily jobs, may be done compatible with general periodicity
+		if (periodInfo == null || periodInfo.getStep() == null || periodInfo.getStep().equals(new GDuration("P1D"))) {
 			Calendar selectedSchedule = regularSchedule(abstractJobType);
 			if (selectedSchedule != null /*&& selectedSchedule.after(Calendar.getInstance())*/) {
 				abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(selectedSchedule);
@@ -44,6 +48,8 @@ public class Scheduler {
 				// yeni zamana kurulmadı, artık çalışmayacak
 				retValue = false;
 			}
+		} else {
+			retValue = periodicSchedule(abstractJobType);
 		}
 
 		return retValue;
@@ -76,6 +82,12 @@ public class Scheduler {
 	}
 
 	private static Calendar regularSchedule(AbstractJobType abstractJobType) {
+		
+		PeriodInfo periodInfo = abstractJobType.getManagement().getPeriodInfo();
+		
+		if(!PeriodCalculations.checkMaxCount(periodInfo)) {
+			return null;
+		}
 
 		Calendar jsPlannedStartTime = abstractJobType.getManagement().getTimeManagement().getBornedPlannedTime().getStartTime();
 
@@ -159,6 +171,9 @@ public class Scheduler {
 		if (sortedCals.length > 0) {
 			selectedSchedule = Calendar.getInstance();
 			selectedSchedule.setTime(sortedCals[0].getTime());
+			if(periodInfo != null) {
+				periodInfo.setCounter(BigInteger.valueOf(periodInfo.getCounter().intValue() + 1));
+			}
 			CoreFactory.getLogger().debug("Minimum of options : " + MyraDateUtils.getDate(selectedSchedule));
 		}
 
