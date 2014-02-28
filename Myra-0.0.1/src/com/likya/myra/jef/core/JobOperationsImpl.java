@@ -213,6 +213,11 @@ public class JobOperationsImpl implements JobOperations {
 	}
 
 	public void enableJob(String jobId) {
+		enableJob(jobId, false);
+		return;
+	}
+	
+	public void enableJob(String jobId, boolean normalize) {
 		
 		logger.info(CoreFactory.getMessage("Myra.310") + CoreFactory.getMessage("Myra.300") + jobId);
 
@@ -221,7 +226,12 @@ public class JobOperationsImpl implements JobOperations {
 			AbstractJobType abstractJobType = coreFactory.getMonitoringOperations().getJobQueue().get(jobId).getAbstractJobType();
 			
 			if(LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.DEACTIVATED)) {
-				ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
+				if(normalize) {
+					CoreFactory.getLogger().info("Enabling job >> " + abstractJobType.getId() + " after normalizing !");
+					JobHelper.resetJob(abstractJobType);
+				} else {
+					ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
+				}
 			}
 			//			synchronized (TlosServer.getDisabledJobQueue()) {
 			//				TlosServer.getDisabledJobQueue().remove(jobName);
