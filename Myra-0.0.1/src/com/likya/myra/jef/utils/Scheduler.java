@@ -38,9 +38,6 @@ public class Scheduler {
 
 		boolean retValue = true;
 
-		// remove the difference between borned and planned time 
-		abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStopTime(abstractJobType.getManagement().getTimeManagement().getBornedPlannedTime().getStopTime());
-
 		PeriodInfo periodInfo = abstractJobType.getManagement().getPeriodInfo();
 		// TODO Special care for daily jobs, may be done compatible with general periodicity
 		if (periodInfo == null || periodInfo.getStep() == null || periodInfo.getStep().equals(new GDuration("P1D"))) {
