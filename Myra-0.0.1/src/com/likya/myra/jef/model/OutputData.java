@@ -27,6 +27,23 @@ public class OutputData implements Serializable {
 
 	private static final long serialVersionUID = -6075964245318352700L;
 
+	public static enum types {
+		DEFAULT(0), JOSTATECHANGE(10), LOGANALYZER(20);
+		
+		private int value;
+
+		private types(int value) {
+			this.value = value;
+		}
+
+		public int getValue() {
+			return this.value;
+		}
+		
+	};
+	
+	private types outputType;
+	
 	private String jobId;
 	private String handleUri;
 	private String treeId;
@@ -36,6 +53,31 @@ public class OutputData implements Serializable {
 	private Calendar stopTime;
 
 	private LiveStateInfo liveStateInfo;
+	
+	private Object outputContent;
+
+	public OutputData(types outputType, Object outputContent, String jobId, String handleUri, String treeId, String groupName, Calendar startTime, Calendar stopTime, LiveStateInfo liveStateInfo) {
+		super();
+		this.outputType = outputType;
+		this.outputContent = outputContent;
+		this.jobId = jobId;
+		this.handleUri = handleUri;
+		this.treeId = treeId;
+		this.groupName = groupName;
+		this.startTime = startTime;
+		this.stopTime = stopTime;
+		this.liveStateInfo = liveStateInfo;
+	}
+	
+	public OutputData(types outputType, Object outputContent) {
+		super();
+		this.outputType = outputType;
+		this.outputContent = outputContent;
+	}
+	
+	public OutputData() {
+		
+	}
 
 	public String getJobId() {
 		return jobId;
@@ -97,6 +139,7 @@ public class OutputData implements Serializable {
 
 		OutputData outputData = new OutputData();
 
+		outputData.setOutputType(OutputData.types.DEFAULT);
 		outputData.setGroupName("");
 		outputData.setHandleUri(abstractJobType.getHandlerURI());
 		outputData.setJobId(abstractJobType.getId());
@@ -107,5 +150,21 @@ public class OutputData implements Serializable {
 
 		return outputData;
 
+	}
+
+	public types getOutputType() {
+		return outputType;
+	}
+
+	public void setOutputType(types outputType) {
+		this.outputType = outputType;
+	}
+
+	public Object getOutputContent() {
+		return outputContent;
+	}
+
+	public void setOutputContent(Object outputContent) {
+		this.outputContent = outputContent;
 	}
 }
