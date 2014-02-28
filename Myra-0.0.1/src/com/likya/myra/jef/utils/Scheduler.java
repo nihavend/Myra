@@ -37,7 +37,10 @@ public class Scheduler {
 	public static boolean scheduleForNextExecution(AbstractJobType abstractJobType) {
 
 		boolean retValue = true;
-		
+
+		// remove the difference between borned and planned time 
+		abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStopTime(abstractJobType.getManagement().getTimeManagement().getBornedPlannedTime().getStopTime());
+
 		PeriodInfo periodInfo = abstractJobType.getManagement().getPeriodInfo();
 		// TODO Special care for daily jobs, may be done compatible with general periodicity
 		if (periodInfo == null || periodInfo.getStep() == null || periodInfo.getStep().equals(new GDuration("P1D"))) {
@@ -59,8 +62,14 @@ public class Scheduler {
 
 		boolean retValue = true;
 
-		Calendar nextPeriodTime = PeriodCalculations.forward(abstractJobType);
+		ArrayList<String> errorMessages = new ArrayList<String>();
 
+		Calendar nextPeriodTime = PeriodCalculations.forward(abstractJobType, errorMessages);
+		
+		for(String message : errorMessages) {
+			CoreFactory.getLogger().warn(message);
+		}
+		
 		if (nextPeriodTime == null) {
 			Calendar bornedCal = abstractJobType.getManagement().getTimeManagement().getBornedPlannedTime().getStartTime();
 			// System.err.println(c);
@@ -82,20 +91,26 @@ public class Scheduler {
 	}
 
 	private static Calendar regularSchedule(AbstractJobType abstractJobType) {
+
+		ScheduleInfo scheduleInfo = abstractJobType.getScheduleInfo();
 		
-		PeriodInfo periodInfo = abstractJobType.getManagement().getPeriodInfo();
-		
-		if(!PeriodCalculations.checkMaxCount(periodInfo)) {
+		if(scheduleInfo == null) {
+			CoreFactory.getLogger().warn("No scheduling rule is defined !");
 			return null;
 		}
+		
+		PeriodInfo periodInfo = abstractJobType.getManagement().getPeriodInfo();
 
+		if (!PeriodCalculations.checkMaxCount(periodInfo)) {
+			CoreFactory.getLogger().warn("Execution count exceeded the value defined for maxCount !");
+			return null;
+		}
+		
 		Calendar jsPlannedStartTime = abstractJobType.getManagement().getTimeManagement().getBornedPlannedTime().getStartTime();
 
 		Calendar selectedSchedule = null;
 
 		ArrayList<Calendar> floatingSchedules = new ArrayList<Calendar>();
-
-		ScheduleInfo scheduleInfo = abstractJobType.getScheduleInfo();
 
 		int hourOfPlannedTime = jsPlannedStartTime.get(Calendar.HOUR_OF_DAY);
 		int minuteOfPlannedTime = jsPlannedStartTime.get(Calendar.MINUTE);
@@ -171,7 +186,7 @@ public class Scheduler {
 		if (sortedCals.length > 0) {
 			selectedSchedule = Calendar.getInstance();
 			selectedSchedule.setTime(sortedCals[0].getTime());
-			if(periodInfo != null) {
+			if (periodInfo != null) {
 				periodInfo.setCounter(BigInteger.valueOf(periodInfo.getCounter().intValue() + 1));
 			}
 			CoreFactory.getLogger().debug("Minimum of options : " + MyraDateUtils.getDate(selectedSchedule));
