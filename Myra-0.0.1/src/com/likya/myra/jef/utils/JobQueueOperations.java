@@ -37,6 +37,7 @@ import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.StateFilter;
 import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.core.CoreFactory;
+import com.likya.myra.jef.jobs.ChangeLSI;
 import com.likya.myra.jef.jobs.JobHelper;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.JobRuntimeInterface;
@@ -49,6 +50,7 @@ import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
+import com.likya.xsd.myra.model.wlagen.TriggerDocument.Trigger;
 
 public class JobQueueOperations {
 
@@ -377,6 +379,25 @@ public class JobQueueOperations {
 
 			CoreFactory.getLogger().info("Transformed " + handlerUri + " Job Id : " + abstractJobType.getId());
 
+			// levelize the initial state according to trigger value
+			
+			int jobType = abstractJobType.getManagement().getTrigger().intValue();
+
+			switch (jobType) {
+			case Trigger.INT_EVENT:
+				ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYEVENT);
+				break;
+			case Trigger.INT_TIME:
+				ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
+				break;
+			case Trigger.INT_USER:
+				ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYUSER);
+				break;
+
+			default:
+				break;
+			}
+			
 			jobQueue.put(abstractJobType.getId(), jobImpl);
 		}
 
