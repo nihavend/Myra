@@ -20,6 +20,7 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
+import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
@@ -103,7 +104,9 @@ public abstract class JobImpl implements Runnable, Serializable {
 	public String toString() {
 		// return "[JobId:" + getAbstractJobType().getId() + "][" + JobHelper.getLastStateInfo(getAbstractJobType()) + "]";
 		LiveStateInfo liveStateInfo = JobHelper.getLastStateInfo(getAbstractJobType());
-		return "[JobId:" + getAbstractJobType().getId() + "][" + liveStateInfo.getLSIDateTime() + "][" + liveStateInfo.getStateName() + ":" + liveStateInfo.getSubstateName() + ":" + liveStateInfo.getStatusName() + "]";
+		String startTime = MyraDateUtils.getDate(getAbstractJobType().getManagement().getTimeManagement().getJsPlannedTime().getStartTime());
+		String stopTime = MyraDateUtils.getDate(getAbstractJobType().getManagement().getTimeManagement().getJsPlannedTime().getStopTime());
+		return "[JobId:" + getAbstractJobType().getId() + "][start:" + startTime + "|stop:" + stopTime + "][LSIDT:" + liveStateInfo.getLSIDateTime() + "][" + liveStateInfo.getStateName() + ":" + liveStateInfo.getSubstateName() + ":" + liveStateInfo.getStatusName() + "]";
 	}
 
 }
