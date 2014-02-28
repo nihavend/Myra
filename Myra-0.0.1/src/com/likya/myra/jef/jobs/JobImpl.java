@@ -106,7 +106,21 @@ public abstract class JobImpl implements Runnable, Serializable {
 		LiveStateInfo liveStateInfo = JobHelper.getLastStateInfo(getAbstractJobType());
 		String startTime = MyraDateUtils.getDate(getAbstractJobType().getManagement().getTimeManagement().getJsPlannedTime().getStartTime());
 		String stopTime = MyraDateUtils.getDate(getAbstractJobType().getManagement().getTimeManagement().getJsPlannedTime().getStopTime());
-		return "[JobId:" + getAbstractJobType().getId() + "][start:" + startTime + "|stop:" + stopTime + "][LSIDT:" + liveStateInfo.getLSIDateTime() + "][" + liveStateInfo.getStateName() + ":" + liveStateInfo.getSubstateName() + ":" + liveStateInfo.getStatusName() + "]";
+		
+		String toString = "";
+		if(liveStateInfo.getStateName() != null) {
+			toString = liveStateInfo.getStateName().toString();
+		}
+		
+		if(liveStateInfo.getSubstateName() != null) {
+			toString = toString + ":" + liveStateInfo.getSubstateName().toString();
+		}
+		
+		if(liveStateInfo.getStatusName() != null) {
+			toString = toString + ":" + liveStateInfo.getStatusName().toString();
+		}	
+		
+		return "[JobId:" + getAbstractJobType().getId() + "][start:" + startTime + "|stop:" + stopTime + "][LSIDT:" + liveStateInfo.getLSIDateTime() + "][" + toString + "]";
 	}
 
 }
