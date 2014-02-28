@@ -69,13 +69,6 @@ public class CoreFactoryBase {
 			throw new Exception("JobList.xml is null or damaged !");
 		}
 
-		HashMap<String, JobImpl> jobQueue = JobQueueOperations.transformJobQueue(jobListDocument);
-		HashMap<String, AbstractJobType> abstractJobTypeQueue = JobQueueOperations.toAbstractJobTypeList(jobQueue);
-
-		if (!DependencyOperations.validateDependencyList(logger, abstractJobTypeQueue)) {
-			throw new Exception("JobList.xml is dependency definitions are not  valid !");
-		}
-
 		return true;
 	}
 
@@ -95,7 +88,16 @@ public class CoreFactoryBase {
 			if(abstractJobTypes.length == 0) {
 				throw new Exception("jobListDocument.getJobList size is 0 !");
 			}
+			
 			jobQueue.putAll(JobQueueOperations.transformJobQueue(jobListDocument));
+			
+			HashMap<String, AbstractJobType> abstractJobTypeQueue = JobQueueOperations.toAbstractJobTypeList(jobQueue);
+
+			if (!DependencyOperations.validateDependencyList(logger, abstractJobTypeQueue)) {
+				throw new Exception("JobList.xml is dependency definitions are not  valid !");
+			}
+			
+			
 		}
 		
 		netTreeManagerInterface = new NetTreeManagerImp(abstractJobTypes);
