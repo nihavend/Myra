@@ -46,6 +46,7 @@ import com.likya.myra.jef.model.PersistObject;
 import com.likya.myra.jef.model.SortType;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.joblist.JobListDocument;
+import com.likya.xsd.myra.model.jobprops.ManagementDocument.Management;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
@@ -381,7 +382,9 @@ public class JobQueueOperations {
 
 			// levelize the initial state according to trigger value
 			
-			int jobType = abstractJobType.getManagement().getTrigger().intValue();
+			Management management = abstractJobType.getManagement();
+			
+			int jobType = management.getTrigger().intValue();
 
 			switch (jobType) {
 			case Trigger.INT_EVENT:
@@ -397,6 +400,10 @@ public class JobQueueOperations {
 			default:
 				break;
 			}
+			
+			// remove the difference between borned and planned time 
+			management.getTimeManagement().getJsPlannedTime().setStartTime(management.getTimeManagement().getBornedPlannedTime().getStartTime());
+			management.getTimeManagement().getJsPlannedTime().setStopTime(management.getTimeManagement().getBornedPlannedTime().getStopTime());
 			
 			jobQueue.put(abstractJobType.getId(), jobImpl);
 		}
