@@ -20,13 +20,16 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
+import com.likya.myra.commons.utils.LogAnalyser;
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
+import com.likya.myra.jef.model.OutputData;
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
+import com.likya.xsd.myra.model.wlagen.LogAnalysisDocument.LogAnalysis;
 
 public abstract class JobImpl implements Runnable, Serializable {
 
@@ -73,8 +76,21 @@ public abstract class JobImpl implements Runnable, Serializable {
 		localRun();
 		
 		processJobResult();
+		
+		performLogAnalyze();
 
 		cleanUp();
+	}
+	
+	private void performLogAnalyze() {
+		LogAnalysis logAnalysis = abstractJobType.getLogAnalysis();
+
+		if (logAnalysis != null && logAnalysis.getActive()) {
+			StringBuffer logContent = new StringBuffer();
+			LiveStateInfo liveStateInfo = new LogAnalyser().evaluate(abstractJobType, logContent);
+			ChangeLSI.forValue(abstractJobType, liveStateInfo);
+			outputStrategy.sendDataObject(new OutputData(OutputData.types.LOGANALYZER, logContent));
+		}
 	}
 	
 	public AbstractJobType getAbstractJobType() {
