@@ -37,9 +37,6 @@ public interface JobRuntimeInterface {
 	public StringBuffer getMessageBuffer();
 	public void setMessageBuffer(StringBuffer messageBuffer);
 	
-	public String getLogAnalyzeString();
-	public void setLogAnalyzeString(String logAnalyzeString);
-	
 	public String getMemberIdOfNetTree();
 	public void setMemberIdOfNetTree(String memberIdOfNetTree);
 	
