@@ -39,31 +39,31 @@ public class Commandability {
 	}
 	
 	public static boolean isRetryable(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED) || LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.STOPPED);
+		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED) || LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.STOPPED);
 	}
 
 	public static boolean isSuccessable(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.PAUSED) || LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED);
+		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.PAUSED) || LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED);
 	}
 
 	public static boolean isSkipable(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.PAUSED) || LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED);
+		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.PAUSED) || LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED);
 	}
 
 	public static boolean isStopable(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.RUNNING);
+		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.RUNNING);
 	}
 
 	public static boolean isPausable(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.PENDING);
+		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING);
 	}
 
 	public static boolean isResumable(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.PAUSED);
+		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.PAUSED);
 	}
 
 	public static boolean isStartable(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.PENDING) && (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0);
+		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING) && (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0);
 	}
 
 	
