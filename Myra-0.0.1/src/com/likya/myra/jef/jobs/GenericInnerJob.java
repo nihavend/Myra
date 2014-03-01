@@ -17,7 +17,6 @@
 package com.likya.myra.jef.jobs;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.MyraDateUtils;
@@ -70,33 +69,6 @@ public abstract class GenericInnerJob extends JobImpl {
 		return Scheduler.scheduleForNextExecution(abstractJobType);
 	}
 
-	//	public boolean processJobResultFromSch() {
-	//
-	//		AbstractJobType abstractJobType = getAbstractJobType();
-	//		
-	//		LiveStateInfo lastState = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
-	//
-	//		if (lastState.getStateName().equals(StateName.FINISHED)) {
-	//
-	//			String logStr = "islem bitirildi : " + abstractJobType.getId() + " => ";
-	//			logStr += StateName.FINISHED.toString() + ":" + lastState.getSubstateName().toString() + ":" + lastState.getStatusName().toString();
-	//			myLogger.info(" >>>>" + logStr + "<<<<");
-	//
-	//		} else {
-	//
-	//			if (Boolean.parseBoolean(abstractJobType.getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry().toString()) && retryFlag) {
-	//				myLogger.info(" >> " + logLabel + " : Job Failed ! Restarting " + abstractJobType.getBaseJobInfos().getJsName());
-	//				setRenewByTime(abstractJobType);
-	//				return true;
-	//			} else {
-	//				myLogger.info(" >>" + logLabel + ">> " + abstractJobType.getId() + ":Job Failed ! ");
-	//				myLogger.debug(" >>" + logLabel + ">> " + abstractJobType.getId() + " : Job Failed !");
-	//			}
-	//		}
-	//
-	//		return false;
-	//	}
-
 	private boolean isInDepenedencyChain(String jobId) {
 		return !CoreFactory.getInstance().getNetTreeManagerInterface().getFreeJobs().containsKey(jobId);
 	}
@@ -112,7 +84,7 @@ public abstract class GenericInnerJob extends JobImpl {
 			return;
 		}
 
-		LiveStateInfo liveStateInfo = abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
+		LiveStateInfo liveStateInfo = LiveStateInfoUtils.getLastStateInfo(abstractJobType);
 
 		boolean isState = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS);
 
@@ -189,63 +161,10 @@ public abstract class GenericInnerJob extends JobImpl {
 				}
 			}
 
-			/*
-			if (abstractJobType.getManagement().getCascadingConditions() != null && abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == true && !manuelStop) {
-
-				if (retryCounter < abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getMaxCount().intValue()) {
-					CoreFactory.getLogger().info(CoreFactory.getMessage("ExternalProgram.11") + jobId);
-					retryCounter++;
-
-					long stepTime = MyraDateUtils.getDurationInMilliSecs(abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getStep());
-
-					JobHelper.setJsPlannedTimeForStart(abstractJobType, stepTime);
-
-					setRenewByTime(abstractJobType);
-
-				} else {
-					// reset counter and leave for normal scheduling
-					retryCounter = 0;
-				}
-
-			}
-			*/
-
 			CoreFactory.getLogger().info(jobId + CoreFactory.getMessage("ExternalProgram.12"));
 			CoreFactory.getLogger().debug(jobId + CoreFactory.getMessage("ExternalProgram.13"));
 
 		}
-	}
-
-	public void reportLog(JobImpl jobClass, Date startTime, Date endTime) {
-
-		//		String jobClassName = "JOBSTATS|";
-		//
-		//		if (jobClass instanceof ExternalProgram) {
-		//			jobClassName = jobClassName.concat("STANDART");
-		//		} else if (jobClass instanceof ManuelExternalProgram) {
-		//			jobClassName = jobClassName.concat("MANUEL");
-		//		} else if (jobClass instanceof RepetitiveExternalProgram) {
-		//			jobClassName = jobClassName.concat("TEKRARLI");
-		//		}
-		//
-		//		TlosServer.getLogger().info(jobClassName + "|" + TlosServer.getTlosParameters().getScenarioName().toString() + "|" + getJobProperties().getGroupName().toString() + "|" + getJobProperties().getKey().toString() + "|" + DateUtils.getDate(startTime) + "|" + DateUtils.getDate(endTime) + "|" + getJobProperties().getStatusString(getJobProperties().getStatus(), getJobProperties().getProcessExitValue()).toString()); //$NON-NLS-1$
-	}
-
-	public String[] parseParameter() {
-
-		String[] cmd = null;
-
-		//		if (getJobProperties().getJobParamList() != null && !getJobProperties().getJobParamList().equals("")) {
-		//			String tmpCmd[] = ValidPlatforms.getCommand(getJobProperties().getJobCommand());
-		//			String tmpPrm[] = getJobProperties().getJobParamList().split(" ").clone();
-		//			cmd = new String[tmpCmd.length + tmpPrm.length];
-		//			System.arraycopy(tmpCmd, 0, cmd, 0, tmpCmd.length);
-		//			System.arraycopy(tmpPrm, 0, cmd, tmpCmd.length, tmpPrm.length);
-		//		} else {
-		//			cmd = ValidPlatforms.getCommand(getSimpleJobProperties().getBaseJobInfos().getJobInfos().getJobTypeDetails().getJobCommand());
-		//		}
-
-		return cmd;
 	}
 
 }
