@@ -16,15 +16,20 @@
 package com.likya.myra.jef.jobs;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.likya.myra.commons.ValidPlatforms;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.commons.utils.PeriodCalculations;
 import com.likya.myra.commons.utils.StateUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.utils.Scheduler;
+import com.likya.xsd.myra.model.generics.EntryDocument.Entry;
+import com.likya.xsd.myra.model.generics.EnvVariablesDocument.EnvVariables;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.jobprops.SimplePropertiesType;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
@@ -77,69 +82,9 @@ public class JobHelper {
 	}
 
 	public static void setJsPlannedTimeForStart(AbstractJobType abstractJobType, long period) {
-
-		// System.err.println("1 : " + CommonDateUtils.getDate(startTime.getTime()));
-
-		// Calendar jobCalendar = abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime();
-
-		// System.err.println("Before : " + CommonDateUtils.getDate(jobCalendar.getTime()));
-
-		//		jobCalendar.set(Calendar.YEAR, startTime.get(Calendar.YEAR));
-		//		jobCalendar.set(Calendar.MONTH, startTime.get(Calendar.MONTH));
-		//		jobCalendar.set(Calendar.DAY_OF_MONTH, startTime.get(Calendar.DAY_OF_MONTH));
-
 		String timeZone = abstractJobType.getManagement().getTimeManagement().getTimeZone();
-
 		Calendar returnCal = PeriodCalculations.addPeriod(Calendar.getInstance(), period, timeZone);
-
 		abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(returnCal);
-
-		// System.err.println("After : " + CommonDateUtils.getDate(returnCal.getTime()));
-
-		// System.err.println(startTime.before(returnCal));
-
-		// System.err.println();
-
-		//		System.err.println("1 : " + CommonDateUtils.getDate(startTime.getTime()));
-		//
-		//		System.err.println("Before : " + CommonDateUtils.getDate(abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime().getTime()));
-		//		
-		//		Calendar startDateTime = PeriodCalculations.dateToXmlTime(abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime().toString());
-		//		
-		//		System.err.println("2 : " + CommonDateUtils.getDate(startDateTime.getTime()));
-		//		
-		//		Calendar returnCal = PeriodCalculations.addPeriod(startDateTime, period);
-		//		
-		//		System.err.println("3 : " + CommonDateUtils.getDate(returnCal.getTime()));
-		//
-		//		abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().setTime(returnCal);
-		//		
-		//		System.err.println("After : " + CommonDateUtils.getDate(abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime().getTime()));
-		//		
-		// GDateBuilder gDateBuilder = new GDateBuilder(startTime);
-
-		// System.err.println("2 : " + CommonDateUtils.getDate(abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime().getTime()));
-
-		// abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().setDate(xmlDateTime.getCalendarValue());
-
-		// System.err.println("3 : " + CommonDateUtils.getDate(abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getDate().getTime()));
-
-		//		Calendar cal = abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime();
-		//		
-		//		System.err.println("Before : " + CommonDateUtils.getDate(cal.getTime()));
-		//
-		//		Calendar startDateTime = PeriodCalculations.dateToXmlTime(cal.toString());
-		//		Calendar returnCal = PeriodCalculations.addPeriod(startDateTime, period);
-		//
-		//		abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().setTime(returnCal);
-		//		
-		//		cal = abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime();
-		//
-		//		System.err.println("After : " + CommonDateUtils.getDate(cal.getTime()));
-
-		//		Date scheduledTime = abstractJobType.getTimeManagement().getJsPlannedTime().getStartTime().getTime();
-		//		System.err.println(scheduledTime);
-
 	}
 
 	protected static void setJsRealTimeForStart(AbstractJobType abstractJobType, Calendar startTime) {
@@ -183,7 +128,45 @@ public class JobHelper {
 		return jobCommand;
 	}
 
-	public static ProcessBuilder parsJobCmdArgs(String jobCommand) {
+	public static ProcessBuilder parsJobCmdArgs(boolean isShell, String jobCommand, String extArgValues) {
+
+		ProcessBuilder processBuilder;
+
+		String realCommand = "";
+		String[] inlineArgs = null;
+
+		int indexOfSpace = jobCommand.indexOf(" ");
+
+		if (indexOfSpace > 0) {
+			realCommand = jobCommand.substring(0, indexOfSpace).trim();
+			inlineArgs = jobCommand.substring(jobCommand.indexOf(" ")).trim().split(" ");
+		} else {
+			realCommand = jobCommand.trim();
+		}
+		
+		String[] commandArr;
+		
+		if(isShell) {
+			commandArr = ValidPlatforms.getCommand(realCommand);
+		} else {
+			commandArr = new String[] { realCommand };
+		}
+		
+		if(inlineArgs != null && inlineArgs.length > 0) {
+			commandArr = concat(commandArr, inlineArgs);
+		}
+		
+		if(extArgValues != null && extArgValues.length() > 0) {
+			commandArr = concat(commandArr, extArgValues.trim().split(" "));
+		}
+		
+		processBuilder = new ProcessBuilder(commandArr);
+
+		return processBuilder;
+
+	}
+	
+	public static ProcessBuilder parsJobCmdArgsOld(String jobCommand) {
 
 		ProcessBuilder processBuilder;
 
@@ -268,17 +251,34 @@ public class JobHelper {
 		return getStateInfo(jobImpl.getAbstractJobType(), index);
 	}
 	
-	/**
-	 * @param abstractJobType
-	 * @return the state values stored in the given index, the most last value has the index 0
-	 */
-	
-	public static LiveStateInfo getLastStateInfo(AbstractJobType abstractJobType) {
-		return abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0);
+	public static LiveStateInfo getLastStateInfo(JobImpl jobImpl) {
+		return LiveStateInfoUtils.getLastStateInfo(jobImpl.getAbstractJobType());
 	}
 	
-	public static LiveStateInfo getLastStateInfo(JobImpl jobImpl) {
-		return getLastStateInfo(jobImpl.getAbstractJobType());
+	public static String[] concat(String[] first, String[] second) {
+
+		String[] result = new String[first.length + second.length];
+		
+		System.arraycopy(first, 0, result, 0, first.length);
+		System.arraycopy(second, 0, result, first.length, second.length);
+
+		return result;
+	}
+	
+	public static Map<String, String> entryToMap(EnvVariables envVariables) {
+		
+		Map<String, String> envMap = new HashMap<String, String>();
+		
+		if (envVariables != null) {
+			Entry [] envVars = envVariables.getEntryArray();
+			
+			for(Entry myEntry : envVars) {
+				envMap.put(myEntry.getKey(), myEntry.getStringValue());
+			}
+		}
+		
+		return envMap;
+
 	}
 
 }
