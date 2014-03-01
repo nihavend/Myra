@@ -38,5 +38,5 @@ public interface JobOperations {
 	
 	public void enableJob(String jobId, boolean normalize);
 
-	public String setJobInputParam(String jobId, String parameterList) ;
+	public String setJobInputParam(String jobId, String paramString) ;
 }
