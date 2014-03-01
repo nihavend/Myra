@@ -20,16 +20,14 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
-import com.likya.myra.commons.utils.LogAnalyser;
+import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
-import com.likya.myra.jef.model.OutputData;
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
-import com.likya.xsd.myra.model.wlagen.LogAnalysisDocument.LogAnalysis;
 
 public abstract class JobImpl implements Runnable, Serializable {
 
@@ -77,20 +75,7 @@ public abstract class JobImpl implements Runnable, Serializable {
 		
 		processJobResult();
 		
-		performLogAnalyze();
-
 		cleanUp();
-	}
-	
-	private void performLogAnalyze() {
-		LogAnalysis logAnalysis = abstractJobType.getLogAnalysis();
-
-		if (logAnalysis != null && logAnalysis.getActive()) {
-			StringBuffer logContent = new StringBuffer();
-			LiveStateInfo liveStateInfo = new LogAnalyser().evaluate(abstractJobType, logContent);
-			ChangeLSI.forValue(abstractJobType, liveStateInfo);
-			outputStrategy.sendDataObject(new OutputData(OutputData.types.LOGANALYZER, logContent));
-		}
 	}
 	
 	public AbstractJobType getAbstractJobType() {
@@ -119,7 +104,7 @@ public abstract class JobImpl implements Runnable, Serializable {
 	
 	public String toString() {
 		// return "[JobId:" + getAbstractJobType().getId() + "][" + JobHelper.getLastStateInfo(getAbstractJobType()) + "]";
-		LiveStateInfo liveStateInfo = JobHelper.getLastStateInfo(getAbstractJobType());
+		LiveStateInfo liveStateInfo = LiveStateInfoUtils.getLastStateInfo(getAbstractJobType());
 		String startTime = MyraDateUtils.getDate(getAbstractJobType().getManagement().getTimeManagement().getJsPlannedTime().getStartTime());
 		String stopTime = MyraDateUtils.getDate(getAbstractJobType().getManagement().getTimeManagement().getJsPlannedTime().getStopTime());
 		
