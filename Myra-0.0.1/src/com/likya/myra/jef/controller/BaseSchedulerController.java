@@ -31,7 +31,6 @@ import com.likya.myra.commons.utils.StateFilter;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.CoreFactoryInterface;
 import com.likya.myra.jef.jobs.ChangeLSI;
-import com.likya.myra.jef.jobs.JobHelper;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.utils.JobQueueOperations;
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
@@ -116,7 +115,7 @@ public class BaseSchedulerController {
 				}
 			} else {
 				// System.err.println(indent + " No dependency ");
-				LiveStateInfo innerLiveStateInfo = JobHelper.getLastStateInfo(innerAbstractJobType);
+				LiveStateInfo innerLiveStateInfo = LiveStateInfoUtils.getLastStateInfo(innerAbstractJobType);
 
 				boolean isState = LiveStateInfoUtils.equalStates(innerLiveStateInfo, StateName.PENDING, SubstateName.IDLED);
 
@@ -128,9 +127,9 @@ public class BaseSchedulerController {
 			}
 		}
 
-		if (isFound && LiveStateInfoUtils.equalStatesPIT(JobHelper.getLastStateInfo(abstractJobType))) {
+		if (isFound && LiveStateInfoUtils.equalStatesPIT(LiveStateInfoUtils.getLastStateInfo(abstractJobType))) {
 			// System.err.println(indent + " found case for job " + abstractJobType.getId() + " Setting PRI !");
-			LiveStateInfo liveStateInfo = JobHelper.getLastStateInfo(abstractJobType);
+			LiveStateInfo liveStateInfo = LiveStateInfoUtils.getLastStateInfo(abstractJobType);
 			liveStateInfo.setSubstateName(SubstateName.READY);
 			liveStateInfo.setStatusName(StatusName.WAITING);
 		}
@@ -349,7 +348,7 @@ public class BaseSchedulerController {
 				// System.err.println("Job " + myAbstractJobType.getId() + " and " + tmpAbstractJobType.getId() + " are in same group >> " + tmpAbstractJobType.getDangerZoneGroupId());
 				// System.err.println("Job " + myAbstractJobType.getId() + " statu : " + myAbstractJobType.getStateInfos());
 				// System.err.println("Job " +  tmpAbstractJobType.getId() + " statu : " + tmpAbstractJobType.getStateInfos());
-				if (StateName.RUNNING.equals(JobHelper.getLastStateInfo(tmpAbstractJobType).getStateName())) {
+				if (StateName.RUNNING.equals(LiveStateInfoUtils.getLastStateInfo(tmpAbstractJobType).getStateName())) {
 					// System.err.println("Can not execute !!!!!!!!!!!");
 					return true;
 				}
