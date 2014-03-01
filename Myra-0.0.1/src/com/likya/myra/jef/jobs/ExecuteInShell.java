@@ -29,6 +29,7 @@ import com.likya.myra.commons.grabber.StreamGrabber;
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
+import com.likya.xsd.myra.model.generics.JobTypeDetailsDocument.JobTypeDetails;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 
@@ -93,16 +94,12 @@ public class ExecuteInShell extends CommonShell {
 
 		ProcessBuilder processBuilder = null;
 
-		String jobCommand = abstractJobType.getBaseJobInfos().getJobTypeDetails().getJobCommand();
+		JobTypeDetails jobTypeDetails =  abstractJobType.getBaseJobInfos().getJobTypeDetails();
+		String jobCommand = jobTypeDetails.getJobCommand();
 
-		CoreFactory.getLogger().info(" >>" + " ExecuteInShell " + jobId + " Çalıştırılacak komut : " + jobCommand);
+		CoreFactory.getLogger().info(" >>" + this.getClass().getSimpleName() + jobId + " Çalıştırılacak komut : " + jobCommand);
 
-		if (isShell) {
-			String[] cmd = ValidPlatforms.getCommand(jobCommand);
-			processBuilder = new ProcessBuilder(cmd);
-		} else {
-			processBuilder = JobHelper.parsJobCmdArgs(jobCommand);
-		}
+		processBuilder = JobHelper.parsJobCmdArgs(isShell, jobCommand, jobTypeDetails.getArgValues());
 
 		String jobPath = abstractJobType.getBaseJobInfos().getJobTypeDetails().getJobPath();
 		if (jobPath != null) {
@@ -118,8 +115,7 @@ public class ExecuteInShell extends CommonShell {
 			tempEnv.putAll(environmentVariables);
 		}
 
-		// TODO
-		// tempEnv.putAll(XmlBeansTransformer.entryToMap(jobProperties));
+		tempEnv.putAll(JobHelper.entryToMap(jobTypeDetails.getEnvVariables()));
 
 		processBuilder.environment().putAll(tempEnv);
 
@@ -142,16 +138,7 @@ public class ExecuteInShell extends CommonShell {
 			
 			CoreFactory.getLogger().info(jobId + CoreFactory.getMessage("ExternalProgram.6") + processExitValue);
 
-			String errStr = jobRuntimeInterface.getLogAnalyzeString();
-			boolean hasErrorInLog = false;
-			//
-			//			if (!getJobProperties().getLogFilePath().equals(ScenarioLoader.UNDEFINED_VALUE)) {
-			//				if (errStr != null) {
-			//					hasErrorInLog = FileUtils.analyzeFileForString(getJobProperties().getLogFilePath(), errStr);
-			//				}
-			//			} else if (errStr != null) {
-			//				CoreFactory.getLogger().error("jobFailString: \"" + errStr + "\" " + LocaleMessages.getString("ExternalProgram.1") + " !");
-			//			}
+			boolean hasErrorInLog = (performLogAnalyze(abstractJobType) == null);
 
 			stopMyDogBarking();
 
@@ -166,9 +153,7 @@ public class ExecuteInShell extends CommonShell {
 
 			JobHelper.writeErrorLogFromOutputs(CoreFactory.getLogger(), this.getClass().getName(), stringBufferForOUTPUT, stringBufferForERROR);
 
-			if (errStr != null && hasErrorInLog) {
-				setFailedOfLog(abstractJobType);
-			} else {
+			if (!hasErrorInLog) {
 				setOfCodeMessage(abstractJobType, statusName, processExitValue, jobRuntimeInterface.getMessageBuffer().toString());
 			}
 
