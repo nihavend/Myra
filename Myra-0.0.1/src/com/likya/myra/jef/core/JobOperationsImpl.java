@@ -208,7 +208,7 @@ public class JobOperationsImpl implements JobOperations {
 //				TlosServer.getDisabledJobQueue().put(jobName, jobName);
 //			}
 			
-			CoreFactory.getLogger().info(CoreFactory.getMessage("Myra.319") + CoreFactory.getMessage("Myra.301") + jobName + " : " + JobHelper.getLastStateInfo(abstractJobType));
+			CoreFactory.getLogger().info(CoreFactory.getMessage("Myra.319") + CoreFactory.getMessage("Myra.301") + jobName + " : " + LiveStateInfoUtils.getLastStateInfo(abstractJobType));
 		}
 	}
 
@@ -225,7 +225,7 @@ public class JobOperationsImpl implements JobOperations {
 
 			AbstractJobType abstractJobType = coreFactory.getMonitoringOperations().getJobQueue().get(jobId).getAbstractJobType();
 			
-			if(LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.DEACTIVATED)) {
+			if(LiveStateInfoUtils.equalStatesPD(abstractJobType)) {
 				if(normalize) {
 					CoreFactory.getLogger().info("Enabling job >> " + abstractJobType.getId() + " after normalizing !");
 					JobHelper.resetJob(abstractJobType);
@@ -237,14 +237,30 @@ public class JobOperationsImpl implements JobOperations {
 			//				TlosServer.getDisabledJobQueue().remove(jobName);
 			//			}
 			
-			logger.info(CoreFactory.getMessage("Myra.310") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(abstractJobType));
+			logger.info(CoreFactory.getMessage("Myra.310") + CoreFactory.getMessage("Myra.301") + jobId + " : " + LiveStateInfoUtils.getLastStateInfo(abstractJobType));
 		}
 	}
 
-	@Override
-	public String setJobInputParam(String jobName, String parameterList) {
-		// TODO Auto-generated method stub
-		return null;
+	public String setJobInputParam(String jobId, String paramString) {
+		
+		logger.info(CoreFactory.getMessage("Myra.311") + CoreFactory.getMessage("Myra.300") + jobId);
+		
+		String returnValue = "";
+		
+		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
+			AbstractJobType abstractJobType = coreFactory.getMonitoringOperations().getJobQueue().get(jobId).getAbstractJobType();
+			if(LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING)) {
+				abstractJobType.getBaseJobInfos().getJobTypeDetails().setArgValues(paramString);
+				returnValue = paramString + " " + CoreFactory.getMessage("Myra.873")  + " " + jobId;
+			} else {
+				logger.info(CoreFactory.getMessage("Myra.847"));
+				returnValue = CoreFactory.getMessage("Myra.874");
+			}
+
+			logger.info(CoreFactory.getMessage("Myra.311") + CoreFactory.getMessage("Myra.301") + jobId + " : " + LiveStateInfoUtils.getLastStateInfo(abstractJobType));
+		}
+		
+		return returnValue;
 	}
 	
 	private void updateStartConditionsOfDepChain(String jobId, Calendar myDate) {
