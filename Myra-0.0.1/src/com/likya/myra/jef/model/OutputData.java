@@ -19,7 +19,7 @@ package com.likya.myra.jef.model;
 import java.io.Serializable;
 import java.util.Calendar;
 
-import com.likya.myra.jef.jobs.JobHelper;
+import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 
@@ -146,7 +146,7 @@ public class OutputData implements Serializable {
 		outputData.setStartTime(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime());
 		outputData.setStopTime(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStopTime());
 		outputData.setTreeId("treeId");
-		outputData.setLiveStateInfo(JobHelper.getLastStateInfo(abstractJobType));
+		outputData.setLiveStateInfo(LiveStateInfoUtils.getLastStateInfo(abstractJobType));
 
 		return outputData;
 
