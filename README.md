@@ -1,4 +1,4 @@
 Myra
 ====
 
-Myra Job Execution And Scheduling Framework for Java
+Myra Job Scheduling Framework for Java
