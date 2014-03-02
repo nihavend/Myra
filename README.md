@@ -16,6 +16,9 @@ Just to say a scheduler is not enough to describe Myra, as it has strong state m
 * Manual job chain definitions
 * T < 1 day job chain definitions
 
+### Releases
+First stable release is planned to be delivered through the first week of April.
+
 ### Mail Group
 
 Please join the mail group if you are interested in using or developing Myra.
