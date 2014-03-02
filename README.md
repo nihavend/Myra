@@ -16,10 +16,6 @@ Just to say a scheduler is not enough to describe Myra, as it has strong state m
 * Manual job chain definitions
 * T < 1 day job chain definitions
 
-### Releases
-
-Download from [www.tlos.com.tr](http://www.tlos.com.tr/downloads.jsp)
-
 ### Mail Group
 
 Please join the mail group if you are interested in using or developing Myra.
