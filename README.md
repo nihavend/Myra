@@ -1,7 +1,7 @@
 Myra Job Scheduling Framework for Java
 ====
 
-Myra is a job scheduler and executer for DAG or single jobs for java.
+Myra is a job scheduler and manager of DAG or single jobs for java.
 
 Just to say a scheduler is not enough to describe Myra, as it has strong state management capability, we can define Myra as comibination of a scheduler and dependency chain management framework.
 
