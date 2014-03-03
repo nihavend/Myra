@@ -175,7 +175,7 @@ public class ExecuteInShell extends CommonShell {
 					}
 				}
 				// Stop the process from running
-				CoreFactory.getLogger().warn(CoreFactory.getMessage("ExternalProgram.8") + jobId); //$NON-NLS-1$
+				CoreFactory.getLogger().warn(CoreFactory.getMessage("ExternalProgram.8") + jobId); 
 
 				// process.waitFor() komutu thread'in interrupt statusunu temizlemedigi icin 
 				// asagidaki sekilde temizliyoruz
@@ -184,8 +184,6 @@ public class ExecuteInShell extends CommonShell {
 				process.destroy();
 			}
 			
-			setFailedOfMessage(abstractJobType, e.getMessage());
-
 		}
 
 	}
