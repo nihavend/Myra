@@ -137,7 +137,7 @@ public class ExecuteInShell extends CommonShell {
 			
 			CoreFactory.getLogger().info(jobId + CoreFactory.getMessage("ExternalProgram.6") + processExitValue);
 
-			boolean hasErrorInLog = (performLogAnalyze(abstractJobType) == null);
+			boolean hasErrorInLog = (performLogAnalyze(abstractJobType) != null);
 
 			stopMyDogBarking();
 
