@@ -60,7 +60,7 @@ public class JobHelper {
 
 		Calendar endTime = Calendar.getInstance();
 		long timeDiff = endTime.getTime().getTime() - startTime.getTime().getTime();
-		
+
 		int durationList[] = MyraDateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
 
 		String endLog = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.14") + MyraDateUtils.getDate(endTime.getTime());
@@ -143,29 +143,29 @@ public class JobHelper {
 		} else {
 			realCommand = jobCommand.trim();
 		}
-		
+
 		String[] commandArr;
-		
-		if(isShell) {
+
+		if (isShell) {
 			commandArr = ValidPlatforms.getCommand(realCommand);
 		} else {
 			commandArr = new String[] { realCommand };
 		}
-		
-		if(inlineArgs != null && inlineArgs.length > 0) {
+
+		if (inlineArgs != null && inlineArgs.length > 0) {
 			commandArr = concat(commandArr, inlineArgs);
 		}
-		
-		if(extArgValues != null && extArgValues.length() > 0) {
+
+		if (extArgValues != null && extArgValues.length() > 0) {
 			commandArr = concat(commandArr, extArgValues.trim().split(" "));
 		}
-		
+
 		processBuilder = new ProcessBuilder(commandArr);
 
 		return processBuilder;
 
 	}
-	
+
 	public static ProcessBuilder parsJobCmdArgsOld(String jobCommand) {
 
 		ProcessBuilder processBuilder;
@@ -196,7 +196,7 @@ public class JobHelper {
 		if ((abstractJobType.getStateInfos().getJobStatusList() != null) && (localStateCheck = StateUtils.contains(abstractJobType.getStateInfos().getJobStatusList(), processExitValue)) != null) {
 			statusName = localStateCheck.getStatusName();
 		} else {
-			if(processExitValue == 0) {
+			if (processExitValue == 0) {
 				statusName = StatusName.SUCCESS;
 			} else {
 				statusName = StatusName.FAILED;
@@ -228,7 +228,10 @@ public class JobHelper {
 	}
 
 	public static void resetJob(AbstractJobType abstractJobType, LiveStateInfo liveStateInfo) {
-		if (Scheduler.scheduleForNextExecution(abstractJobType)) {
+
+		boolean isByTime = LiveStateInfoUtils.getLastStateInfo(abstractJobType).getStatusName().equals(StatusName.BYTIME);
+
+		if (isByTime && Scheduler.scheduleForNextExecution(abstractJobType)) {
 			if (liveStateInfo == null) {
 				liveStateInfo = LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_IDLED, StatusName.INT_BYTIME);
 			}
@@ -240,43 +243,43 @@ public class JobHelper {
 	public static LiveStateInfo getStateInfo(AbstractJobType abstractJobType, int index) {
 		return abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(index);
 	}
-	
+
 	/**
 	 * @param jobImpl
 	 * @param index
 	 * @return the state values stored in the given index, the most last value has the index 0
 	 */
-	
+
 	public static LiveStateInfo getStateInfo(JobImpl jobImpl, int index) {
 		return getStateInfo(jobImpl.getAbstractJobType(), index);
 	}
-	
+
 	public static LiveStateInfo getLastStateInfo(JobImpl jobImpl) {
 		return LiveStateInfoUtils.getLastStateInfo(jobImpl.getAbstractJobType());
 	}
-	
+
 	public static String[] concat(String[] first, String[] second) {
 
 		String[] result = new String[first.length + second.length];
-		
+
 		System.arraycopy(first, 0, result, 0, first.length);
 		System.arraycopy(second, 0, result, first.length, second.length);
 
 		return result;
 	}
-	
+
 	public static Map<String, String> entryToMap(EnvVariables envVariables) {
-		
+
 		Map<String, String> envMap = new HashMap<String, String>();
-		
+
 		if (envVariables != null) {
-			Entry [] envVars = envVariables.getEntryArray();
-			
-			for(Entry myEntry : envVars) {
+			Entry[] envVars = envVariables.getEntryArray();
+
+			for (Entry myEntry : envVars) {
 				envMap.put(myEntry.getKey(), myEntry.getStringValue());
 			}
 		}
-		
+
 		return envMap;
 
 	}
