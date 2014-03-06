@@ -235,7 +235,7 @@ public class JobQueueOperations {
 
 			AbstractJobType abstractJobType = tmpJobImpl.getAbstractJobType();
 
-			if (exceptionLiveStateInfo != null && LiveStateInfoUtils.equalStates(exceptionLiveStateInfo, abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0))) {
+			if (exceptionLiveStateInfo != null && LiveStateInfoUtils.equalStates(exceptionLiveStateInfo, LiveStateInfoUtils.getLastStateInfo(abstractJobType))) {
 				continue;
 			}
 
