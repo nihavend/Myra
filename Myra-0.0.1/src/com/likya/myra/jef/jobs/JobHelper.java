@@ -41,7 +41,7 @@ import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 
 public class JobHelper {
 
-	protected static void updateDescStr(StringBuffer descStr, StringBuilder stringBufferForOUTPUT, StringBuilder stringBufferForERROR) {
+	public static void updateDescStr(StringBuffer descStr, StringBuilder stringBufferForOUTPUT, StringBuilder stringBufferForERROR) {
 
 		if (stringBufferForOUTPUT != null && stringBufferForOUTPUT.length() > 1) {
 			descStr.append("OUTPUT : " + stringBufferForOUTPUT);
@@ -93,7 +93,7 @@ public class JobHelper {
 		// System.err.println("Beofer : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime().getTime().getTime()));
 	}
 
-	protected static void setJsRealTimeForStop(AbstractJobType abstractJobType, Calendar stopTime) {
+	public static void setJsRealTimeForStop(AbstractJobType abstractJobType, Calendar stopTime) {
 		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStopTime(stopTime);
 	}
 
@@ -210,7 +210,7 @@ public class JobHelper {
 		return statusName;
 	}
 
-	protected static void writeErrorLogFromOutputs(Logger myLogger, String logClassName, StringBuilder stringBufferForOUTPUT, StringBuilder stringBufferForERROR) {
+	public static void writeErrorLogFromOutputs(Logger myLogger, String logClassName, StringBuilder stringBufferForOUTPUT, StringBuilder stringBufferForERROR) {
 
 		StringBuffer descStr = new StringBuffer();
 
