@@ -18,11 +18,14 @@ package com.likya.myra.jef.jobs;
 
 import java.util.Calendar;
 
+import org.apache.log4j.Logger;
+
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.utils.Scheduler;
+import com.likya.xsd.myra.model.generics.UnitDocument.Unit;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
@@ -36,6 +39,8 @@ public abstract class GenericInnerJob extends JobImpl {
 	private static final long serialVersionUID = -680353114457170591L;
 
 	protected Calendar startTime;
+	
+	transient private int wdtCounter = 0;
 
 	public GenericInnerJob(AbstractJobType abstractJobType, JobRuntimeInterface jobRuntimeProperties) {
 		super(abstractJobType, jobRuntimeProperties);
@@ -167,5 +172,62 @@ public abstract class GenericInnerJob extends JobImpl {
 
 		}
 	}
+	
+	final protected void startWathcDogTimer() {
+		// TL deki 
 
+		AbstractJobType abstractJobType = getAbstractJobType();
+		long timeout = abstractJobType.getManagement().getTimeManagement().getJsTimeOut().getValueInteger().longValue();
+
+		Long timeOut = abstractJobType.getManagement().getTimeManagement().getJsTimeOut().getValueInteger().longValue();
+
+		if (abstractJobType.getManagement().getTimeManagement().getJsTimeOut().getUnit() == Unit.HOURS) {
+			timeOut = timeOut * 3600;
+		} else if (abstractJobType.getManagement().getTimeManagement().getJsTimeOut().getUnit() == Unit.MINUTES) {
+			timeOut = timeOut * 60;
+		}
+
+		if (!(abstractJobType.getManagement().getCascadingConditions() != null && abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == true && wdtCounter > 0)) {
+			watchDogTimer = new WatchDogTimer(this, abstractJobType.getId(), Thread.currentThread(), timeout * 1000);
+			watchDogTimer.setName(abstractJobType.getId() + ".WatchDogTimer.id." + watchDogTimer.getId());
+			watchDogTimer.start();
+
+			wdtCounter++;
+		}
+
+		// sw deki
+
+		//		if (simpleProperties.getTimeManagement().getJsTimeOut().getUnit() == Unit.HOURS) {
+		//			timeOut = timeOut * 3600;
+		//		} else if (simpleProperties.getTimeManagement().getJsTimeOut().getUnit() == Unit.MINUTES) {
+		//			timeOut = timeOut * 60;
+		//		}
+		//
+		//		watchDogTimer = new WatchDogTimer(this, simpleProperties.getId(), Thread.currentThread(), timeOut * 1000, globalLogger);
+		//		watchDogTimer.setName(simpleProperties.getId() + ".WatchDogTimer.id." + watchDogTimer.getId());
+		//		watchDogTimer.start();
+
+	}
+	
+	final public void stopMyDogBarking() {
+		if (watchDogTimer != null) {
+			watchDogTimer.interrupt();
+			watchDogTimer = null;
+		}
+	}
+	
+	public void handleException(Exception err, Logger myLogger) {
+
+		AbstractJobType abstractJobType = getAbstractJobType();
+
+		stopMyDogBarking();
+
+		myLogger.error(err.getMessage());
+
+		setFailedOfMessage(abstractJobType, err.getMessage());
+
+		err.printStackTrace();
+
+	}
+	
 }
