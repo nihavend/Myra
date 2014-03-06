@@ -21,7 +21,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.jvnet.winp.WinProcess;
 
 import com.likya.myra.commons.ValidPlatforms;
@@ -185,20 +184,6 @@ public class ExecuteInShell extends CommonShell {
 			}
 			
 		}
-
-	}
-
-	public void handleException(Exception err, Logger myLogger) {
-
-		AbstractJobType abstractJobType = getAbstractJobType();
-
-		stopMyDogBarking();
-
-		myLogger.error(err.getMessage());
-
-		setFailedOfMessage(abstractJobType, err.getMessage());
-
-		err.printStackTrace();
 
 	}
 
