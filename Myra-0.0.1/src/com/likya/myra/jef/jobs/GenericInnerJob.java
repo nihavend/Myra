@@ -32,7 +32,6 @@ import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 import com.likya.xsd.myra.model.wlagen.CascadingConditionsDocument.CascadingConditions;
-import com.likya.xsd.myra.model.wlagen.TriggerDocument.Trigger;
 
 public abstract class GenericInnerJob extends JobImpl {
 
@@ -105,26 +104,7 @@ public abstract class GenericInnerJob extends JobImpl {
 
 			JobHelper.setWorkDurations(this, startTime);
 
-			int jobType = abstractJobType.getManagement().getTrigger().intValue();
-
-			switch (jobType) {
-			case Trigger.INT_EVENT:
-				// Not implemented yet
-				break;
-			case Trigger.INT_TIME:
-				if (scheduleForNextExecution(abstractJobType)) {
-					String startTime = MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime());
-					CoreFactory.getLogger().info("Job [" + abstractJobType.getId() + "] bir sonraki zamana kuruldu : " + startTime);
-					setRenewByTime(abstractJobType);
-				}
-				break;
-			case Trigger.INT_USER:
-				setRenewByUser(abstractJobType);
-				break;
-
-			default:
-				break;
-			}
+			JobHelper.evaluateTriggerType(abstractJobType, true);
 
 			CoreFactory.getLogger().info(CoreFactory.getMessage("ExternalProgram.9") + jobId + " => " + (liveStateInfo.getStatusName() == null ? "" : liveStateInfo.getStatusName().toString()));
 
