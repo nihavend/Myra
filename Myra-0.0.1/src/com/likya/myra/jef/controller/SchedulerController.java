@@ -99,7 +99,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 							}
 						} else {
 							if (LiveStateInfoUtils.equalStatesPIT(liveStateInfo) || LiveStateInfoUtils.equalStatesPRW(liveStateInfo)) {
-								if (checkDependency(scheduledJob, dependencyList)) {
+								if (checkDependency(scheduledJob)) {
 									if (isTimeSensitive(dependencyList)) {
 										if (!dependencyList.getSensInfo().getSensTime().getRelativeStart()) {
 											if (hasTimeCome(abstractJobType)) {
