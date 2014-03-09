@@ -8,7 +8,9 @@ import com.likya.myra.commons.utils.NetTreeResolver.NetTree;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.jobs.JobHelper;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
+import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
+import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 
 public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 
@@ -53,20 +55,41 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 				for (NetTreeResolver.NetTree netTree : netTreeMap.values()) {
 
 					try {
-						boolean isAllFinished = true;
+						
+						boolean confirmForReset = true;
+
 						for (AbstractJobType abstractJobType : netTree.getMembers()) {
-							boolean isFinished = LiveStateInfoUtils.equalStates(abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0), StateName.FINISHED);
-							boolean isPending = LiveStateInfoUtils.equalStates(abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0), StateName.PENDING);
-							if (!isFinished) {
-								// TODO Buradaki çalışma mantığı tekrar gözden geçirilmeli !
-								isAllFinished = false;
+
+							boolean isDeadBeanch = abstractJobType.getGraphInfo().isSetDeadBranch();
+
+							if(isDeadBeanch) {
+								// he branch of live is dead due to dependency desision, so continue to next
+								continue;
 							}
+							
+							LiveStateInfo lastLiveStateInfo = LiveStateInfoUtils.getLastStateInfo(abstractJobType);
+							
+							boolean isPending = LiveStateInfoUtils.equalStates(lastLiveStateInfo, StateName.PENDING);
+							
 							if (!isPending) {
+								// One of the branch(s) is started, lower the check interval
 								freq = 1000;
 							}
+							
+							boolean isFinished = LiveStateInfoUtils.equalStates(lastLiveStateInfo, StateName.FINISHED);
+							boolean isLastJobOfBranch = abstractJobType.getGraphInfo().isSetLastNodeOfBranch();
+							boolean isBlockBranchOnFail = abstractJobType.getGraphInfo().isSetBlockBranchOnFail();
+							
+							boolean secondCond = (isFinished && isLastJobOfBranch && isBlockBranchOnFail && StatusName.FAILED.equals(lastLiveStateInfo.getStatusName()));
+							
+							if (!isFinished || secondCond) {
+								confirmForReset = false;
+								break;
+							}
+							
 						}
 
-						if (isAllFinished) {
+						if (confirmForReset) {
 							for (AbstractJobType abstractJobType : netTree.getMembers()) {
 								// System.err.println("Reset all NetTree members functionality not implemented yet !");
 								JobHelper.resetJob(abstractJobType);
