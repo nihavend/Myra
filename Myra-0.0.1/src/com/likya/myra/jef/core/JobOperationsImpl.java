@@ -201,7 +201,7 @@ public class JobOperationsImpl implements JobOperations {
 
 			AbstractJobType abstractJobType = coreFactory.getMonitoringOperations().getJobQueue().get(jobName).getAbstractJobType();
 			
-			ChangeLSI.forValue(abstractJobType, LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_DEACTIVATED));
+			ChangeLSI.forValue(abstractJobType, LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_DEACTIVATED, LiveStateInfoUtils.getLastStateInfo(abstractJobType).getStatusName().intValue()));
 			
 //			TODO yeni yapıda bu iş nasıl olacak ?
 //			synchronized (TlosServer.getDisabledJobQueue()) {
@@ -225,13 +225,17 @@ public class JobOperationsImpl implements JobOperations {
 
 			AbstractJobType abstractJobType = coreFactory.getMonitoringOperations().getJobQueue().get(jobId).getAbstractJobType();
 			
+			String logStr = "Enabling job >> " + abstractJobType.getId();
+			
 			if(LiveStateInfoUtils.equalStatesPD(abstractJobType)) {
 				if(normalize) {
-					CoreFactory.getLogger().info("Enabling job >> " + abstractJobType.getId() + " after normalizing !");
+					logStr = logStr + " after normalizing !";
 					JobHelper.resetJob(abstractJobType);
-				} else {
-					ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
+				} else { 
+					logStr = logStr + " without normalizing !";
 				}
+				ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, LiveStateInfoUtils.getLastStateInfo(abstractJobType).getStatusName());
+				CoreFactory.getLogger().info(logStr);
 			}
 			//			synchronized (TlosServer.getDisabledJobQueue()) {
 			//				TlosServer.getDisabledJobQueue().remove(jobName);
