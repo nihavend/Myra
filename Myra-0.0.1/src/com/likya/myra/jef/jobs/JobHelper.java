@@ -217,7 +217,7 @@ public class JobHelper {
 
 		updateDescStr(descStr, stringBufferForOUTPUT, stringBufferForERROR);
 
-		if (descStr.length() > 1) {
+		if (stringBufferForERROR != null && stringBufferForERROR.length() > 1) {
 			myLogger.error(" >>" + " writetErrorLogFromOutputs " + ">> " + logClassName + " : Job has error, terminating " + descStr.toString());
 		}
 
