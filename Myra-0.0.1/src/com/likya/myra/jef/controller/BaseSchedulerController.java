@@ -178,17 +178,9 @@ public class BaseSchedulerController {
 		// System.err.println("After : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime()));
 	}
 
-	protected boolean checkDependency(JobImpl meJob, DependencyList dependencyList) throws UnresolvedDependencyException {
+	protected boolean checkDependency(JobImpl currentJob) throws UnresolvedDependencyException {
 
-		if (dependencyList == null || dependencyList.getItemArray().length == 0) {
-			return true;
-		}
-
-		String dependencyExpression = dependencyList.getDependencyExpression().trim().toUpperCase();
-
-		Item[] dependencyArray = dependencyList.getItemArray();
-
-		boolean retValue = JobDependencyResolver.isResolved(CoreFactory.getLogger(), meJob.getAbstractJobType(), dependencyExpression, dependencyArray, JobQueueOperations.toAbstractJobTypeList(jobQueue));
+		boolean retValue = JobDependencyResolver.isResolved(CoreFactory.getLogger(), currentJob.getAbstractJobType(), JobQueueOperations.toAbstractJobTypeList(jobQueue));
 
 		return retValue;
 
