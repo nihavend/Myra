@@ -229,7 +229,9 @@ public class JobHelper {
 
 	public static void resetJob(AbstractJobType abstractJobType, LiveStateInfo liveStateInfo) {
 
-		boolean isByTime = StatusName.BYTIME.equals(LiveStateInfoUtils.getLastStateInfo(abstractJobType).getStatusName());
+		StatusName.Enum statusName = LiveStateInfoUtils.getLastStateInfo(abstractJobType).getStatusName();
+		
+		boolean isByTime = (statusName == null || StatusName.BYTIME.equals(statusName));
 
 		if (isByTime && Scheduler.scheduleForNextExecution(abstractJobType)) {
 			if (liveStateInfo == null) {
