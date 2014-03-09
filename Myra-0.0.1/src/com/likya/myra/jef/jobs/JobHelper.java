@@ -38,6 +38,7 @@ import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.Status;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
+import com.likya.xsd.myra.model.wlagen.TriggerDocument.Trigger;
 
 public class JobHelper {
 
@@ -223,24 +224,25 @@ public class JobHelper {
 	}
 
 	public static void resetJob(AbstractJobType abstractJobType) {
-		resetJob(abstractJobType, null);
+		// resetJob(abstractJobType, null);
+		evaluateTriggerType(abstractJobType, true);
 		return;
 	}
 
-	public static void resetJob(AbstractJobType abstractJobType, LiveStateInfo liveStateInfo) {
-
-		StatusName.Enum statusName = LiveStateInfoUtils.getLastStateInfo(abstractJobType).getStatusName();
-		
-		boolean isByTime = (statusName == null || StatusName.BYTIME.equals(statusName));
-
-		if (isByTime && Scheduler.scheduleForNextExecution(abstractJobType)) {
-			if (liveStateInfo == null) {
-				liveStateInfo = LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_IDLED, StatusName.INT_BYTIME);
-			}
-			ChangeLSI.forValue(abstractJobType, liveStateInfo);
-			CoreFactory.getLogger().info("Job id :" + abstractJobType.getId() + " is scheduled for new time " + abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime());
-		}
-	}
+//	public static void resetJob(AbstractJobType abstractJobType, LiveStateInfo liveStateInfo) {
+//
+//		StatusName.Enum statusName = LiveStateInfoUtils.getLastStateInfo(abstractJobType).getStatusName();
+//		
+//		boolean isByTime = (statusName == null || StatusName.BYTIME.equals(statusName));
+//
+//		if (isByTime && Scheduler.scheduleForNextExecution(abstractJobType)) {
+//			if (liveStateInfo == null) {
+//				liveStateInfo = LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_IDLED, StatusName.INT_BYTIME);
+//			}
+//			ChangeLSI.forValue(abstractJobType, liveStateInfo);
+//			CoreFactory.getLogger().info("Job id :" + abstractJobType.getId() + " is scheduled for new time " + abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime());
+//		}
+//	}
 
 	public static LiveStateInfo getStateInfo(AbstractJobType abstractJobType, int index) {
 		return abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(index);
@@ -284,6 +286,39 @@ public class JobHelper {
 
 		return envMap;
 
+	}
+	
+	private static void doControlForNextTime(AbstractJobType abstractJobType) {
+		if (Scheduler.scheduleForNextExecution(abstractJobType)) {
+			String startTime = MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime());
+			CoreFactory.getLogger().info("Job [" + abstractJobType.getId() + "] bir sonraki zamana kuruldu : " + startTime);
+			ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
+		}
+	}
+	
+	
+	public static void evaluateTriggerType(AbstractJobType abstractJobType, boolean forward) {
+		
+		int jobType = abstractJobType.getManagement().getTrigger().intValue();
+
+		switch (jobType) {
+		case Trigger.INT_EVENT:
+			ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYEVENT);
+			break;
+		case Trigger.INT_TIME:
+			if(forward) {
+				doControlForNextTime(abstractJobType);
+			} else {
+				ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
+			}
+			break;
+		case Trigger.INT_USER:
+			ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYUSER);
+			break;
+
+		default:
+			break;
+		}
 	}
 
 }
