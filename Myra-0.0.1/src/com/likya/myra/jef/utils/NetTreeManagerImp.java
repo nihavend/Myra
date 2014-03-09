@@ -60,7 +60,7 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 
 						for (AbstractJobType abstractJobType : netTree.getMembers()) {
 
-							boolean isDeadBeanch = abstractJobType.getGraphInfo().isSetDeadBranch();
+							boolean isDeadBeanch = abstractJobType.getGraphInfo().getDeadBranch();
 
 							if(isDeadBeanch) {
 								// he branch of live is dead due to dependency desision, so continue to next
@@ -77,8 +77,8 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 							}
 							
 							boolean isFinished = LiveStateInfoUtils.equalStates(lastLiveStateInfo, StateName.FINISHED);
-							boolean isLastJobOfBranch = abstractJobType.getGraphInfo().isSetLastNodeOfBranch();
-							boolean isBlockBranchOnFail = abstractJobType.getGraphInfo().isSetBlockBranchOnFail();
+							boolean isLastJobOfBranch = abstractJobType.getGraphInfo().getLastNodeOfBranch();
+							boolean isBlockBranchOnFail = abstractJobType.getGraphInfo().getBlockBranchOnFail();
 							
 							boolean secondCond = (isFinished && isLastJobOfBranch && isBlockBranchOnFail && StatusName.FAILED.equals(lastLiveStateInfo.getStatusName()));
 							
