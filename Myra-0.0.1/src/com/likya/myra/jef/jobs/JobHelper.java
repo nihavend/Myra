@@ -299,7 +299,9 @@ public class JobHelper {
 	
 	public static void evaluateTriggerType(AbstractJobType abstractJobType, boolean forward) {
 		
-		abstractJobType.getGraphInfo().setDeadBranch(false);
+		if(abstractJobType.getGraphInfo() != null) {
+			abstractJobType.getGraphInfo().setDeadBranch(false);
+		}
 		
 		int jobType = abstractJobType.getManagement().getTrigger().intValue();
 
