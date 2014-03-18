@@ -131,11 +131,6 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 										if (isTimeSensitive(dependencyList) && dependencyList.getSensInfo().getSensTime().getRelativeStart()) {
 											abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(null);
 										}
-										// long startTime = Calendar.getInstance().getTimeInMillis();
-										// boolean lastRes = 
-										// atLeastOneParentNOTPI(abstractJobType, ">>");
-										// System.err.println("Fark :" + (Calendar.getInstance().getTimeInMillis() - startTime));
-										// System.err.println(lastRes);
 										liveStateInfo.setSubstateName(SubstateName.READY);
 										liveStateInfo.setStatusName(StatusName.WAITING);
 									}
@@ -143,71 +138,11 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 							}
 						}
 
-						//						if (LiveStateInfoUtils.equalStatesPIT(liveStateInfo)) {
-						//							// Waiting for time to execute
-						//							Date scheduledTime = abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime();
-						//							Date currentTime = Calendar.getInstance().getTime();
-						//
-						//							if (scheduledTime.before(currentTime)) {
-						//								if (checkDependency(scheduledJob, dependencyList)) {
-						//									executeJob(scheduledJob);
-						//								} else {
-						//									// Time ok but dependency, so change status !
-						//									liveStateInfo.setSubstateName(SubstateName.IDLED);
-						//									liveStateInfo.setStatusName(StatusName.WAITING);
-						//								}
-						//							}
-						//
-						//						} else if (LiveStateInfoUtils.equalStatesPIW(liveStateInfo)) {
-						//
-						//							// Waiting for dependency to execute
-						//							if (checkDependency(scheduledJob, dependencyList)) {
-						//								executeJob(scheduledJob);
-						//							}
-						//						}
-
 					} catch (UnresolvedDependencyException ude) {
 						LiveStateInfoUtils.insertNewLiveStateInfo(scheduledJob.getAbstractJobType(), StateName.INT_CANCELLED, SubstateName.INT_STOPPED, StatusName.INT_BYEVENT);
 						logger.fatal("Job " + scheduledJob.getAbstractJobType().getId() + " disabled due to invalid dependency definiton !");
 						ude.printStackTrace();
 					}
-
-					//					if (scheduledJob.getJobRuntimeProperties().getJobSimpleProperties().getStatus() == JobProperties.READY) {
-					//					
-					//							Date scheduledTime = scheduledJob.getJobProperties().getTime();
-					//							Date currentTime = Calendar.getInstance().getTime();
-					//
-					//							if (scheduledTime.before(currentTime)) {
-					//								if (dependentJobList.get(0).getJobKey().equals(ScenarioLoader.UNDEFINED_VALUE)) {
-					//									executeJob(scheduledJob);
-					//								} else {
-					//									if (checkDependency(scheduledJob, dependentJobList)) {
-					//										executeJob(scheduledJob);
-					//									} else {
-					//										if (scheduledJob.getJobProperties().getStatus() != JobProperties.SKIP) {
-					//											scheduledJob.getJobProperties().setStatus(JobProperties.WAITING);
-					//										}
-					//									}
-					//
-					//								}
-					//							}
-					//
-					//						} else if (scheduledJob.getJobProperties().getStatus() == JobProperties.WAITING) {
-					//
-					//							if (checkDependency(scheduledJob, dependentJobList)) {
-					//								executeJob(scheduledJob);
-					//							} else {
-					//								if (scheduledJob.getJobProperties().getStatus() != JobProperties.SKIP) {
-					//									scheduledJob.getJobProperties().setStatus(JobProperties.WAITING);
-					//								}
-					//							}
-					//
-					//						}
-					//					} else if (scheduledJob instanceof RepetitiveExternalProgram) {
-					//						executeRepetitiveJob(scheduledJob);
-					//					} else if (scheduledJob instanceof ManuelExternalProgram) {
-					//						executeManuelJob(scheduledJob);
-					//					}
 
 				} // end of while
 
