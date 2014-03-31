@@ -122,7 +122,7 @@ public class Scheduler {
 			if (firstDay != null) {
 				int firstDayOfMonth = 1;
 				restCal = MyraDateUtils.setTimePart(jsPlannedStartTime);
-				restCal.set(Calendar.MONTH, restCal.get(Calendar.MONTH) + 1);
+				restCal.add(Calendar.MONTH, 1);
 				restCal.set(Calendar.DAY_OF_MONTH, firstDayOfMonth);
 				floatingSchedules.add(restCal);
 				CoreFactory.getLogger().debug("Option for firstDayOfMonth : " + MyraDateUtils.getDate(restCal));
@@ -132,7 +132,7 @@ public class Scheduler {
 				int lastDayOfMonth = Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH);
 				restCal = MyraDateUtils.setTimePart(jsPlannedStartTime);
 				if (Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == lastDayOfMonth) {
-					restCal.set(Calendar.MONTH, restCal.get(Calendar.MONTH) + 1);
+					restCal.add(Calendar.MONTH, 1);
 					lastDayOfMonth = restCal.getActualMaximum(Calendar.DAY_OF_MONTH);
 				}
 				restCal.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
