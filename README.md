@@ -36,4 +36,4 @@ Copyright (c) 2008-2013, Likya Bilgi Teknolojileri ve İlet. Hiz. Ltd. Şti. All
 Visit [www.likyateknoloji.com](http://www.likyateknoloji.com/) for more info.
 
 #### Note
-Please get the these [jars](http://www.tlos.com.tr/myra/) from our server.
+Please get these [jars](http://www.tlos.com.tr/myra/) from our server.
