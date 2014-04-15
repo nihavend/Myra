@@ -34,3 +34,6 @@ Myra is available under the Apache 2 License.
 Copyright (c) 2008-2013, Likya Bilgi Teknolojileri ve İlet. Hiz. Ltd. Şti. All Rights Reserved.
 
 Visit [www.likyateknoloji.com](http://www.likyateknoloji.com/) for more info.
+
+#### Note
+Please get the these [jars](http://www.tlos.com.tr/myra/) from our server.
