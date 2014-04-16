@@ -122,7 +122,7 @@
 			<version>0.5</version>
 		</dependency>
 		<dependency>
-			<groupId>jsch</groupId>
+			<groupId>com.jcraft</groupId>
 			<artifactId>jsch</artifactId>
 			<version>0.1.50</version>
 		</dependency>
