@@ -1,0 +1,104 @@
+<myra:jobList xmlns:myra="http://www.likyateknoloji.com/myra-joblist" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:myra-jobprops="http://www.likyateknoloji.com/myra-jobprops" xmlns:wla="http://www.likyateknoloji.com/wla-gen"
+	xmlns:lik="http://www.likyateknoloji.com/likya-gen" xmlns:myra-stateinfo="http://www.likyateknoloji.com/myra-stateinfo">
+	<myra:genericJob xsi:type="myra:simpleProperties" handlerURI="com.likya.myra.jef.jobs.ExecuteInShell"
+		Id="22" groupId="my_group" agentId="1">
+		<myra-jobprops:baseJobInfos>
+			<wla:jsName>My name is</wla:jsName>
+			<lik:jobTypeDetails>
+				<lik:jobCommandType>BATCH PROCESS</lik:jobCommandType>
+				<lik:jobCommand>job1.sh birinci ikinci ucuncu</lik:jobCommand>
+				<lik:jobPath>jobs</lik:jobPath>
+				<lik:argValues>dorduncu besinci altıncı</lik:argValues>
+				<lik:envVariables>
+					<lik:entry key="yedinci">yedinci</lik:entry>
+					<lik:entry key="sekizinci">sekizinci</lik:entry>
+					<lik:entry key="dokuzuncu">dokuzuncu</lik:entry>
+				</lik:envVariables>
+			</lik:jobTypeDetails>
+			<wla:jobLogFile>demo.log</wla:jobLogFile>
+			<wla:jobLogPath>./</wla:jobLogPath>
+			<wla:oSystem>MACOS</wla:oSystem>
+			<wla:jobPriority>1</wla:jobPriority>
+			<myra-jobprops:jsIsActive>true</myra-jobprops:jsIsActive>
+			<lik:userId>1</lik:userId>
+		</myra-jobprops:baseJobInfos>
+		<myra-jobprops:graphInfo />
+		<!--  myra-jobprops:DependencyList>
+			<wla:Item dependencyID="mydep">
+				<wla:jsName>depJsName</wla:jsName>
+				<wla:jsId>1</wla:jsId>
+				<wla:jsType>JOB</wla:jsType>
+				<lik:comment>no comment</lik:comment>
+				<myra-stateinfo:jsDependencyRule>
+					<myra-stateinfo:StateName>PENDING</myra-stateinfo:StateName>
+					<myra-stateinfo:SubstateName>IDLED</myra-stateinfo:SubstateName>
+					<myra-stateinfo:StatusName>BYTIME</myra-stateinfo:StatusName>
+				</myra-stateinfo:jsDependencyRule>
+			</wla:Item>
+			<myra-jobprops:DependencyExpression>I can not express my deps !</myra-jobprops:DependencyExpression>
+		</myra-jobprops:DependencyList-->
+		<myra-stateinfo:stateInfos>
+			<myra-stateinfo:JobStatusList>
+				<myra-stateinfo:JobStatus>
+					<myra-stateinfo:StatusName>SUCCESS</myra-stateinfo:StatusName>
+					<myra-stateinfo:Desc />
+					<myra-stateinfo:ReturnCodeList osType="MACOS">
+						<myra-stateinfo:ReturnCode>
+							<myra-stateinfo:Code>0</myra-stateinfo:Code>
+							<myra-stateinfo:Desc>Açıklama</myra-stateinfo:Desc>
+						</myra-stateinfo:ReturnCode>
+					</myra-stateinfo:ReturnCodeList>
+				</myra-stateinfo:JobStatus>
+			</myra-stateinfo:JobStatusList>
+			<myra-stateinfo:LiveStateInfos>
+				<myra-stateinfo:LiveStateInfo LSIDateTime="2014-01-30T23:41:58.595+02:00">
+					<myra-stateinfo:StateName>PENDING</myra-stateinfo:StateName>
+					<myra-stateinfo:SubstateName>IDLED</myra-stateinfo:SubstateName>
+					<myra-stateinfo:StatusName>BYTIME</myra-stateinfo:StatusName>
+				</myra-stateinfo:LiveStateInfo>
+			</myra-stateinfo:LiveStateInfos>
+		</myra-stateinfo:stateInfos>
+		<myra-jobprops:management>
+			<wla:trigger>TIME</wla:trigger>
+			<wla:timeManagement>
+				<wla:bornedPlannedTime>
+					<wla:startTime>2014-03-09T11:43:20.285+02:00</wla:startTime>
+					<wla:stopTime>2024-05-30T23:41:58.352+02:00</wla:stopTime>
+				</wla:bornedPlannedTime>
+				<wla:jsPlannedTime>
+					<wla:startTime>2014-01-30T23:41:58.357+02:00</wla:startTime>
+					<wla:stopTime>2014-01-30T23:41:58.357+02:00</wla:stopTime>
+				</wla:jsPlannedTime>
+				<wla:jsRealTime>
+					<wla:startTime>2014-01-30T23:41:58.373+02:00</wla:startTime>
+					<wla:stopTime>2014-01-30T23:41:58.373+02:00</wla:stopTime>
+				</wla:jsRealTime>
+				<wla:jsTimeOut>
+					<lik:value_integer>100</lik:value_integer>
+					<lik:unit>SECONDS</lik:unit>
+				</wla:jsTimeOut>
+				<wla:expectedTime>
+					<lik:value_integer>100</lik:value_integer>
+					<lik:unit>SECONDS</lik:unit>
+				</wla:expectedTime>
+			</wla:timeManagement>
+			<wla:cascadingConditions>
+				<wla:runEvenIfFailed>true</wla:runEvenIfFailed>
+				<wla:jobSafeToRestart>true</wla:jobSafeToRestart>
+				<wla:jobAutoRetryInfo step="PT30M">
+					<wla:jobAutoRetry>true</wla:jobAutoRetry>
+				</wla:jobAutoRetryInfo>
+			</wla:cascadingConditions>
+		</myra-jobprops:management>
+		<myra-jobprops:scheduleInfo>
+			<myra-jobprops:daysOfWeekIntType>1</myra-jobprops:daysOfWeekIntType>
+			<myra-jobprops:daysOfWeekIntType>2</myra-jobprops:daysOfWeekIntType>
+			<myra-jobprops:daysOfWeekIntType>3</myra-jobprops:daysOfWeekIntType>
+			<myra-jobprops:daysOfWeekIntType>4</myra-jobprops:daysOfWeekIntType>
+			<myra-jobprops:daysOfWeekIntType>5</myra-jobprops:daysOfWeekIntType>
+			<myra-jobprops:daysOfWeekIntType>6</myra-jobprops:daysOfWeekIntType>
+			<myra-jobprops:daysOfWeekIntType>7</myra-jobprops:daysOfWeekIntType>
+		</myra-jobprops:scheduleInfo>
+	</myra:genericJob>
+</myra:jobList>
