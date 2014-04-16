@@ -34,3 +34,15 @@ Myra is available under the Apache 2 License.
 Copyright (c) 2008-2013, Likya Bilgi Teknolojileri ve İlet. Hiz. Ltd. Şti. All Rights Reserved.
 
 Visit [www.likyateknoloji.com](http://www.likyateknoloji.com/) for more info.
+
+#### Note
+Please get these [jars](http://www.tlos.com.tr/myra/) from our server.
+Install to local repo :
+
+mvn install:install-file -Dfile=/downloadedpath/myra-commons-0.0.1.jar  -DgroupId=likyateknoloji -DartifactId=myra-commons -Dversion=0.0.1 -Dpackaging=jar 
+
+mvn install:install-file -Dfile=/downloadedpath/myra-schema-0.0.1.jar  -DgroupId=likyateknoloji -DartifactId=myra-schema -Dversion=0.0.1 -Dpackaging=jar 
+
+mvn install:install-file -Dfile=/downloadedpath/likya-commons-commons-0.0.1.jar  -DgroupId=likyateknoloji -DartifactId=likya-commons-commons -Dversion=0.0.1 -Dpackaging=jar 
+
+Thanks to [mkyong]( http://www.mkyong.com/maven/how-to-include-library-manully-into-maven-local-repository/) for maven install guide
