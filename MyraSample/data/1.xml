@@ -7,9 +7,9 @@
 			<wla:jsName>My name is</wla:jsName>
 			<lik:jobTypeDetails>
 				<lik:jobCommandType>BATCH PROCESS</lik:jobCommandType>
-				<lik:jobCommand>job1.sh birinci ikinci ucuncu</lik:jobCommand>
+				<lik:jobCommand>job1.sh</lik:jobCommand>
 				<lik:jobPath>jobs</lik:jobPath>
-				<lik:argValues>dorduncu besinci altıncı</lik:argValues>
+				<lik:argValues></lik:argValues>
 				<lik:envVariables>
 					<lik:entry key="yedinci">yedinci</lik:entry>
 					<lik:entry key="sekizinci">sekizinci</lik:entry>
