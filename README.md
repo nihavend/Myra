@@ -43,6 +43,6 @@ mvn install:install-file -Dfile=/downloadedpath/myra-commons-0.0.1.jar  -DgroupI
 
 mvn install:install-file -Dfile=/downloadedpath/myra-schema-0.0.1.jar  -DgroupId=likyateknoloji -DartifactId=myra-schema -Dversion=0.0.1 -Dpackaging=jar 
 
-mvn install:install-file -Dfile=/downloadedpath/likya-commons-commons-0.0.1.jar  -DgroupId=likyateknoloji -DartifactId=likya-commons-commons -Dversion=0.0.1 -Dpackaging=jar 
+mvn install:install-file -Dfile=/downloadedpath/likya-commons-0.0.1.jar  -DgroupId=likyateknoloji -DartifactId=likya-commons -Dversion=0.0.1 -Dpackaging=jar 
 
 Thanks to [mkyong]( http://www.mkyong.com/maven/how-to-include-library-manully-into-maven-local-repository/) for maven install guide
