@@ -126,5 +126,10 @@
 			<artifactId>jsch</artifactId>
 			<version>0.1.50</version>
 		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.2</version>
+		</dependency>
 	</dependencies>
 </project>
