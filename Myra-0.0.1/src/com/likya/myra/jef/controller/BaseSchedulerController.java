@@ -91,9 +91,12 @@ public class BaseSchedulerController {
 	}
 
 	/**
-	 * @param dependencyArray
+	 * 
+	 * @param abstractJobType
+	 * @param indent
 	 * @return true if at least one of the dependent jobs's status is different from PENDING-IDLED
 	 */
+	
 	protected boolean atLeastOneParentNOTPI(AbstractJobType abstractJobType, String indent) {
 
 		// System.err.println(indent + " Checking for job " + abstractJobType.getId());
