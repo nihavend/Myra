@@ -35,6 +35,11 @@ import com.likya.myra.jef.utils.NetTreeManagerInterface;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.joblist.JobListDocument;
 
+/**
+ * 
+ * @author serkan taş
+ *
+ */
 public class CoreFactoryBase {
 
 	private static final String version = "0.0.1";
@@ -53,8 +58,6 @@ public class CoreFactoryBase {
 	 * For current version it is limited to one
 	 * For future releases, it may be extended
 	 * according to distribution strategy
-	 * 
-	 * @author serkan taş
 	 */
 
 	protected int numOfSchedulerControllers = 1;
