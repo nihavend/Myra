@@ -30,8 +30,6 @@ public class SortType implements Comparable<SortType>,Serializable {
 	/**
 	 * Bu bölüm, sıralama yapılabilmesi amacı ile eklendi
 	 * Örnek : Collections.sort(arrayList);
-	 * @param jobRuntimeProperties
-	 * @return
 	 */
 	
 	public int compareTo(SortType sortType) {
