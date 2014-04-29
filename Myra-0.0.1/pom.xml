@@ -16,9 +16,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>likyateknoloji</groupId>
+	<groupId>com.likyateknoloji</groupId>
 	<artifactId>myra</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<!-- For release  
 	<version>0.0.1</version>
+	-->
 	<name>Myra</name>
 	<description>Myra Job Scheduling and Execution Framework</description>
 
@@ -43,8 +46,8 @@
 
 	<developers>
 		<developer>
-			<id>serkan</id>
-			<name>serkan taş</name>
+			<id>hulagu</id>
+			<name>Serkan Taş</name>
 			<email>serkan.tas@likyateknoloji.com</email>
 		</developer>
 	</developers>
@@ -58,6 +61,18 @@
 		<name>Likya Bilgi Teknolojileri ve İlet. Hiz. Ltd. Şti.</name>
 		<url>http://www.likyateknoloji.com/</url>
 	</organization>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<name>Maven2 Snapshot Repository</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
@@ -80,6 +95,67 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<properties>
+				<javadoc>true</javadoc>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>2.2.1</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.9.1</version>
+						<configuration>
+							<additionalJOption>-J-Duser.country=EN</additionalJOption>
+							<additionalJOption>-J-Duser.language=en</additionalJOption>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>									
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<executable>/usr/local/bin/gpg</executable>
+						</configuration>
+					</plugin>
+				</plugins>
+
+			</build>
+		</profile>
+	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>likyateknoloji</groupId>
