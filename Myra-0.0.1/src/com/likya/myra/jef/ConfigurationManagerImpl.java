@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import com.likya.myra.commons.utils.XMLValidations;
 import com.likya.xsd.myra.model.config.MyraConfigDocument;
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
+import com.likya.xsd.myra.model.config.UsejobnamesforlogDocument.Usejobnamesforlog;
 
 public class ConfigurationManagerImpl implements ConfigurationManager {
 
@@ -33,6 +34,12 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 	
 	private boolean isRecovered = false;
 
+	public ConfigurationManagerImpl() {
+		super();
+		MyraConfig myraConfig = setDefaults();
+		this.myraConfig = myraConfig;
+	}
+	
 	public ConfigurationManagerImpl(MyraConfigDocument myraConfigDocument) {
 		super();
 
@@ -42,6 +49,27 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 
 		myraConfig = myraConfigDocument.getMyraConfig();
 
+	}
+	
+	private MyraConfig setDefaults() {
+		
+		MyraConfigDocument myraConfigDocument = MyraConfigDocument.Factory.newInstance();
+		myraConfigDocument.addNewMyraConfig();
+		
+		MyraConfig myraConfig = myraConfigDocument.getMyraConfig();
+		myraConfig.setPersistent(false);
+		myraConfig.setNormalize(false);
+		myraConfig.setFrequency((short)1);
+		myraConfig.setHigherThreshold((short)10);
+		myraConfig.setLowerThreshold((short)3);
+		myraConfig.setLogPath("./");
+		myraConfig.setUsejobnamesforlog(Usejobnamesforlog.NO);
+		myraConfig.setLogFileExt(".log");
+		myraConfig.setGlobalLogPath("./");
+		myraConfig.setLogbuffersize((short)800);
+		myraConfig.setLogpagesize((short)10);
+		
+		return myraConfig;
 	}
 
 	public MyraConfig getMyraConfig() {
