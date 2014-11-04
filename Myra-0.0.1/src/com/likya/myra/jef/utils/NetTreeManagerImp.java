@@ -51,42 +51,44 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 
 			int freq = 1000;
 			while (loop) {
+				
+				try {
 
-				for (NetTreeResolver.NetTree netTree : netTreeMap.values()) {
+					for (NetTreeResolver.NetTree netTree : netTreeMap.values()) {
 
-					try {
-						
 						boolean confirmForReset = true;
 
 						for (AbstractJobType abstractJobType : netTree.getMembers()) {
 
 							boolean isDeadBeanch = abstractJobType.getGraphInfo().getDeadBranch();
 
-							if(isDeadBeanch) {
-								// he branch of live is dead due to dependency desision, so continue to next
+							if (isDeadBeanch) {
+								// he branch of live is dead due to dependency
+								// desision, so continue to next
 								continue;
 							}
-							
+
 							LiveStateInfo lastLiveStateInfo = LiveStateInfoUtils.getLastStateInfo(abstractJobType);
-							
+
 							boolean isPending = LiveStateInfoUtils.equalStates(lastLiveStateInfo, StateName.PENDING);
-							
+
 							if (!isPending) {
-								// One of the branch(s) is started, lower the check interval
+								// One of the branch(s) is started, lower the
+								// check interval
 								freq = 1000;
 							}
-							
+
 							boolean isFinished = LiveStateInfoUtils.equalStates(lastLiveStateInfo, StateName.FINISHED);
 							boolean isLastJobOfBranch = abstractJobType.getGraphInfo().getLastNodeOfBranch();
 							boolean isBlockBranchOnFail = abstractJobType.getGraphInfo().getBlockBranchOnFail();
-							
+
 							boolean secondCond = (isFinished && isLastJobOfBranch && isBlockBranchOnFail && StatusName.FAILED.equals(lastLiveStateInfo.getStatusName()));
-							
+
 							if (!isFinished || secondCond) {
 								confirmForReset = false;
 								break;
 							}
-							
+
 						}
 
 						if (confirmForReset) {
@@ -97,10 +99,12 @@ public class NetTreeManagerImp implements NetTreeManagerInterface, Runnable {
 							freq = 60000;
 						}
 
-						Thread.sleep(freq);
-					} catch (InterruptedException e) {
-						CoreFactory.getLogger().info(e.getMessage());
 					}
+
+					Thread.sleep(freq);
+					
+				} catch (InterruptedException e) {
+					CoreFactory.getLogger().info(e.getMessage());
 				}
 			}
 		}
