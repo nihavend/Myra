@@ -88,16 +88,18 @@ public class CoreFactoryBase {
 			abstractJobTypes = jobListDocument.getJobList().getGenericJobArray();
 		} else {
 			abstractJobTypes = jobListDocument.getJobList().getGenericJobArray();
-			if(abstractJobTypes.length == 0) {
-				throw new Exception("jobListDocument.getJobList size is 0 !");
-			}
-			
-			jobQueue.putAll(JobQueueOperations.transformJobQueue(jobListDocument));
-			
-			HashMap<String, AbstractJobType> abstractJobTypeQueue = JobQueueOperations.toAbstractJobTypeList(jobQueue);
+//			if(abstractJobTypes.length == 0) {
+//				throw new Exception("jobListDocument.getJobList size is 0 !");
+//			}
 
-			if (!DependencyOperations.validateDependencyList(logger, abstractJobTypeQueue)) {
-				throw new Exception("JobList.xml is dependency definitions are not  valid !");
+			if(abstractJobTypes.length != 0) {
+				jobQueue.putAll(JobQueueOperations.transformJobQueue(jobListDocument));
+				
+				HashMap<String, AbstractJobType> abstractJobTypeQueue = JobQueueOperations.toAbstractJobTypeList(jobQueue);
+	
+				if (!DependencyOperations.validateDependencyList(logger, abstractJobTypeQueue)) {
+					throw new Exception("JobList.xml is dependency definitions are not  valid !");
+				}
 			}
 			
 			

@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.likya.myra.jef.core;
 
+import com.likya.xsd.myra.model.joblist.AbstractJobType;
+
 
 public interface JobOperations {
 	
@@ -39,4 +41,13 @@ public interface JobOperations {
 	public void enableJob(String jobId, boolean normalize);
 
 	public String setJobInputParam(String jobId, String paramString) ;
+	
+	public void addJob(AbstractJobType abstractJobType) throws Exception;
+	
+	public void removeJob(String jobId) throws Exception;
+	
+	public void updateJob(AbstractJobType abstractJobType) throws Exception;
+	
+	public void readJob(String jobId)  throws Exception;
+	
 }

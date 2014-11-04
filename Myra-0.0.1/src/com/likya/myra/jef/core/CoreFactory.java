@@ -17,12 +17,16 @@ package com.likya.myra.jef.core;
 
 import java.util.HashMap;
 
+import com.likya.myra.jef.ConfigurationManager;
+import com.likya.myra.jef.ConfigurationManagerImpl;
 import com.likya.myra.jef.InputStrategy;
+import com.likya.myra.jef.InputStrategyImpl;
 import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.controller.ControllerInterface;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.model.InstanceNotFoundException;
 import com.likya.myra.jef.model.MyraException;
+import com.likya.xsd.myra.model.joblist.JobListDocument;
 
 public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface {
 
@@ -65,7 +69,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 	public static CoreFactoryInterface getInstance() {
 		if (coreFactory == null) {
 			try {
-				throw new InstanceNotFoundException("Use getInstance(ConfigurationManagerBean configurationManagerBean) ");
+				throw new InstanceNotFoundException("Use getInstance with parameters !");
 			} catch (InstanceNotFoundException e) {
 				e.printStackTrace();
 				return null;
@@ -73,14 +77,37 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		}
 		return (CoreFactoryInterface) coreFactory;
 	}
+	
+	public static CoreFactoryInterface getInstance(OutputStrategy outputStrategy) {
+		
+		InputStrategy inputStrategy = new InputStrategyImpl();
+
+		return getInstance(inputStrategy, outputStrategy);
+	}
 
 	public static CoreFactoryInterface getInstance(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
 		if (coreFactory == null) {
+			validateInputStrategy(inputStrategy);
 			coreFactory = new CoreFactory(inputStrategy, outputStrategy);
 		}
 		return (CoreFactoryInterface) coreFactory;
 	}
 
+	private static void validateInputStrategy(InputStrategy inputStrategy) {
+		
+		if(inputStrategy.getConfigurationManager() == null) {
+			ConfigurationManager configurationManager = new ConfigurationManagerImpl();
+			inputStrategy.setConfigurationManager(configurationManager);
+		}
+		
+		if(inputStrategy.getJobListDocument() == null) {
+			JobListDocument jobListDocument = JobListDocument.Factory.newInstance();
+			jobListDocument.addNewJobList();
+			inputStrategy.setJobListDocument(jobListDocument);
+		}
+		
+	}
+	
 	protected void start() throws Throwable {
 		if (coreFactory != null) {
 			if (validateFactory()) {

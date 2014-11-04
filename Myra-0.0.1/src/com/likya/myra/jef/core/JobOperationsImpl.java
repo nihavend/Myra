@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.likya.myra.jef.core;
 
+import java.net.UnknownServiceException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -294,4 +295,20 @@ public class JobOperationsImpl implements JobOperations {
 
 	}
 	
+	
+	public void addJob(AbstractJobType abstractJobType) throws Exception {
+		throw new UnknownServiceException("Not implemented yet !");
+	}
+	
+	public void removeJob(String jobId)  throws Exception {
+		throw new UnknownServiceException("Not implemented yet !");
+	}
+	
+	public void updateJob(AbstractJobType abstractJobType)  throws Exception {
+		throw new UnknownServiceException("Not implemented yet !");
+	}
+	
+	public void readJob(String jobId)  throws Exception {
+		throw new UnknownServiceException("Use monitoringOperations.getJobQueue().get(jobId); instead !");
+	}
 }
