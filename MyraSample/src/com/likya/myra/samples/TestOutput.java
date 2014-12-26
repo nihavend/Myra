@@ -16,7 +16,7 @@ public class TestOutput implements OutputStrategy, Serializable {
 	public void sendDataObject(Object dataObject) {
 		
 		OutputData outputData = (OutputData) dataObject;
-		
+		//TODO must be considered have been synchronized
 		outputList.add(outputData);
 		
 	}

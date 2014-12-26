@@ -35,7 +35,13 @@ public class MyraFWTester {
 			}
 		}
 		
-		CoreFactory coreFactory = DataFileLoader.loadAndStart(senaryoDosya);
+		CoreFactory coreFactory = null;
+				
+		if(senaryoDosya != null) {
+			coreFactory = DataFileLoader.loadAndStart(senaryoDosya);
+		} else {
+			coreFactory = DataFileLoader.resetAndStart();
+		}
 		
 		globalCarrier.setCoreFactory(coreFactory);
 

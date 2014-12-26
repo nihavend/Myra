@@ -49,8 +49,7 @@ public class CommandList {
 		System.out.println("30 : İş durumunu göster");
 		System.out.println("31 : Yeni iş ekle");
 		System.out.println("32 : İşi güncelle");
-		System.out.println("33 : İş durumunu göster");
-		System.out.println("34 : İşi sil");
+		System.out.println("33 : İşi sil");
 		
 		System.out.println();
 		System.out.println("İzleme komutları :");
@@ -280,10 +279,7 @@ public class CommandList {
 			case "32": // 32 : İşi güncelle
 				break;
 
-			case "33": // 33 : İş durumunu göster
-				break;
-
-			case "34": // 34 : İşi sil
+			case "33": // 33 : İşi sil
 				break;
 
 			// İzleme komutları	
