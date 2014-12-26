@@ -86,10 +86,10 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 	}
 
 	public static CoreFactoryInterface getInstance(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
-		if (coreFactory == null) {
+		// if (coreFactory == null) {
 			validateInputStrategy(inputStrategy);
 			coreFactory = new CoreFactory(inputStrategy, outputStrategy);
-		}
+		// }
 		return (CoreFactoryInterface) coreFactory;
 	}
 
