@@ -32,5 +32,7 @@ public interface ManagementOperations {
 	public CoreStateInfo getExecutionState();
 	
 	public void setExecutionState(CoreStateInfo coreStateInfo);
+	
+	public void sendReIndexSignal();
 
 }

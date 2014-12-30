@@ -129,6 +129,14 @@ public class ManagementOperationsImpl implements ManagementOperations {
 
 		gracefulShutDown();
 	}
+	
+	public void sendReIndexSignal() { 
+		HashMap<String, ControllerInterface> controllerContainer = coreFactory.getControllerContainer();
+		for (String key : controllerContainer.keySet()) {
+			SchedulerController schedulerController = (SchedulerController) controllerContainer.get(key);
+			schedulerController.setReIndexJobQueue(true);
+		}
+	}
 
 	@Override
 	public CoreStateInfo getExecutionState() {
