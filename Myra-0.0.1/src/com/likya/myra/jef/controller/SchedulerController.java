@@ -67,6 +67,12 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 		while (executionPermission) {
 
 			try {
+				
+				if(isReIndexJobQueue()) {
+					setReIndexJobQueue(false);
+					jobIndex = JobQueueOperations.createProrityIndex(jobQueue);
+					Collections.sort(jobIndex);
+				}
 
 				Iterator<SortType> indexIterator = jobIndex.iterator();
 
@@ -164,7 +170,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 			if(System.console() != null) { 
 				System.err.print(PrintVantil.getVantil() + "\r");
 			} else {
-				System.err.print(".");
+				// System.err.print(".");
 			}
 		}
 
