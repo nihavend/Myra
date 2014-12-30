@@ -313,8 +313,6 @@ public class JobQueueOperations {
 
 		HashMap<String, JobImpl> jobQueue = new HashMap<String, JobImpl>();
 
-		JobRuntimeInterface jobRuntimeInterface = new JobRuntimeProperties();
-
 		Object[] objectArray = jobListDocument.getJobList().getGenericJobArray();
 
 		ArrayIterator jobArrayIterator = new ArrayIterator(objectArray);
@@ -322,76 +320,84 @@ public class JobQueueOperations {
 		while (jobArrayIterator.hasNext()) {
 
 			AbstractJobType abstractJobType = (AbstractJobType) jobArrayIterator.next();
-
-			String handlerUri = abstractJobType.getHandlerURI();
-
-			Class<?> abstractClass;
-			try {
-				// abstractClass = Class.forName("com.likya.myra.jef.jobs.ExecuteInShell");
-				abstractClass = Class.forName(handlerUri);
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				return null;
-			}
-
-			JobImpl jobImpl = null;
-
-			try {
-				jobImpl = (JobImpl) abstractClass.getDeclaredConstructor(new Class[] { AbstractJobType.class, JobRuntimeInterface.class }).newInstance(abstractJobType, jobRuntimeInterface);
-				jobImpl.getJobInfo();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			//			switch (jobType) {
-			//			case JobCommandType.INT_BATCH_PROCESS:
-			//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
-			//				((ExecuteInShell) jobImpl).setShell(true);
-			//				break;
-			//			case JobCommandType.INT_SYSTEM_COMMAND:
-			//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
-			//				((ExecuteInShell) jobImpl).setShell(false);
-			//				break;
-			//			case JobCommandType.INT_REMOTE_SHELL:
-			//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
-			//				break;
-			//
-			//			default:
-			//				break;
-			//			}
-
-			CoreFactory.getLogger().info("Transformed " + handlerUri + " Job Id : " + abstractJobType.getId());
-
-			// levelize the initial state according to trigger value
 			
-			Management management = abstractJobType.getManagement();
-			
-			JobHelper.evaluateTriggerType(abstractJobType, false);
-			
-			// remove the difference between borned and planned time 
-			management.getTimeManagement().getJsPlannedTime().setStartTime(management.getTimeManagement().getBornedPlannedTime().getStartTime());
-			management.getTimeManagement().getJsPlannedTime().setStopTime(management.getTimeManagement().getBornedPlannedTime().getStopTime());
-			
+			JobImpl jobImpl = transformJobTypeToImpl(abstractJobType);
+
+			CoreFactory.getLogger().info("Transformed " + abstractJobType.getHandlerURI() + " Job Id : " + abstractJobType.getId());
+
 			jobQueue.put(abstractJobType.getId(), jobImpl);
 		}
 
 		return jobQueue;
+	}
+	
+	public static JobImpl transformJobTypeToImpl(AbstractJobType abstractJobType) {
+
+		String handlerUri = abstractJobType.getHandlerURI();
+
+		Class<?> abstractClass;
+		try {
+			// abstractClass = Class.forName("com.likya.myra.jef.jobs.ExecuteInShell");
+			abstractClass = Class.forName(handlerUri);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+		// levelize the initial state according to trigger value
+
+		Management management = abstractJobType.getManagement();
+
+		JobHelper.evaluateTriggerType(abstractJobType, false);
+
+		// remove the difference between borned and planned time 
+		management.getTimeManagement().getJsPlannedTime().setStartTime(management.getTimeManagement().getBornedPlannedTime().getStartTime());
+		management.getTimeManagement().getJsPlannedTime().setStopTime(management.getTimeManagement().getBornedPlannedTime().getStopTime());
+		
+		JobRuntimeInterface jobRuntimeInterface = new JobRuntimeProperties();
+		JobImpl jobImpl = null;
+
+		try {
+			jobImpl = (JobImpl) abstractClass.getDeclaredConstructor(new Class[] { AbstractJobType.class, JobRuntimeInterface.class }).newInstance(abstractJobType, jobRuntimeInterface);
+			jobImpl.getJobInfo();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		//			switch (jobType) {
+		//			case JobCommandType.INT_BATCH_PROCESS:
+		//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
+		//				((ExecuteInShell) jobImpl).setShell(true);
+		//				break;
+		//			case JobCommandType.INT_SYSTEM_COMMAND:
+		//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
+		//				((ExecuteInShell) jobImpl).setShell(false);
+		//				break;
+		//			case JobCommandType.INT_REMOTE_SHELL:
+		//				jobImpl = new ExecuteInShell(simpleProperties, jobRuntimeInterface);
+		//				break;
+		//
+		//			default:
+		//				break;
+		//			}
+		
+		return jobImpl;
 	}
 
 	public static HashMap<String, AbstractJobType> toAbstractJobTypeList(HashMap<String, JobImpl> jobQueue) {
