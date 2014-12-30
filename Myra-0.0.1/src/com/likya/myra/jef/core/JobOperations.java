@@ -42,11 +42,11 @@ public interface JobOperations {
 
 	public String setJobInputParam(String jobId, String paramString) ;
 	
-	public void addJob(AbstractJobType abstractJobType) throws Exception;
+	public void addJob(AbstractJobType abstractJobType, boolean persist) throws Exception;
 	
-	public void removeJob(String jobId) throws Exception;
+	public void removeJob(String jobId, boolean persist) throws Exception;
 	
-	public void updateJob(AbstractJobType abstractJobType) throws Exception;
+	public void updateJob(AbstractJobType abstractJobType, boolean persist) throws Exception;
 	
 	public void readJob(String jobId)  throws Exception;
 	

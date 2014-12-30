@@ -294,20 +294,31 @@ public class JobOperationsImpl implements JobOperations {
 		}
 
 	}
+
+	public void addJob(AbstractJobType abstractJobType, boolean persist) throws Exception {
+		JobImpl jobImpl = JobQueueOperations.transformJobTypeToImpl(abstractJobType);
+		synchronized (coreFactory.getMonitoringOperations().getJobQueue()) {
+			coreFactory.getMonitoringOperations().getJobQueue().put(abstractJobType.getId(), jobImpl);
+			coreFactory.getManagementOperations().sendReIndexSignal();
+		}
+
+		if (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0) { // No dependency free job
+			synchronized (coreFactory.getNetTreeManagerInterface().getFreeJobs()) {
+				coreFactory.getNetTreeManagerInterface().getFreeJobs().put(abstractJobType.getId(), abstractJobType);
+			}
+		} else { // has dependency, if nettreemap exist, then add to that map. If not, then create new map and move all to new net tree map
+			throw new UnknownServiceException("Not implemented yet !");
+		}
+	}
 	
-	
-	public void addJob(AbstractJobType abstractJobType) throws Exception {
+	public void removeJob(String jobId, boolean persist)  throws Exception {
 		throw new UnknownServiceException("Not implemented yet !");
 	}
 	
-	public void removeJob(String jobId)  throws Exception {
+	public void updateJob(AbstractJobType abstractJobType, boolean persist)  throws Exception {
 		throw new UnknownServiceException("Not implemented yet !");
 	}
-	
-	public void updateJob(AbstractJobType abstractJobType)  throws Exception {
-		throw new UnknownServiceException("Not implemented yet !");
-	}
-	
+
 	public void readJob(String jobId)  throws Exception {
 		throw new UnknownServiceException("Use monitoringOperations.getJobQueue().get(jobId); instead !");
 	}
