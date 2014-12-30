@@ -56,6 +56,8 @@ public class BaseSchedulerController {
 	private boolean thresholdOverflow = false;
 
 	private boolean isPersistent = false;
+	
+	private boolean reIndexJobQueue = false;
 
 	protected CoreFactoryInterface coreFactoryInterface;
 
@@ -353,7 +355,7 @@ public class BaseSchedulerController {
 		return false;
 
 	}
-
+	
 	public HashMap<String, JobImpl> getJobQueue() {
 		return jobQueue;
 	}
@@ -376,5 +378,13 @@ public class BaseSchedulerController {
 
 	public boolean isPersistent() {
 		return isPersistent;
+	}
+	
+	public boolean isReIndexJobQueue() {
+		return reIndexJobQueue;
+	}
+
+	public void setReIndexJobQueue(boolean reIndexJobQueue) {
+		this.reIndexJobQueue = reIndexJobQueue;
 	}
 }
