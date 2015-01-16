@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
+import com.likya.commons.utils.SortUtils;
 import com.likya.myra.commons.utils.DependencyOperations;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.jobs.ChangeLSI;
@@ -295,9 +296,12 @@ public class JobOperationsImpl implements JobOperations {
 
 	}
 
-	public void addJob(AbstractJobType abstractJobType, boolean persist) throws Exception {
+	public void addJob(AbstractJobType abstractJobType, boolean persist) throws UnknownServiceException  {
 		JobImpl jobImpl = JobQueueOperations.transformJobTypeToImpl(abstractJobType);
 		synchronized (coreFactory.getMonitoringOperations().getJobQueue()) {
+			String [] idArray = SortUtils.sortKeys(coreFactory.getMonitoringOperations().getJobQueue().keySet());
+			int maxId = Integer.parseInt(idArray[idArray.length - 1]);
+			abstractJobType.setId("" + (maxId + 1));
 			coreFactory.getMonitoringOperations().getJobQueue().put(abstractJobType.getId(), jobImpl);
 			coreFactory.getManagementOperations().sendReIndexSignal();
 		}
