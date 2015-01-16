@@ -139,12 +139,18 @@ public class OutputData implements Serializable {
 
 		OutputData outputData = new OutputData();
 
-		outputData.setOutputType(OutputData.types.DEFAULT);
 		outputData.setGroupName("");
 		outputData.setHandleUri(abstractJobType.getHandlerURI());
 		outputData.setJobId(abstractJobType.getId());
-		outputData.setStartTime(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime());
-		outputData.setStopTime(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStopTime());
+		
+		if(abstractJobType.getManagement().getTimeManagement().getJsRealTime() != null) {
+			outputData.setOutputType(OutputData.types.DEFAULT);
+	 		outputData.setStartTime(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime());
+			outputData.setStopTime(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStopTime());
+		} else {
+			outputData.setOutputType(OutputData.types.JOSTATECHANGE);
+		}
+
 		outputData.setTreeId("treeId");
 		outputData.setLiveStateInfo(LiveStateInfoUtils.getLastStateInfo(abstractJobType));
 
