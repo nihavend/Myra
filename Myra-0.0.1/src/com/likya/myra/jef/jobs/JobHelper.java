@@ -67,6 +67,9 @@ public class JobHelper {
 		String endLog = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.14") + MyraDateUtils.getDate(endTime.getTime());
 		String duration = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.15") + durationList[0] + " saat " + durationList[1] + " dakika " + durationList[2] + " saniye";
 
+		if(abstractJobType.getManagement().getTimeManagement().getJsRealTime() == null) {
+			abstractJobType.getManagement().getTimeManagement().addNewJsRealTime();
+		}
 		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStopTime(endTime);
 
 		jobClassName.getJobRuntimeProperties().setCompletionDate(endTime);
@@ -90,11 +93,17 @@ public class JobHelper {
 
 	protected static void setJsRealTimeForStart(AbstractJobType abstractJobType, Calendar startTime) {
 		// System.err.println("Beofer : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime().getTime().getTime()));
+		if(abstractJobType.getManagement().getTimeManagement().getJsRealTime() == null) {
+			abstractJobType.getManagement().getTimeManagement().addNewJsRealTime();
+		}
 		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStartTime(startTime);
 		// System.err.println("Beofer : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime().getTime().getTime()));
 	}
 
 	public static void setJsRealTimeForStop(AbstractJobType abstractJobType, Calendar stopTime) {
+		if(abstractJobType.getManagement().getTimeManagement().getJsRealTime() == null) {
+			abstractJobType.getManagement().getTimeManagement().addNewJsRealTime();
+		}
 		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStopTime(stopTime);
 	}
 
