@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.likya.myra.jef.core;
 
+import java.net.UnknownServiceException;
+
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 
 
@@ -42,7 +44,7 @@ public interface JobOperations {
 
 	public String setJobInputParam(String jobId, String paramString) ;
 	
-	public void addJob(AbstractJobType abstractJobType, boolean persist) throws Exception;
+	public void addJob(AbstractJobType abstractJobType, boolean persist) throws UnknownServiceException;
 	
 	public void removeJob(String jobId, boolean persist) throws Exception;
 	
