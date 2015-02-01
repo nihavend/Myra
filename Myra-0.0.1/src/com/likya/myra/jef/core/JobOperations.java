@@ -46,10 +46,8 @@ public interface JobOperations {
 	
 	public void addJob(AbstractJobType abstractJobType, boolean persist) throws UnknownServiceException;
 	
-	public void removeJob(String jobId, boolean persist) throws Exception;
-	
 	public void updateJob(AbstractJobType abstractJobType, boolean persist) throws Exception;
 	
-	public void readJob(String jobId)  throws Exception;
+	public void deleteJob(String jobId, boolean persist) throws Exception;
 	
 }
