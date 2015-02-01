@@ -203,7 +203,7 @@ public class JobOperationsImpl implements JobOperations {
 
 			AbstractJobType abstractJobType = coreFactory.getMonitoringOperations().getJobQueue().get(jobName).getAbstractJobType();
 			
-			ChangeLSI.forValue(abstractJobType, LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_DEACTIVATED, LiveStateInfoUtils.getLastStateInfo(abstractJobType).getStatusName().intValue()));
+			ChangeLSI.forValue(abstractJobType, LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_DEACTIVATED));
 			
 //			TODO yeni yapıda bu iş nasıl olacak ?
 //			synchronized (TlosServer.getDisabledJobQueue()) {
@@ -295,14 +295,21 @@ public class JobOperationsImpl implements JobOperations {
 		}
 
 	}
-
-	public void addJob(AbstractJobType abstractJobType, boolean persist) throws UnknownServiceException  {
+	
+	private void addUpdateJob(AbstractJobType abstractJobType, boolean persist, boolean isNew) throws UnknownServiceException  {
+		
 		JobImpl jobImpl = JobQueueOperations.transformJobTypeToImpl(abstractJobType);
+
 		synchronized (coreFactory.getMonitoringOperations().getJobQueue()) {
-			String [] idArray = SortUtils.sortKeys(coreFactory.getMonitoringOperations().getJobQueue().keySet());
-			int maxId = Integer.parseInt(idArray[idArray.length - 1]);
-			abstractJobType.setId("" + (maxId + 1));
-			coreFactory.getMonitoringOperations().getJobQueue().put(abstractJobType.getId(), jobImpl);
+			if(isNew) {
+				String [] idArray = SortUtils.sortKeys(coreFactory.getMonitoringOperations().getJobQueue().keySet());
+				int maxId = Integer.parseInt(idArray[idArray.length - 1]);
+				abstractJobType.setId("" + (maxId + 1));
+				coreFactory.getMonitoringOperations().getJobQueue().put(abstractJobType.getId(), jobImpl);
+			} else { // update existing
+				coreFactory.getMonitoringOperations().getJobQueue().put(abstractJobType.getId(), jobImpl);
+			}
+			
 			coreFactory.getManagementOperations().sendReIndexSignal();
 		}
 
@@ -315,15 +322,35 @@ public class JobOperationsImpl implements JobOperations {
 		}
 	}
 	
-	public void removeJob(String jobId, boolean persist)  throws Exception {
-		throw new UnknownServiceException("Not implemented yet !");
+	public void addJob(AbstractJobType abstractJobType, boolean persist) throws UnknownServiceException  {
+		addUpdateJob(abstractJobType, persist, true);
 	}
 	
 	public void updateJob(AbstractJobType abstractJobType, boolean persist)  throws Exception {
-		throw new UnknownServiceException("Not implemented yet !");
+		addUpdateJob(abstractJobType, persist, false);
+	}
+	
+	public void deleteJob(String jobId, boolean persist)  throws Exception {
+		if(coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
+			
+			AbstractJobType abstractJobType = null;
+			
+			synchronized (coreFactory.getMonitoringOperations().getJobQueue()) {
+				abstractJobType = coreFactory.getMonitoringOperations().getJobQueue().remove(jobId).getAbstractJobType();
+				coreFactory.getManagementOperations().sendReIndexSignal();
+			}
+			
+			if (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0) { // No dependency free job
+				synchronized (coreFactory.getNetTreeManagerInterface().getFreeJobs()) {
+					coreFactory.getNetTreeManagerInterface().getFreeJobs().remove(abstractJobType.getId());
+				}
+			} else { // has dependency, if nettreemap exist, then remove from that map.
+				throw new UnknownServiceException("Not implemented yet !");
+			}
+		} else {
+			throw new Exception("Job not found with id :" + jobId);
+		}
+		
 	}
 
-	public void readJob(String jobId)  throws Exception {
-		throw new UnknownServiceException("Use monitoringOperations.getJobQueue().get(jobId); instead !");
-	}
 }
