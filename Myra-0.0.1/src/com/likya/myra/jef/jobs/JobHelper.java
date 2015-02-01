@@ -312,7 +312,7 @@ public class JobHelper {
 			abstractJobType.getGraphInfo().setDeadBranch(false);
 		}
 		
-		if(LiveStateInfoUtils.equalStates(abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0), StateName.PENDING, SubstateName.CREATED, StatusName.DEPLOYED)) {
+		if(LiveStateInfoUtils.equalStates(abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0), StateName.PENDING, SubstateName.DEACTIVATED)) {
 			// new added job, just leave it's state
 			return;
 		}
