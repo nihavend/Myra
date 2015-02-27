@@ -58,12 +58,11 @@ public class ExecuteSchComponent extends CommonShell {
 
 			startWathcDogTimer();
 
-			String jobPath = abstractJobType.getBaseJobInfos().getJobTypeDetails().getJobPath();
 			String jobCommand = abstractJobType.getBaseJobInfos().getJobTypeDetails().getJobCommand();
 
 			setRunning(abstractJobType);
 
-			startSchProcess(jobPath, jobCommand, null, this.getClass().getName(), CoreFactory.getLogger());
+			startSchProcess(jobCommand, null, this.getClass().getName(), CoreFactory.getLogger());
 
 		} catch (Exception err) {
 			handleException(err, CoreFactory.getLogger());
@@ -71,7 +70,7 @@ public class ExecuteSchComponent extends CommonShell {
 
 	}
 
-	public void startSchProcess(String jobPath, String jobCommand, Map<String, String> environmentVariables, String logClassName, Logger myLogger) throws Exception {
+	public void startSchProcess(String jobCommand, Map<String, String> environmentVariables, String logClassName, Logger myLogger) throws Exception {
 
 		// JobRuntimeInterface jobRuntimeInterface = getJobRuntimeProperties();
 
@@ -90,9 +89,6 @@ public class ExecuteSchComponent extends CommonShell {
 		String user = executeRShellParams.getUserName();
 		String password = executeRShellParams.getRshellPassword(); 
 		int port = executeRShellParams.getPort();
-		String fileSeperator = executeRShellParams.getFileSeperator();
-
-		jobCommand = jobPath + fileSeperator + jobCommand;
 
 		Session session = jsch.getSession(user, host, port);
 
