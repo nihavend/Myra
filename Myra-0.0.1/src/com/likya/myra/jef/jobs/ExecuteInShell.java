@@ -100,10 +100,9 @@ public class ExecuteInShell extends CommonShell {
 
 		processBuilder = JobHelper.parsJobCmdArgs(isShell, jobCommand, jobTypeDetails.getArgValues());
 
-		String jobPath = abstractJobType.getBaseJobInfos().getJobTypeDetails().getJobPath();
-		if (jobPath != null) {
-			jobCommand = JobHelper.removeSlashAtTheEnd(abstractJobType, jobPath, jobCommand);
-			processBuilder.directory(new File(jobPath));
+		String jobWorkDir = abstractJobType.getBaseJobInfos().getJobTypeDetails().getJobWorkDir();
+		if (jobWorkDir != null && !jobWorkDir.equals("")) {
+			processBuilder.directory(new File(jobWorkDir));
 		}
 
 		Map<String, String> tempEnv = new HashMap<String, String>();
