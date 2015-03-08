@@ -45,6 +45,7 @@ import com.likya.myra.jef.model.PersistObject;
 import com.likya.myra.jef.model.SortType;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.joblist.JobListDocument;
+import com.likya.xsd.myra.model.joblist.JobListDocument.JobList;
 import com.likya.xsd.myra.model.jobprops.ManagementDocument.Management;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
@@ -469,5 +470,37 @@ public class JobQueueOperations {
 		Collection<AbstractJobType> filteredList = CollectionUtils.select(abstractJobTypeList, predicate);
 
 		return filteredList;
+	}
+	
+	public static int indexOfJobType(AbstractJobType newAbstractJobType, JobList jobList) {
+		
+		int index = 0;
+		
+		for(AbstractJobType abstractJobType : jobList.getGenericJobArray()) {
+			if(abstractJobType.getId().equals(abstractJobType.getId())) {
+				break;
+			}
+			++index;
+		}
+
+		return index;
+	}
+	
+	public static boolean updateJobType(AbstractJobType newAbstractJobType, JobList jobList) {
+		
+		int index = indexOfJobType(newAbstractJobType, jobList);
+		
+		jobList.getGenericJobArray(index).set(newAbstractJobType);
+		
+		return true;
+	}
+	
+	public static boolean deleteJobType(AbstractJobType newAbstractJobType, JobList jobList) {
+		
+		int index = indexOfJobType(newAbstractJobType, jobList);
+		
+		jobList.removeGenericJob(index);
+
+		return true;
 	}
 }
