@@ -201,4 +201,8 @@ public class CoreFactoryBase {
 	protected void setConfigurationManager(ConfigurationManager configurationManager) {
 		this.configurationManager = configurationManager;
 	}
+	
+	public JobListDocument getJobListDocument() {
+		return jobListDocument;
+	}
 }
