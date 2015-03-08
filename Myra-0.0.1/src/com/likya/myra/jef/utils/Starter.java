@@ -13,6 +13,21 @@ import com.likya.xsd.myra.model.joblist.JobListDocument;
 
 public class Starter {
 	
+	public static CoreFactory startForce(JobListDocument jobListDocument, OutputStrategy outputStrategy) throws Exception {
+		
+		CoreFactory coreFactory;
+		
+		if(jobListDocument == null) {
+			jobListDocument = JobListDocument.Factory.newInstance();
+			jobListDocument.addNewJobList();
+		} 
+		
+		coreFactory = start(jobListDocument, outputStrategy);
+		
+		return coreFactory;
+		
+	}
+	
 	public static CoreFactory startForce(String senaryo, OutputStrategy outputStrategy) throws Exception {
 		
 		CoreFactory coreFactory;
@@ -27,7 +42,7 @@ public class Starter {
 			jobListDocument = JobListDocument.Factory.parse(xmlString.toString());
 		}
 		
-		coreFactory = doIt(jobListDocument, outputStrategy);
+		coreFactory = start(jobListDocument, outputStrategy);
 		
 		return coreFactory;
 	}
@@ -38,7 +53,7 @@ public class Starter {
 
 		jobListDocument.addNewJobList();
 		
-		CoreFactory coreFactory = doIt(jobListDocument, outputStrategy);
+		CoreFactory coreFactory = start(jobListDocument, outputStrategy);
 		
 		return coreFactory;
 	}
@@ -49,12 +64,12 @@ public class Starter {
 
 		JobListDocument jobListDocument = JobListDocument.Factory.parse(xmlString.toString());
 
-		CoreFactory coreFactory = doIt(jobListDocument, outputStrategy);
+		CoreFactory coreFactory = start(jobListDocument, outputStrategy);
 		
 		return coreFactory;
 	}
 	
-	private static CoreFactory doIt(JobListDocument jobListDocument, OutputStrategy outputStrategy ) {
+	public static CoreFactory start(JobListDocument jobListDocument, OutputStrategy outputStrategy ) {
 		
 		InputStrategy inputStrategy = new InputStrategyImpl();
 
