@@ -320,6 +320,14 @@ public class JobOperationsImpl implements JobOperations {
 		} else { // has dependency, if nettreemap exist, then add to that map. If not, then create new map and move all to new net tree map
 			throw new UnknownServiceException("Not implemented yet !");
 		}
+
+		synchronized (coreFactory.getJobListDocument().getJobList()) {
+			if (isNew) {
+				coreFactory.getJobListDocument().getJobList().addNewGenericJob().set(abstractJobType);
+			} else {
+				JobQueueOperations.updateJobType(abstractJobType, coreFactory.getJobListDocument().getJobList());
+			}
+		}
 	}
 	
 	public void addJob(AbstractJobType abstractJobType, boolean persist) throws UnknownServiceException  {
@@ -347,6 +355,11 @@ public class JobOperationsImpl implements JobOperations {
 			} else { // has dependency, if nettreemap exist, then remove from that map.
 				throw new UnknownServiceException("Not implemented yet !");
 			}
+			
+			synchronized (coreFactory.getJobListDocument().getJobList()) {
+				JobQueueOperations.deleteJobType(abstractJobType, coreFactory.getJobListDocument().getJobList());
+			}
+			
 		} else {
 			throw new Exception("Job not found with id :" + jobId);
 		}
