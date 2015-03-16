@@ -17,11 +17,6 @@ public class Starter {
 		
 		CoreFactory coreFactory;
 		
-		if(jobListDocument == null) {
-			jobListDocument = JobListDocument.Factory.newInstance();
-			jobListDocument.addNewJobList();
-		} 
-		
 		coreFactory = start(jobListDocument, outputStrategy);
 		
 		return coreFactory;
