@@ -477,7 +477,7 @@ public class JobQueueOperations {
 		int index = 0;
 		
 		for(AbstractJobType abstractJobType : jobList.getGenericJobArray()) {
-			if(abstractJobType.getId().equals(abstractJobType.getId())) {
+			if(abstractJobType.getId().equals(newAbstractJobType.getId())) {
 				break;
 			}
 			++index;
