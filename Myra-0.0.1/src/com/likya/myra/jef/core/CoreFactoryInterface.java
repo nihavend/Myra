@@ -18,6 +18,7 @@ package com.likya.myra.jef.core;
 import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.utils.NetTreeManagerInterface;
+import com.likya.xsd.myra.model.joblist.JobListDocument;
 
 public interface CoreFactoryInterface {
 	
@@ -32,4 +33,6 @@ public interface CoreFactoryInterface {
 	public OutputStrategy getOutputStrategy();
 	
 	public NetTreeManagerInterface getNetTreeManagerInterface();
+	
+	public JobListDocument getJobListDocument();
 }
