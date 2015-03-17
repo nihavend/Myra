@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.likya.myra.jef.core;
 
+import java.io.File;
 import java.util.HashMap;
 
 import com.likya.myra.jef.ConfigurationManager;
@@ -30,6 +31,10 @@ import com.likya.xsd.myra.model.joblist.JobListDocument;
 
 public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface {
 
+	public static final String CONFIG_PATH = "conf";
+	public static final String CONFIG_FILE = "myraConfig.xml";
+	public static final String MYRA_DATA_PATH = "data" + File.separator + "myra" + File.separator;
+	
 	private static CoreFactory coreFactory;
 
 	private ManagementOperations managementOperations;
