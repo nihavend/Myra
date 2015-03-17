@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 
 import com.likya.commons.utils.FileUtils;
 import com.likya.myra.commons.utils.XMLValidations;
+import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.utils.MyraPersistApi;
 import com.likya.xsd.myra.model.config.MyraConfigDocument;
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
@@ -33,12 +34,9 @@ import com.likya.xsd.myra.model.config.UsejobnamesforlogDocument.Usejobnamesforl
 
 public class ConfigurationManagerImpl implements ConfigurationManager {
 
-	private static final String CONFIG_PATH = "conf";
-	private static final String CONFIG_FILE = "myraConfig.xml";
-
 	private MyraConfig myraConfig;
 
-	private final String fileToPersist = "Myra.recover";
+	private final String fileToPersist = CoreFactory.MYRA_DATA_PATH + "Myra.recover";
 
 	private HashMap<Integer, String> groupList = new HashMap<Integer, String>();
 
@@ -46,6 +44,7 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 
 	public ConfigurationManagerImpl() {
 		super();
+		this.checkDataPath();
 		this.myraConfig = checkMyraConfig();
 	}
 
@@ -60,11 +59,10 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 	//
 	//	}
 
-	private static MyraConfig checkMyraConfig() {
-
-		Path dataPath = Paths.get(CONFIG_PATH);
-		MyraConfig myraConfig = null;
-
+	private void checkDataPath() {
+		
+		Path dataPath = Paths.get(CoreFactory.MYRA_DATA_PATH);
+		
 		if (Files.notExists(dataPath)) {
 			try {
 				Files.createDirectory(dataPath);
@@ -73,8 +71,24 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 				System.exit(-1);
 			}
 		}
+		
+	}
+	
+	private static MyraConfig checkMyraConfig() {
 
-		Path configFile = Paths.get(CONFIG_PATH + File.separator + CONFIG_FILE);
+		Path configPath = Paths.get(CoreFactory.CONFIG_PATH);
+		MyraConfig myraConfig = null;
+
+		if (Files.notExists(configPath)) {
+			try {
+				Files.createDirectory(configPath);
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.exit(-1);
+			}
+		}
+
+		Path configFile = Paths.get(CoreFactory.CONFIG_PATH + File.separator + CoreFactory.CONFIG_FILE);
 		if (Files.exists(configFile)) {
 			myraConfig = readConfig(configFile).getMyraConfig();
 		} else {
