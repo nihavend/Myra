@@ -32,6 +32,7 @@ import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.model.SortType;
 import com.likya.myra.jef.utils.JobQueueOperations;
+import com.likya.myra.jef.utils.MyraPersistApi;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.jobprops.DependencyListDocument.DependencyList;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
@@ -158,7 +159,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 			}
 
 			if (isPersistent()) {
-				JobQueueOperations.persistJobQueue(coreFactoryInterface.getConfigurationManager(), jobQueue);
+				MyraPersistApi.persistJobQueue(coreFactoryInterface.getConfigurationManager(), jobQueue);
 				// JobQueueOperations.persistDisabledJobQueue(coreFactoryInterface.getConfigurationManager(), disabledJobQueue);
 			}
 
