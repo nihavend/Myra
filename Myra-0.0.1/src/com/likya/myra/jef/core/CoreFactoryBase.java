@@ -30,6 +30,7 @@ import com.likya.myra.jef.controller.SchedulerController;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.utils.JobQueueOperations;
+import com.likya.myra.jef.utils.MyraPersistApi;
 import com.likya.myra.jef.utils.NetTreeManagerImp;
 import com.likya.myra.jef.utils.NetTreeManagerInterface;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
@@ -82,7 +83,7 @@ public class CoreFactoryBase {
 		HashMap<String, JobImpl> jobQueue = new HashMap<String, JobImpl>();
 		AbstractJobType[] abstractJobTypes = null;
 		
-		if (configurationManager.getMyraConfig().getPersistent() && JobQueueOperations.recoverJobQueue(configurationManager, jobQueue, messages) && jobQueue.size() != 0) {
+		if (configurationManager.getMyraConfig().getPersistent() && MyraPersistApi.recoverJobQueue(configurationManager, jobQueue, messages) && jobQueue.size() != 0) {
 			// TODO abstractJobTypes = (AbstractJobType[]) JobQueueOperations.toAbstractJobTypeList(jobQueue).values().toArray();
 			// Yukarısı çözülene dek aşağıyı kullanıyoruz
 			abstractJobTypes = jobListDocument.getJobList().getGenericJobArray();
