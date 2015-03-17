@@ -26,6 +26,7 @@ import com.likya.myra.jef.controller.SchedulerController;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.utils.JobQueueOperations;
+import com.likya.myra.jef.utils.MyraPersistApi;
 import com.likya.myra.jef.utils.NetTreeManagerImp.NetTreeMonitor;
 
 public class ManagementOperationsImpl implements ManagementOperations {
@@ -91,7 +92,7 @@ public class ManagementOperationsImpl implements ManagementOperations {
 		for (String key : controllerContainer.keySet()) {
 			SchedulerController schedulerController = (SchedulerController) controllerContainer.get(key);
 			if (configurationManager.getMyraConfig().getPersistent()) {
-				JobQueueOperations.persistJobQueue(configurationManager, schedulerController.getJobQueue());
+				MyraPersistApi.persistJobQueue(configurationManager, schedulerController.getJobQueue());
 				// JobQueueOperations.persistDisabledJobQueue(configurationManager, schedulerController.getDisabledJobQueue());
 			}
 		}
