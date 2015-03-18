@@ -34,7 +34,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 	public static final String CONFIG_PATH = "conf";
 	public static final String CONFIG_FILE = "myraConfig.xml";
 	public static final String MYRA_DATA_PATH = "data" + File.separator + "myra" + File.separator;
-	
+
 	private static CoreFactory coreFactory;
 
 	private ManagementOperations managementOperations;
@@ -48,17 +48,17 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 	private CoreFactory(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
 
 		super();
-		
+
 		try {
 			registerMessageBundle();
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			t.printStackTrace();
 		}
-		
+
 		controllerContainer = new HashMap<String, ControllerInterface>();
 
 		setConfigurationManager(inputStrategy.getConfigurationManager());
-		
+
 		this.managementOperations = new ManagementOperationsImpl(this);
 
 		this.monitoringOperations = new MonitoringOperationsImpl(this);
@@ -66,7 +66,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		this.jobListDocument = inputStrategy.getJobListDocument();
 
 		this.outputStrategy = outputStrategy;
-		
+
 		this.jobOperations = new JobOperationsImpl(this);
 
 	}
@@ -82,37 +82,36 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		}
 		return (CoreFactoryInterface) coreFactory;
 	}
-	
-	public static CoreFactoryInterface getInstance(OutputStrategy outputStrategy) {
-		
-		InputStrategy inputStrategy = new InputStrategyImpl();
 
-		return getInstance(inputStrategy, outputStrategy);
+	public static CoreFactoryInterface getInstance(OutputStrategy outputStrategy) {
+		return getInstance(null, outputStrategy);
 	}
 
 	public static CoreFactoryInterface getInstance(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
-		// if (coreFactory == null) {
-			validateInputStrategy(inputStrategy);
-			coreFactory = new CoreFactory(inputStrategy, outputStrategy);
-		// }
+		validateInputStrategy(inputStrategy);
+		coreFactory = new CoreFactory(inputStrategy, outputStrategy);
 		return (CoreFactoryInterface) coreFactory;
 	}
 
 	private static void validateInputStrategy(InputStrategy inputStrategy) {
+
+		if(inputStrategy == null) {
+			inputStrategy = new InputStrategyImpl();
+		}
 		
-		if(inputStrategy.getConfigurationManager() == null) {
+		if (inputStrategy.getConfigurationManager() == null) {
 			ConfigurationManager configurationManager = new ConfigurationManagerImpl();
 			inputStrategy.setConfigurationManager(configurationManager);
 		}
-		
-		if(inputStrategy.getJobListDocument() == null) {
+
+		if (inputStrategy.getJobListDocument() == null) {
 			JobListDocument jobListDocument = JobListDocument.Factory.newInstance();
 			jobListDocument.addNewJobList();
 			inputStrategy.setJobListDocument(jobListDocument);
 		}
-		
+
 	}
-	
+
 	protected void start() throws Throwable {
 		if (coreFactory != null) {
 			if (validateFactory()) {
