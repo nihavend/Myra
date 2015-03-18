@@ -19,7 +19,7 @@ import com.likya.myra.samples.TestOutput;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.joblist.JobListDocument;
 
-public class DataFileLoader {
+public class DataFileLoader1 {
 	
 	private static CoreFactory restart(JobListDocument jobListDocument) {
 		

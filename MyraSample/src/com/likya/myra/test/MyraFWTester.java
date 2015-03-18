@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.MonitoringOperations;
+import com.likya.myra.jef.utils.Starter;
 import com.likya.myra.samples.TestOutput;
 
 public class MyraFWTester {
@@ -36,11 +37,13 @@ public class MyraFWTester {
 		}
 		
 		CoreFactory coreFactory = null;
-				
+		
+		final TestOutput testOutput = new TestOutput();
+		
 		if(senaryoDosya != null) {
-			coreFactory = DataFileLoader.loadAndStart(senaryoDosya);
+			coreFactory = Starter.start(senaryoDosya, testOutput);
 		} else {
-			coreFactory = DataFileLoader.resetAndStart();
+			coreFactory = Starter.start(testOutput);
 		}
 		
 		globalCarrier.setCoreFactory(coreFactory);
