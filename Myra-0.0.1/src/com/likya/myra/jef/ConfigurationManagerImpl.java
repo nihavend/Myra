@@ -42,12 +42,24 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 
 	private boolean isRecovered = false;
 
+	private static boolean persistent = false;
+	private static boolean normalize = false;
+	private static int frequency = 1;
+	private static int higherThreshold = 10;
+	private static int lowerThreshold = 3;
+	private static String logPath = "logs";
+	
+	private static String logFileExt = ".log";
+	private static String globalLogPath = "logs";
+	private static int logbuffersize = 800;
+	private static int logpagesize = 10;
+
 	public ConfigurationManagerImpl() {
 		super();
 		this.checkDataPath();
 		this.myraConfig = checkMyraConfig();
 	}
-
+	
 	//	private ConfigurationManagerImpl(MyraConfigDocument myraConfigDocument) {
 	//		super();
 	//
@@ -93,17 +105,21 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 			myraConfig = readConfig(configFile).getMyraConfig();
 		} else {
 			myraConfig = setDefaults();
-			MyraConfigDocument myraConfigDocument = MyraConfigDocument.Factory.newInstance();
-			myraConfigDocument.addNewMyraConfig().set(myraConfig);
-			try {
-				MyraPersistApi.serializeConfig(configFile.toString(), myraConfigDocument);
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.exit(-1);
-			}
+			serializeConfig(myraConfig, configFile.toString());
 		}
 
 		return myraConfig;
+	}
+	
+	private static void serializeConfig(MyraConfig myraConfig, String fileName) {
+		MyraConfigDocument myraConfigDocument = MyraConfigDocument.Factory.newInstance();
+		myraConfigDocument.addNewMyraConfig().set(myraConfig);
+		try {
+			MyraPersistApi.serializeConfig(fileName, myraConfigDocument);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 	}
 
 	public static MyraConfigDocument readConfig(Path configFile) {
@@ -136,19 +152,19 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 
 		MyraConfigDocument myraConfigDocument = MyraConfigDocument.Factory.newInstance();
 		myraConfigDocument.addNewMyraConfig();
-
+		
 		MyraConfig myraConfig = myraConfigDocument.getMyraConfig();
-		myraConfig.setPersistent(false);
-		myraConfig.setNormalize(false);
-		myraConfig.setFrequency((short) 1);
-		myraConfig.setHigherThreshold((short) 10);
-		myraConfig.setLowerThreshold((short) 3);
-		myraConfig.setLogPath("./");
+		myraConfig.setPersistent(persistent);
+		myraConfig.setNormalize(normalize);
+		myraConfig.setFrequency((short) frequency);
+		myraConfig.setHigherThreshold((short) higherThreshold);
+		myraConfig.setLowerThreshold((short) lowerThreshold);
+		myraConfig.setLogPath(logPath);
 		myraConfig.setUsejobnamesforlog(Usejobnamesforlog.NO);
-		myraConfig.setLogFileExt(".log");
-		myraConfig.setGlobalLogPath("./");
-		myraConfig.setLogbuffersize((short) 800);
-		myraConfig.setLogpagesize((short) 10);
+		myraConfig.setLogFileExt(logFileExt);
+		myraConfig.setGlobalLogPath(globalLogPath);
+		myraConfig.setLogbuffersize((short) logbuffersize);
+		myraConfig.setLogpagesize((short) logpagesize);
 
 		return myraConfig;
 	}
