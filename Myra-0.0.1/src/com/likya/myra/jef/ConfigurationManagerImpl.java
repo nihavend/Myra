@@ -15,49 +15,26 @@
  ******************************************************************************/
 package com.likya.myra.jef;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-
-import com.likya.commons.utils.FileUtils;
-import com.likya.myra.commons.utils.XMLValidations;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.utils.MyraPersistApi;
-import com.likya.xsd.myra.model.config.MyraConfigDocument;
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
-import com.likya.xsd.myra.model.config.UsejobnamesforlogDocument.Usejobnamesforlog;
 
 public class ConfigurationManagerImpl implements ConfigurationManager {
 
 	private MyraConfig myraConfig;
 
-	private final String fileToPersist = CoreFactory.MYRA_DATA_PATH + "Myra.recover";
+	public static final String fileToPersist = CoreFactory.MYRA_DATA_PATH + "Myra.recover";
 
 	private HashMap<Integer, String> groupList = new HashMap<Integer, String>();
 
 	private boolean isRecovered = false;
 
-	private static boolean persistent = false;
-	private static boolean normalize = false;
-	private static int frequency = 1;
-	private static int higherThreshold = 10;
-	private static int lowerThreshold = 3;
-	private static String logPath = "logs";
-	
-	private static String logFileExt = ".log";
-	private static String globalLogPath = "logs";
-	private static int logbuffersize = 800;
-	private static int logpagesize = 10;
-
 	public ConfigurationManagerImpl() {
 		super();
-		this.checkDataPath();
-		this.myraConfig = checkMyraConfig();
+		MyraPersistApi.checkDataPath();
+		this.myraConfig = MyraPersistApi.getMyraConfig(true);
 	}
 	
 	//	private ConfigurationManagerImpl(MyraConfigDocument myraConfigDocument) {
@@ -71,104 +48,7 @@ public class ConfigurationManagerImpl implements ConfigurationManager {
 	//
 	//	}
 
-	private void checkDataPath() {
-		
-		Path dataPath = Paths.get(CoreFactory.MYRA_DATA_PATH);
-		
-		if (Files.notExists(dataPath)) {
-			try {
-				Files.createDirectory(dataPath);
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(-1);
-			}
-		}
-		
-	}
 	
-	private static MyraConfig checkMyraConfig() {
-
-		Path configPath = Paths.get(CoreFactory.CONFIG_PATH);
-		MyraConfig myraConfig = null;
-
-		if (Files.notExists(configPath)) {
-			try {
-				Files.createDirectory(configPath);
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(-1);
-			}
-		}
-
-		Path configFile = Paths.get(CoreFactory.CONFIG_PATH + File.separator + CoreFactory.CONFIG_FILE);
-		if (Files.exists(configFile)) {
-			myraConfig = readConfig(configFile).getMyraConfig();
-		} else {
-			myraConfig = setDefaults();
-			serializeConfig(myraConfig, configFile.toString());
-		}
-
-		return myraConfig;
-	}
-	
-	private static void serializeConfig(MyraConfig myraConfig, String fileName) {
-		MyraConfigDocument myraConfigDocument = MyraConfigDocument.Factory.newInstance();
-		myraConfigDocument.addNewMyraConfig().set(myraConfig);
-		try {
-			MyraPersistApi.serializeConfig(fileName, myraConfigDocument);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-	}
-
-	public static MyraConfigDocument readConfig(Path configFile) {
-
-		MyraConfigDocument myraConfigDocument = null;
-
-		String myraConfigFile = configFile.toString();
-
-		StringBuffer xmlString = FileUtils.readFile(myraConfigFile);
-
-		//		ConfigurationManager configurationManager;
-
-		try {
-			myraConfigDocument = MyraConfigDocument.Factory.parse(xmlString.toString());
-
-			if (!XMLValidations.validateWithXSDAndLog(Logger.getRootLogger(), myraConfigDocument)) {
-				throw new Exception("myraConfigDocument is null or damaged !");
-			}
-
-			//			configurationManager = new ConfigurationManagerImpl(myraConfigDocument);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-
-		return myraConfigDocument;
-	}
-
-	private static MyraConfig setDefaults() {
-
-		MyraConfigDocument myraConfigDocument = MyraConfigDocument.Factory.newInstance();
-		myraConfigDocument.addNewMyraConfig();
-		
-		MyraConfig myraConfig = myraConfigDocument.getMyraConfig();
-		myraConfig.setPersistent(persistent);
-		myraConfig.setNormalize(normalize);
-		myraConfig.setFrequency((short) frequency);
-		myraConfig.setHigherThreshold((short) higherThreshold);
-		myraConfig.setLowerThreshold((short) lowerThreshold);
-		myraConfig.setLogPath(logPath);
-		myraConfig.setUsejobnamesforlog(Usejobnamesforlog.NO);
-		myraConfig.setLogFileExt(logFileExt);
-		myraConfig.setGlobalLogPath(globalLogPath);
-		myraConfig.setLogbuffersize((short) logbuffersize);
-		myraConfig.setLogpagesize((short) logpagesize);
-
-		return myraConfig;
-	}
-
 	public MyraConfig getMyraConfig() {
 		return myraConfig;
 	}
