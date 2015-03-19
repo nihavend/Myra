@@ -44,10 +44,40 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 	private JobOperations jobOperations;
 
 	private OutputStrategy outputStrategy;
+	
+	/**
+	 * Gets the pre-created instance of {@link CoreFactory}
+	 * @return {@link CoreFactoryInterface}
+	 */
+	
+	public static CoreFactoryInterface getInstance() {
+		if (coreFactory == null) {
+			try {
+				throw new InstanceNotFoundException("Use getInstance with parameters !");
+			} catch (InstanceNotFoundException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		return (CoreFactoryInterface) coreFactory;
+	}
+	
+	public static CoreFactoryInterface getInstance(OutputStrategy outputStrategy) {
+		return getInstance(null, outputStrategy);
+	}
 
+	public static CoreFactoryInterface getInstance(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
+		validateInputStrategy(inputStrategy);
+		coreFactory = new CoreFactory(inputStrategy, outputStrategy);
+		return (CoreFactoryInterface) coreFactory;
+	}
+	
 	private CoreFactory(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
-
 		super();
+		init(inputStrategy, outputStrategy);
+	}
+	
+	private void init(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
 
 		try {
 			registerMessageBundle();
@@ -68,31 +98,8 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		this.outputStrategy = outputStrategy;
 
 		this.jobOperations = new JobOperationsImpl(this);
-
 	}
-
-	public static CoreFactoryInterface getInstance() {
-		if (coreFactory == null) {
-			try {
-				throw new InstanceNotFoundException("Use getInstance with parameters !");
-			} catch (InstanceNotFoundException e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
-		return (CoreFactoryInterface) coreFactory;
-	}
-
-	public static CoreFactoryInterface getInstance(OutputStrategy outputStrategy) {
-		return getInstance(null, outputStrategy);
-	}
-
-	public static CoreFactoryInterface getInstance(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
-		validateInputStrategy(inputStrategy);
-		coreFactory = new CoreFactory(inputStrategy, outputStrategy);
-		return (CoreFactoryInterface) coreFactory;
-	}
-
+	
 	private static void validateInputStrategy(InputStrategy inputStrategy) {
 
 		if(inputStrategy == null) {
