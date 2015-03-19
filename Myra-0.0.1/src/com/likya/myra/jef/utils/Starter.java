@@ -8,27 +8,31 @@ import com.likya.myra.jef.InputStrategy;
 import com.likya.myra.jef.InputStrategyImpl;
 import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.core.CoreFactory;
+import com.likya.myra.jef.core.CoreFactoryInterface;
 import com.likya.myra.jef.core.ManagementOperations;
+import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.xsd.myra.model.joblist.JobListDocument;
 
 public class Starter {
 	
-	public static CoreFactory startForce(JobListDocument jobListDocument, OutputStrategy outputStrategy) throws Exception {
-		
-		CoreFactory coreFactory;
-		
-		coreFactory = start(jobListDocument, outputStrategy);
-		
-		return coreFactory;
-		
+	public static CoreFactoryInterface startRecover(OutputStrategy outputStrategy) throws Exception {
+		return start(null, outputStrategy, CoreStateInfo.STATE_RECOVER);
 	}
 	
-	public static CoreFactory startForce(String senaryo, OutputStrategy outputStrategy) throws Exception {
+	public static CoreFactoryInterface start(OutputStrategy outputStrategy) throws Exception {
+		return start("", outputStrategy);
+	}
+	
+	public static CoreFactoryInterface start(String senaryo, OutputStrategy outputStrategy) throws Exception {
 		
-		CoreFactory coreFactory;
+		CoreFactoryInterface coreFactoryInterface;
 		JobListDocument jobListDocument;
 		
-		StringBuffer xmlString = getData(senaryo);
+		StringBuffer xmlString = null;
+		
+		if(senaryo != null && !senaryo.equals("")) {
+			xmlString = getData(senaryo);
+		}
 		
 		if(xmlString == null) {
 			jobListDocument = JobListDocument.Factory.newInstance();
@@ -37,42 +41,28 @@ public class Starter {
 			jobListDocument = JobListDocument.Factory.parse(xmlString.toString());
 		}
 		
-		coreFactory = start(jobListDocument, outputStrategy);
+		coreFactoryInterface = start(jobListDocument, outputStrategy, null);
 		
-		return coreFactory;
+		return coreFactoryInterface;
 	}
 
-	public static CoreFactory start(OutputStrategy outputStrategy) throws Exception {
-		
-		JobListDocument jobListDocument = JobListDocument.Factory.newInstance();
-
-		jobListDocument.addNewJobList();
-		
-		CoreFactory coreFactory = start(jobListDocument, outputStrategy);
-		
-		return coreFactory;
+	public static CoreFactoryInterface start(JobListDocument jobListDocument, OutputStrategy outputStrategy) {
+		return start(jobListDocument, outputStrategy, null);
 	}
 	
-	public static CoreFactory start(String senaryo, OutputStrategy outputStrategy) throws Exception {
-		
-		StringBuffer xmlString = getData(senaryo);
-
-		JobListDocument jobListDocument = JobListDocument.Factory.parse(xmlString.toString());
-
-		CoreFactory coreFactory = start(jobListDocument, outputStrategy);
-		
-		return coreFactory;
-	}
-	
-	public static CoreFactory start(JobListDocument jobListDocument, OutputStrategy outputStrategy ) {
+	public static CoreFactoryInterface start(JobListDocument jobListDocument, OutputStrategy outputStrategy, CoreStateInfo coreStateInfo) {
 		
 		InputStrategy inputStrategy = new InputStrategyImpl();
 
 		inputStrategy.setJobListDocument(jobListDocument);
 
-		CoreFactory coreFactory = (CoreFactory) CoreFactory.getInstance(inputStrategy, outputStrategy);
+		CoreFactoryInterface coreFactoryInterface = CoreFactory.getInstance(inputStrategy, outputStrategy);
+		
+		if(coreStateInfo != null) {
+			coreFactoryInterface.getManagementOperations().setExecutionState(coreStateInfo);
+		}
 
-		ManagementOperations managementOperations = coreFactory.getManagementOperations();
+		ManagementOperations managementOperations = coreFactoryInterface.getManagementOperations();
 		
 		try {
 			managementOperations.start();
@@ -81,7 +71,7 @@ public class Starter {
 			return null;
 		}
 		
-		return coreFactory;
+		return coreFactoryInterface;
 	}
 	
 	public static StringBuffer getData(String senaryo) throws Exception {
