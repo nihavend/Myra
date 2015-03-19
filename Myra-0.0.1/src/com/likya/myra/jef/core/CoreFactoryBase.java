@@ -83,8 +83,14 @@ public class CoreFactoryBase {
 		HashMap<String, JobImpl> jobQueue = new HashMap<String, JobImpl>();
 		AbstractJobType[] abstractJobTypes = null;
 		
-		if (configurationManager.getMyraConfig().getPersistent() && MyraPersistApi.recoverJobQueue(configurationManager, jobQueue, messages) && jobQueue.size() != 0) {
-			// TODO abstractJobTypes = (AbstractJobType[]) JobQueueOperations.toAbstractJobTypeList(jobQueue).values().toArray();
+		boolean recovered = checkAndDoRecover(jobQueue, messages);
+		
+		if (recovered) {
+			// TODO 
+			HashMap<String, AbstractJobType> abstractJobTypeQueue = JobQueueOperations.toAbstractJobTypeList(jobQueue);
+			//abstractJobTypes = (AbstractJobType[]) abstractJobTypeQueue.values().toArray();
+			abstractJobTypes = abstractJobTypeQueue.values().toArray(new AbstractJobType[abstractJobTypeQueue.values().size()]);
+			jobListDocument.getJobList().setGenericJobArray(abstractJobTypes);
 			// Yukarısı çözülene dek aşağıyı kullanıyoruz
 			abstractJobTypes = jobListDocument.getJobList().getGenericJobArray();
 		} else {
@@ -102,8 +108,6 @@ public class CoreFactoryBase {
 					throw new Exception("JobList.xml is dependency definitions are not  valid !");
 				}
 			}
-			
-			
 		}
 		
 		netTreeManagerInterface = new NetTreeManagerImp(abstractJobTypes);
@@ -154,6 +158,25 @@ public class CoreFactoryBase {
 
 		netTreeManagerInterface.startMe();
 	}
+	
+	private boolean checkAndDoRecover(HashMap<String, JobImpl> jobQueue, ArrayList<String> messages) {
+		
+		boolean permitPersist = true;
+
+		// check config for persistency
+		permitPersist = permitPersist && configurationManager.getMyraConfig().getPersistent();
+		
+		// check if the user decided to recover
+		permitPersist = permitPersist && getExecutionState().equals(CoreStateInfo.STATE_RECOVER);
+		
+		// check if successfully recovered
+		permitPersist = permitPersist && MyraPersistApi.recoverJobQueue(configurationManager, jobQueue, messages);
+		
+		// check if jobQueue is not empty
+		permitPersist = permitPersist && (jobQueue.size() != 0);
+		
+		return permitPersist;
+	}
 
 	public static Logger getLogger() {
 		return logger;
@@ -175,11 +198,11 @@ public class CoreFactoryBase {
 		return version;
 	}
 
-	protected CoreStateInfo getExecutionState() {
+	public CoreStateInfo getExecutionState() {
 		return coreStateInfo;
 	}
 
-	protected synchronized void setExecutionState(CoreStateInfo coreStateInfo) {
+	public synchronized void setExecutionState(CoreStateInfo coreStateInfo) {
 		this.coreStateInfo = coreStateInfo;
 	}
 
