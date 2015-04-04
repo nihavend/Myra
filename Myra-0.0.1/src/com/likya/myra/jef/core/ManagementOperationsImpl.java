@@ -27,7 +27,7 @@ import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.utils.JobQueueOperations;
 import com.likya.myra.jef.utils.MyraPersistApi;
-import com.likya.myra.jef.utils.NetTreeManagerImp.NetTreeMonitor;
+import com.likya.myra.jef.utils.NetTreeManagerImpl.NetTreeMonitor;
 
 public class ManagementOperationsImpl implements ManagementOperations {
 
