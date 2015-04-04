@@ -301,12 +301,13 @@ public class JobOperationsImpl implements JobOperations {
 		JobImpl jobImpl = JobQueueOperations.transformJobTypeToImpl(abstractJobType);
 
 		synchronized (coreFactory.getMonitoringOperations().getJobQueue()) {
-			if(isNew) {
+			// new on not empty list
+			if(isNew && coreFactory.getMonitoringOperations().getJobQueue().size() > 0) {
 				String [] idArray = SortUtils.sortKeys(coreFactory.getMonitoringOperations().getJobQueue().keySet());
 				int maxId = Integer.parseInt(idArray[idArray.length - 1]);
 				abstractJobType.setId("" + (maxId + 1));
 				coreFactory.getMonitoringOperations().getJobQueue().put(abstractJobType.getId(), jobImpl);
-			} else { // update existing
+			} else { // update existing, or the first record to be inserted
 				coreFactory.getMonitoringOperations().getJobQueue().put(abstractJobType.getId(), jobImpl);
 			}
 			
