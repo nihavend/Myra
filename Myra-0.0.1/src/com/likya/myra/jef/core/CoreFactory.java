@@ -67,7 +67,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 	}
 
 	public static CoreFactoryInterface getInstance(InputStrategy inputStrategy, OutputStrategy outputStrategy) {
-		validateInputStrategy(inputStrategy);
+		inputStrategy = validateInputStrategy(inputStrategy);
 		coreFactory = new CoreFactory(inputStrategy, outputStrategy);
 		return (CoreFactoryInterface) coreFactory;
 	}
@@ -100,7 +100,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 		this.jobOperations = new JobOperationsImpl(this);
 	}
 	
-	private static void validateInputStrategy(InputStrategy inputStrategy) {
+	private static InputStrategy validateInputStrategy(InputStrategy inputStrategy) {
 
 		if(inputStrategy == null) {
 			inputStrategy = new InputStrategyImpl();
@@ -117,6 +117,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 			inputStrategy.setJobListDocument(jobListDocument);
 		}
 
+		return inputStrategy;
 	}
 
 	protected void start() throws Throwable {
