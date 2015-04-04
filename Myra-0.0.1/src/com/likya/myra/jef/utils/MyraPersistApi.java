@@ -264,7 +264,10 @@ public class MyraPersistApi {
 			persistObject.setTlosVersion(CoreFactory.getVersion());
 			persistObject.setGroupList(configurationManager.getGroupList());
 
-			out.writeObject(persistObject);
+			synchronized (persistObject) {
+				out.writeObject(persistObject);
+			}
+			
 			out.close();
 
 			File file = new File(configurationManager.getFileToPersist());
