@@ -31,7 +31,7 @@ import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.myra.jef.utils.JobQueueOperations;
 import com.likya.myra.jef.utils.MyraPersistApi;
-import com.likya.myra.jef.utils.NetTreeManagerImp;
+import com.likya.myra.jef.utils.NetTreeManagerImpl;
 import com.likya.myra.jef.utils.NetTreeManagerInterface;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.joblist.JobListDocument;
@@ -110,7 +110,7 @@ public class CoreFactoryBase {
 			}
 		}
 		
-		netTreeManagerInterface = new NetTreeManagerImp(abstractJobTypes);
+		netTreeManagerInterface = new NetTreeManagerImpl(abstractJobTypes);
 		updateNetTreeStatus(jobQueue);
 		controllerContainer.put("1", new SchedulerController((CoreFactoryInterface) this, jobQueue));
 		
