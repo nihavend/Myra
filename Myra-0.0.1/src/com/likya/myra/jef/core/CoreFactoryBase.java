@@ -119,12 +119,12 @@ public class CoreFactoryBase {
 
 	private void updateNetTreeStatus(HashMap<String, JobImpl> jobQueue) {
 
-		for (NetTreeResolver.NetTree netTreeMap : netTreeManagerInterface.getNetTreeMap().values()) {
+		for (NetTreeResolver.NetTree netTree : netTreeManagerInterface.getNetTreeMap().values()) {
 
-			for (AbstractJobType abstractJobType : netTreeMap.getMembers()) {
+			for (AbstractJobType abstractJobType : netTree.getMembers()) {
 				if (jobQueue.containsKey(abstractJobType.getId())) {
 					JobImpl jobImpl = jobQueue.get(abstractJobType.getId());
-					jobImpl.getJobRuntimeProperties().setMemberIdOfNetTree(netTreeMap.getVirtualId());
+					jobImpl.getJobRuntimeProperties().setMemberIdOfNetTree(netTree.getVirtualId());
 				}
 			}
 
