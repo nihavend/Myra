@@ -370,20 +370,26 @@ public class JobQueueOperations {
 	public static int indexOfJobType(AbstractJobType newAbstractJobType, JobList jobList) {
 		
 		int index = 0;
+		boolean found = false;
 		
 		for(AbstractJobType abstractJobType : jobList.getGenericJobArray()) {
+			// System.out.println(abstractJobType.getId());
+			// System.out.println(newAbstractJobType.getId());
 			if(abstractJobType.getId().equals(newAbstractJobType.getId())) {
+				found = true;
 				break;
 			}
 			++index;
 		}
 
-		return index;
+		return found ? index:-1;
 	}
 	
 	public static boolean updateJobType(AbstractJobType newAbstractJobType, JobList jobList) {
 		
 		int index = indexOfJobType(newAbstractJobType, jobList);
+		
+		if(index < 0) return false;
 		
 		jobList.getGenericJobArray(index).set(newAbstractJobType);
 		
