@@ -66,10 +66,12 @@ public class Commandability {
 		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING) && (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0);
 	}
 
+	public static boolean isDisablable(AbstractJobType abstractJobType) {
+		return !isEnablable(abstractJobType) && isStartable(abstractJobType);
+	}
 	
-
-	// TODO ?? public boolean isDisablable(JobImpl myJob);
-	
-	// TODO ?? public boolean isEnablable(JobImpl myJob);
+	public static boolean isEnablable(AbstractJobType abstractJobType) {
+		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.DEACTIVATED);
+	}
 
 }
