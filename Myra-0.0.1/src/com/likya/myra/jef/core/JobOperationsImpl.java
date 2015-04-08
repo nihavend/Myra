@@ -236,7 +236,13 @@ public class JobOperationsImpl implements JobOperations {
 				} else { 
 					logStr = logStr + " without normalizing !";
 				}
-				ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, LiveStateInfoUtils.getLastStateInfo(abstractJobType).getStatusName());
+				
+				if(LiveStateInfoUtils.getLastStateInfo(abstractJobType).getStatusName() == null) {
+					ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED);
+				} else {
+					ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, LiveStateInfoUtils.getLastStateInfo(abstractJobType).getStatusName());
+				}
+				
 				CoreFactory.getLogger().info(logStr);
 			}
 			//			synchronized (TlosServer.getDisabledJobQueue()) {
