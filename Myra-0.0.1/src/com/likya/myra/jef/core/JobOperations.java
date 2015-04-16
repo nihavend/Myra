@@ -44,7 +44,7 @@ public interface JobOperations {
 
 	public String setJobInputParam(String jobId, String paramString) ;
 	
-	public void addJob(AbstractJobType abstractJobType, boolean persist) throws UnknownServiceException;
+	public void addJob(AbstractJobType abstractJobType, boolean persist) throws UnknownServiceException, Exception;
 	
 	public void updateJob(AbstractJobType abstractJobType, boolean persist) throws Exception;
 	

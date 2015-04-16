@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import com.likya.commons.utils.SortUtils;
 import com.likya.myra.commons.utils.DependencyOperations;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
+import com.likya.myra.commons.utils.NetTreeResolver.NetTree;
 import com.likya.myra.jef.jobs.ChangeLSI;
 import com.likya.myra.jef.jobs.GenericInnerJob;
 import com.likya.myra.jef.jobs.JobHelper;
@@ -34,6 +35,7 @@ import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
+import com.likya.xsd.myra.model.wlagen.ItemDocument.Item;
 
 public class JobOperationsImpl implements JobOperations {
 	
@@ -302,42 +304,97 @@ public class JobOperationsImpl implements JobOperations {
 
 	}
 	
-	private void addUpdateJob(AbstractJobType abstractJobType, boolean persist, boolean isNew) throws UnknownServiceException  {
+	private void addUpdateJobQueue(JobImpl jobImpl, boolean persist, boolean isNew) throws UnknownServiceException  {
 		
-		JobImpl jobImpl = JobQueueOperations.transformJobTypeToImpl(abstractJobType);
-
 		synchronized (coreFactory.getMonitoringOperations().getJobQueue()) {
 			// new on not empty list
 			if(isNew && coreFactory.getMonitoringOperations().getJobQueue().size() > 0) {
 				String [] idArray = SortUtils.sortKeys(coreFactory.getMonitoringOperations().getJobQueue().keySet());
 				int maxId = Integer.parseInt(idArray[idArray.length - 1]);
-				abstractJobType.setId("" + (maxId + 1));
-				coreFactory.getMonitoringOperations().getJobQueue().put(abstractJobType.getId(), jobImpl);
+				
+				if(maxId < 0) maxId = 1;
+				
+				jobImpl.getAbstractJobType().setId("" + (maxId + 1));
+				coreFactory.getMonitoringOperations().getJobQueue().put(jobImpl.getAbstractJobType().getId(), jobImpl);
 			} else { // update existing, or the first record to be inserted
-				coreFactory.getMonitoringOperations().getJobQueue().put(abstractJobType.getId(), jobImpl);
+				coreFactory.getMonitoringOperations().getJobQueue().put(jobImpl.getAbstractJobType().getId(), jobImpl);
 			}
 			
 			coreFactory.getManagementOperations().sendReIndexSignal();
 		}
-
-		if (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0) { // No dependency free job
-			synchronized (coreFactory.getNetTreeManagerInterface().getFreeJobs()) {
-				coreFactory.getNetTreeManagerInterface().getFreeJobs().put(abstractJobType.getId(), abstractJobType);
-			}
-		} else { // has dependency, if nettreemap exist, then add to that map. If not, then create new map and move all to new net tree map
-			throw new UnknownServiceException("Not implemented yet !");
-		}
-
+		
 		synchronized (coreFactory.getJobListDocument().getJobList()) {
 			if (isNew) {
-				coreFactory.getJobListDocument().getJobList().addNewGenericJob().set(abstractJobType);
+				coreFactory.getJobListDocument().getJobList().addNewGenericJob().set(jobImpl.getAbstractJobType());
 			} else {
-				JobQueueOperations.updateJobType(abstractJobType, coreFactory.getJobListDocument().getJobList());
+				JobQueueOperations.updateJobType(jobImpl.getAbstractJobType(), coreFactory.getJobListDocument().getJobList());
 			}
 		}
 	}
 	
-	public void addJob(AbstractJobType abstractJobType, boolean persist) throws UnknownServiceException  {
+	private void addUpdateJob(AbstractJobType abstractJobType, boolean persist, boolean isNew) throws Exception  {
+		
+		JobImpl jobImpl = JobQueueOperations.transformJobTypeToImpl(abstractJobType);
+		
+		if (jobImpl.getAbstractJobType().getDependencyList() == null || jobImpl.getAbstractJobType().getDependencyList().sizeOfItemArray() == 0) { // No dependency free job
+			synchronized (coreFactory.getNetTreeManagerInterface().getFreeJobs()) {
+				addUpdateJobQueue(jobImpl, persist, isNew);
+				coreFactory.getNetTreeManagerInterface().getFreeJobs().put(jobImpl.getAbstractJobType().getId(), jobImpl.getAbstractJobType());
+			}
+		} else { // has dependency, if nettreemap exist, then add to that map. If not, then create new map and move all to new net tree map
+			
+			// 1. Validate dependency list  if (!DependencyOperations.validateDependencyList(logger, abstractJobTypeQueue)) {....
+			HashMap<String, AbstractJobType> abstractJobTypeQueue = JobQueueOperations.toAbstractJobTypeList(coreFactory.getMonitoringOperations().getJobQueue());
+			if (!DependencyOperations.validateDependencyList(logger, abstractJobTypeQueue)) {
+				throw new Exception("JobList.xml is dependency definitions are not  valid !");
+			}
+			// 2. Bağımlılık listesinde ağacı olan var mı kontrol et, 
+			
+			addUpdateJobQueue(jobImpl, persist, isNew);
+			
+			boolean found = false;
+			for(Item myItem : jobImpl.getAbstractJobType().getDependencyList().getItemArray()) {
+				JobImpl tmpJobImpl = coreFactory.getMonitoringOperations().getJobQueue().get(myItem.getJsId());
+				if(tmpJobImpl.getJobRuntimeProperties().getMemberIdOfNetTree() != null) {
+					jobImpl.getJobRuntimeProperties().setMemberIdOfNetTree(tmpJobImpl.getJobRuntimeProperties().getMemberIdOfNetTree());
+					ArrayList<AbstractJobType> netTreeMembers = coreFactory.getNetTreeManagerInterface().getNetTreeMap().get(tmpJobImpl.getJobRuntimeProperties().getMemberIdOfNetTree()).getMembers();
+					
+					coreFactory.getNetTreeManagerInterface().getFreeJobs().remove(jobImpl.getAbstractJobType().getId());
+					coreFactory.getNetTreeManagerInterface().getFreeJobs().remove(tmpJobImpl.getAbstractJobType().getId());
+					if(!netTreeMembers.contains(tmpJobImpl.getAbstractJobType())) {
+						netTreeMembers.add(tmpJobImpl.getAbstractJobType());
+					}
+					if(!netTreeMembers.contains(jobImpl.getAbstractJobType())) {
+						netTreeMembers.add(jobImpl.getAbstractJobType());
+					}
+					found = true;
+					break;
+				}
+			}
+			
+			if(!found) {
+				coreFactory.getNetTreeManagerInterface().getFreeJobs().remove(jobImpl.getAbstractJobType().getId());
+				NetTree netTree = new NetTree();
+				netTree.getMembers().add(jobImpl.getAbstractJobType());
+				jobImpl.getJobRuntimeProperties().setMemberIdOfNetTree(netTree.getVirtualId());
+				
+				for(Item myItem : jobImpl.getAbstractJobType().getDependencyList().getItemArray()) {
+					JobImpl tmpJobImpl = coreFactory.getMonitoringOperations().getJobQueue().get(myItem.getJsId());
+					coreFactory.getNetTreeManagerInterface().getFreeJobs().remove(tmpJobImpl.getAbstractJobType().getId());
+					if(!netTree.getMembers().contains(tmpJobImpl.getAbstractJobType())) {
+						netTree.getMembers().add(tmpJobImpl.getAbstractJobType());
+					}
+					tmpJobImpl.getJobRuntimeProperties().setMemberIdOfNetTree(netTree.getVirtualId());
+				}
+				
+				coreFactory.getNetTreeManagerInterface().getNetTreeMap().put(netTree.getVirtualId(), netTree);
+			}
+			
+		}
+
+	}
+	
+	public void addJob(AbstractJobType abstractJobType, boolean persist) throws Exception  {
 		addUpdateJob(abstractJobType, persist, true);
 	}
 	
