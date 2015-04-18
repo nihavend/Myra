@@ -240,7 +240,7 @@ public class JobOperationsImpl implements JobOperations {
 				}
 				
 				if(LiveStateInfoUtils.getLastStateInfo(abstractJobType).getStatusName() == null) {
-					ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED);
+					JobHelper.evaluateTriggerType(abstractJobType, true, false);
 				} else {
 					ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, LiveStateInfoUtils.getLastStateInfo(abstractJobType).getStatusName());
 				}
