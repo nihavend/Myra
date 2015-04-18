@@ -305,14 +305,17 @@ public class JobHelper {
 		}
 	}
 	
-	
 	public static void evaluateTriggerType(AbstractJobType abstractJobType, boolean forward) {
+		 evaluateTriggerType(abstractJobType, forward, true);
+	}
+	
+	public static void evaluateTriggerType(AbstractJobType abstractJobType, boolean forward, boolean isNew) {
 		
 		if(abstractJobType.getGraphInfo() != null) {
 			abstractJobType.getGraphInfo().setDeadBranch(false);
 		}
 		
-		if(LiveStateInfoUtils.equalStates(abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0), StateName.PENDING, SubstateName.DEACTIVATED)) {
+		if(isNew && LiveStateInfoUtils.equalStates(abstractJobType.getStateInfos().getLiveStateInfos().getLiveStateInfoArray(0), StateName.PENDING, SubstateName.DEACTIVATED)) {
 			// new added job, just leave it's state
 			return;
 		}
