@@ -160,7 +160,6 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 
 			if (isPersistent()) {
 				MyraPersistApi.persistJobQueue(coreFactoryInterface.getConfigurationManager(), jobQueue);
-				// JobQueueOperations.persistDisabledJobQueue(coreFactoryInterface.getConfigurationManager(), disabledJobQueue);
 			}
 
 			try {
