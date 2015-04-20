@@ -307,18 +307,31 @@ public class JobOperationsImpl implements JobOperations {
 	private void addUpdateJobQueue(JobImpl jobImpl, boolean persist, boolean isNew) throws UnknownServiceException  {
 		
 		synchronized (coreFactory.getMonitoringOperations().getJobQueue()) {
-			// new on not empty list
-			if(isNew && coreFactory.getMonitoringOperations().getJobQueue().size() > 0) {
-				String [] idArray = SortUtils.sortKeys(coreFactory.getMonitoringOperations().getJobQueue().keySet());
-				int maxId = Integer.parseInt(idArray[idArray.length - 1]);
-				
-				if(maxId < 0) maxId = 1;
-				
-				jobImpl.getAbstractJobType().setId("" + (maxId + 1));
-				coreFactory.getMonitoringOperations().getJobQueue().put(jobImpl.getAbstractJobType().getId(), jobImpl);
-			} else { // update existing, or the first record to be inserted
-				coreFactory.getMonitoringOperations().getJobQueue().put(jobImpl.getAbstractJobType().getId(), jobImpl);
-			}
+			
+			if(isNew) {
+				int maxId = 1;
+				if(coreFactory.getMonitoringOperations().getJobQueue().size() > 0) {
+					String [] idArray = SortUtils.sortKeys(coreFactory.getMonitoringOperations().getJobQueue().keySet());
+					maxId = Integer.parseInt(idArray[idArray.length]);
+				}
+				jobImpl.getAbstractJobType().setId("" + maxId);
+			} 
+			
+			coreFactory.getMonitoringOperations().getJobQueue().put(jobImpl.getAbstractJobType().getId(), jobImpl);
+					
+			
+//			// new on not empty list
+//			if(isNew && coreFactory.getMonitoringOperations().getJobQueue().size() > 0) {
+//				String [] idArray = SortUtils.sortKeys(coreFactory.getMonitoringOperations().getJobQueue().keySet());
+//				int maxId = Integer.parseInt(idArray[idArray.length - 1]);
+//				
+//				if(maxId < 0) maxId = 1;
+//				
+//				jobImpl.getAbstractJobType().setId("" + (maxId + 1));
+//				coreFactory.getMonitoringOperations().getJobQueue().put(jobImpl.getAbstractJobType().getId(), jobImpl);
+//			} else { // update existing, or the first record to be inserted
+//				coreFactory.getMonitoringOperations().getJobQueue().put(jobImpl.getAbstractJobType().getId(), jobImpl);
+//			}
 			
 			coreFactory.getManagementOperations().sendReIndexSignal();
 		}
