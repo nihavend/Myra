@@ -312,9 +312,9 @@ public class JobOperationsImpl implements JobOperations {
 				int maxId = 1;
 				if(coreFactory.getMonitoringOperations().getJobQueue().size() > 0) {
 					String [] idArray = SortUtils.sortKeys(coreFactory.getMonitoringOperations().getJobQueue().keySet());
-					maxId = Integer.parseInt(idArray[idArray.length]);
+					maxId = Integer.parseInt(idArray[idArray.length - 1]);
 				}
-				jobImpl.getAbstractJobType().setId("" + maxId);
+				jobImpl.getAbstractJobType().setId("" + (maxId + 1));
 			} 
 			
 			coreFactory.getMonitoringOperations().getJobQueue().put(jobImpl.getAbstractJobType().getId(), jobImpl);
@@ -352,7 +352,7 @@ public class JobOperationsImpl implements JobOperations {
 		if (jobImpl.getAbstractJobType().getDependencyList() == null || jobImpl.getAbstractJobType().getDependencyList().sizeOfItemArray() == 0) { // No dependency free job
 			synchronized (coreFactory.getNetTreeManagerInterface().getFreeJobs()) {
 				addUpdateJobQueue(jobImpl, persist, isNew);
-				coreFactory.getNetTreeManagerInterface().getFreeJobs().put(jobImpl.getAbstractJobType().getId(), jobImpl.getAbstractJobType());
+				coreFactory.getNetTreeManagerInterface().getFreeJobs().put(jobImpl.getAbstractJobType().getId(), jobImpl.getAbstractJobType().getId());
 			}
 		} else { // has dependency, if nettreemap exist, then add to that map. If not, then create new map and move all to new net tree map
 			
@@ -370,15 +370,15 @@ public class JobOperationsImpl implements JobOperations {
 				JobImpl tmpJobImpl = coreFactory.getMonitoringOperations().getJobQueue().get(myItem.getJsId());
 				if(tmpJobImpl.getJobRuntimeProperties().getMemberIdOfNetTree() != null) {
 					jobImpl.getJobRuntimeProperties().setMemberIdOfNetTree(tmpJobImpl.getJobRuntimeProperties().getMemberIdOfNetTree());
-					ArrayList<AbstractJobType> netTreeMembers = coreFactory.getNetTreeManagerInterface().getNetTreeMap().get(tmpJobImpl.getJobRuntimeProperties().getMemberIdOfNetTree()).getMembers();
+					ArrayList<String> netTreeMembers = coreFactory.getNetTreeManagerInterface().getNetTreeMap().get(tmpJobImpl.getJobRuntimeProperties().getMemberIdOfNetTree()).getMembers();
 					
 					coreFactory.getNetTreeManagerInterface().getFreeJobs().remove(jobImpl.getAbstractJobType().getId());
 					coreFactory.getNetTreeManagerInterface().getFreeJobs().remove(tmpJobImpl.getAbstractJobType().getId());
-					if(!netTreeMembers.contains(tmpJobImpl.getAbstractJobType())) {
-						netTreeMembers.add(tmpJobImpl.getAbstractJobType());
+					if(!netTreeMembers.contains(tmpJobImpl.getAbstractJobType().getId())) {
+						netTreeMembers.add(tmpJobImpl.getAbstractJobType().getId());
 					}
-					if(!netTreeMembers.contains(jobImpl.getAbstractJobType())) {
-						netTreeMembers.add(jobImpl.getAbstractJobType());
+					if(!netTreeMembers.contains(jobImpl.getAbstractJobType().getId())) {
+						netTreeMembers.add(jobImpl.getAbstractJobType().getId());
 					}
 					found = true;
 					break;
@@ -388,14 +388,14 @@ public class JobOperationsImpl implements JobOperations {
 			if(!found) {
 				coreFactory.getNetTreeManagerInterface().getFreeJobs().remove(jobImpl.getAbstractJobType().getId());
 				NetTree netTree = new NetTree();
-				netTree.getMembers().add(jobImpl.getAbstractJobType());
+				netTree.getMembers().add(jobImpl.getAbstractJobType().getId());
 				jobImpl.getJobRuntimeProperties().setMemberIdOfNetTree(netTree.getVirtualId());
 				
 				for(Item myItem : jobImpl.getAbstractJobType().getDependencyList().getItemArray()) {
 					JobImpl tmpJobImpl = coreFactory.getMonitoringOperations().getJobQueue().get(myItem.getJsId());
 					coreFactory.getNetTreeManagerInterface().getFreeJobs().remove(tmpJobImpl.getAbstractJobType().getId());
 					if(!netTree.getMembers().contains(tmpJobImpl.getAbstractJobType())) {
-						netTree.getMembers().add(tmpJobImpl.getAbstractJobType());
+						netTree.getMembers().add(tmpJobImpl.getAbstractJobType().getId());
 					}
 					tmpJobImpl.getJobRuntimeProperties().setMemberIdOfNetTree(netTree.getVirtualId());
 				}
