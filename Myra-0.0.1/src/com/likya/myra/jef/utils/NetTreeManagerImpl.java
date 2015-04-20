@@ -64,7 +64,7 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 
 							if (isDeadBeanch) {
 								// he branch of live is dead due to dependency
-								// desision, so continue to next
+								// decision, so continue to next
 								continue;
 							}
 
