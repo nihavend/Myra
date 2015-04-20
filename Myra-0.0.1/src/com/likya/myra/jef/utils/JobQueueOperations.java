@@ -338,11 +338,11 @@ public class JobQueueOperations {
 		return getJobList(abstractJobTypeList, predicate);
 	}
 	
-	public static Collection<AbstractJobType> getJobList(HashMap<String, AbstractJobType> abstractJobTypeList, StateName.Enum filterStates[]) {
+	public static Collection<AbstractJobType> getJobList(HashMap<String, String> jobIdList, StateName.Enum filterStates[]) {
 		
 		JobListFilter jobListFilter = new StateFilter(filterStates);
 		
-		return getJobList(abstractJobTypeList, jobListFilter.anyPredicate());
+		return getJobList(getSubset(jobIdList), jobListFilter.anyPredicate());
 	}
 	
 	public static Collection<AbstractJobType> getJobListForImpl(HashMap<String, JobImpl> jobQueue, StateName.Enum filterStates[]) {
@@ -352,11 +352,11 @@ public class JobQueueOperations {
 		return getJobListForImpl(jobQueue, jobListFilter.anyPredicate());
 	}
 	
-	public static Collection<AbstractJobType> getJobList(ArrayList<AbstractJobType> abstractJobTypeList, StateName.Enum filterStates[]) {
+	public static Collection<AbstractJobType> getJobList(ArrayList<String> jobIdList, StateName.Enum filterStates[]) {
 
 		JobListFilter jobListFilter = new StateFilter(filterStates);
 
-		return getJobList(abstractJobTypeList, jobListFilter.anyPredicate());
+		return getJobList(getSubsetList(jobIdList), jobListFilter.anyPredicate());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -403,5 +403,29 @@ public class JobQueueOperations {
 		jobList.removeGenericJob(index);
 
 		return true;
+	}
+	
+	public static ArrayList<AbstractJobType> getSubset(HashMap<String, String> jobIdList) {
+		
+		ArrayList<AbstractJobType> abstractJobTypeList = new ArrayList<AbstractJobType>();
+		
+		for(String jobId : jobIdList.keySet()) {
+			AbstractJobType tmpAbstractJobType = CoreFactory.getInstance().getMonitoringOperations().getJobQueue().get(jobId).getAbstractJobType();
+			abstractJobTypeList.add(tmpAbstractJobType);
+		}
+		
+		return abstractJobTypeList;
+	}
+
+	public static ArrayList<AbstractJobType> getSubsetList(ArrayList<String> jobIdList) {
+		
+		ArrayList<AbstractJobType> abstractJobTypeList = new ArrayList<AbstractJobType>();
+		
+		for(String jobId : jobIdList) {
+			AbstractJobType tmpAbstractJobType = CoreFactory.getInstance().getMonitoringOperations().getJobQueue().get(jobId).getAbstractJobType();
+			abstractJobTypeList.add(tmpAbstractJobType);
+		}
+		
+		return abstractJobTypeList;
 	}
 }
