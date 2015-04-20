@@ -264,7 +264,7 @@ public class MyraPersistApi {
 			persistObject.setTlosVersion(CoreFactory.getVersion());
 			persistObject.setGroupList(configurationManager.getGroupList());
 
-			synchronized (persistObject) {
+			synchronized (jobQueue) {
 				out.writeObject(persistObject);
 			}
 			
