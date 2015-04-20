@@ -7,6 +7,7 @@ import com.likya.myra.commons.utils.NetTreeResolver;
 import com.likya.myra.commons.utils.NetTreeResolver.NetTree;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.jobs.JobHelper;
+import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
@@ -17,7 +18,7 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 	private HashMap<String, NetTreeMonitor> netTreeMonitorMap = new HashMap<String, NetTreeMonitor>();
 
 	private HashMap<String, NetTree> netTreeMap = new HashMap<String, NetTree>();
-	private HashMap<String, AbstractJobType> freeJobs = new HashMap<String, AbstractJobType>();
+	private HashMap<String, String> freeJobs = new HashMap<String, String>();
 
 	transient private Thread myExecuter;
 
@@ -49,6 +50,8 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 
 			Thread.currentThread().setName("NetTreeMonitor_" + System.currentTimeMillis()/*netTree.getVirtualId()*/);
 
+			HashMap<String, JobImpl> jobQueue = CoreFactory.getInstance().getMonitoringOperations().getJobQueue();
+			
 			int freq = 1000;
 			while (loop) {
 				
@@ -58,9 +61,11 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 
 						boolean confirmForReset = true;
 
-						for (AbstractJobType abstractJobType : netTree.getMembers()) {
+						for (String jobId : netTree.getMembers()) {
 
-							boolean isDeadBeanch = abstractJobType.getGraphInfo().getDeadBranch();
+							AbstractJobType abstractJobType = jobQueue.get(jobId).getAbstractJobType();
+							
+							boolean isDeadBeanch =   abstractJobType.getGraphInfo().getDeadBranch();
 
 							if (isDeadBeanch) {
 								// he branch of live is dead due to dependency
@@ -92,9 +97,12 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 						}
 
 						if (confirmForReset) {
-							for (AbstractJobType abstractJobType : netTree.getMembers()) {
+							for (String jobId : netTree.getMembers()) {
 								// System.err.println("Reset all NetTree members functionality not implemented yet !");
-								JobHelper.resetJob(abstractJobType);
+								AbstractJobType abstractJobType = jobQueue.get(jobId).getAbstractJobType();
+								synchronized (abstractJobType) {
+									JobHelper.resetJob(abstractJobType);
+								}
 							}
 							freq = 60000;
 						}
@@ -147,7 +155,7 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 		return netTreeMap;
 	}
 
-	public HashMap<String, AbstractJobType> getFreeJobs() {
+	public HashMap<String, String> getFreeJobs() {
 		return freeJobs;
 	}
 
