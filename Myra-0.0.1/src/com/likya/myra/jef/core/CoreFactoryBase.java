@@ -121,9 +121,9 @@ public class CoreFactoryBase {
 
 		for (NetTreeResolver.NetTree netTree : netTreeManagerInterface.getNetTreeMap().values()) {
 
-			for (AbstractJobType abstractJobType : netTree.getMembers()) {
-				if (jobQueue.containsKey(abstractJobType.getId())) {
-					JobImpl jobImpl = jobQueue.get(abstractJobType.getId());
+			for (String jobId : netTree.getMembers()) {
+				if (jobQueue.containsKey(jobId)) {
+					JobImpl jobImpl = jobQueue.get(jobId);
 					jobImpl.getJobRuntimeProperties().setMemberIdOfNetTree(netTree.getVirtualId());
 				}
 			}
