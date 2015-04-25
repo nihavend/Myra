@@ -24,13 +24,7 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 
 	public NetTreeManagerImpl(AbstractJobType[] abscAbstractJobTypes) {
 		super();
-		StringBuilder logString;
-		try {
-			logString = NetTreeResolver.runAlgorythm(abscAbstractJobTypes, netTreeMap, freeJobs);
-			CoreFactory.getLogger().info(logString);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		refresh(abscAbstractJobTypes);
 	}
 
 	public class NetTreeMonitor implements Runnable {
@@ -134,6 +128,18 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 	public void startMe() {
 		myExecuter = new Thread(this);
 		myExecuter.start();
+	}
+	
+	public void refresh(AbstractJobType[] abscAbstractJobTypes) {
+		StringBuilder logString;
+		try {
+			netTreeMap.clear();
+			freeJobs.clear();
+			logString = NetTreeResolver.runAlgorythm(abscAbstractJobTypes, netTreeMap, freeJobs);
+			CoreFactory.getLogger().info(logString);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void run() {
