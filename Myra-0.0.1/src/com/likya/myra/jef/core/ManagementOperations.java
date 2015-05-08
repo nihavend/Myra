@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.likya.myra.jef.core;
 
-import com.likya.myra.jef.model.CoreStateInfo;
 
 public interface ManagementOperations {
 
@@ -28,10 +27,6 @@ public interface ManagementOperations {
 	public void gracefulShutDown();
 
 	public void forceFullShutDown();
-	
-	public CoreStateInfo getExecutionState();
-	
-	public void setExecutionState(CoreStateInfo coreStateInfo);
 	
 	public void sendReIndexSignal();
 
