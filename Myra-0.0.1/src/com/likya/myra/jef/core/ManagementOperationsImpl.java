@@ -50,17 +50,17 @@ public class ManagementOperationsImpl implements ManagementOperations {
 	}
 
 	public void suspend() {
-		if (coreFactory.getExecutionState() == CoreStateInfo.STATE_WORKING) {
+		if (CoreFactory.getExecutionState() == CoreStateInfo.STATE_WORKING) {
 			logger.info(CoreFactory.getMessage("Myra.321"));
-			coreFactory.setExecutionState(CoreStateInfo.STATE_SUSPENDED);
+			CoreFactory.setExecutionState(CoreStateInfo.STATE_SUSPENDED);
 			logger.info(CoreFactory.getMessage("Myra.322"));
 		}
 	}
 
 	public void resume() {
-		if (coreFactory.getExecutionState() == CoreStateInfo.STATE_SUSPENDED) {
+		if (CoreFactory.getExecutionState() == CoreStateInfo.STATE_SUSPENDED) {
 			logger.info(CoreFactory.getMessage("Myra.323"));
-			coreFactory.setExecutionState(CoreStateInfo.STATE_WORKING);
+			CoreFactory.setExecutionState(CoreStateInfo.STATE_WORKING);
 			logger.info(CoreFactory.getMessage("Myra.324"));
 		}
 	}
@@ -97,7 +97,7 @@ public class ManagementOperationsImpl implements ManagementOperations {
 			}
 		}
 
-		coreFactory.setExecutionState(CoreStateInfo.STATE_STOP);
+		CoreFactory.setExecutionState(CoreStateInfo.STATE_STOP);
 
 	}
 
@@ -139,14 +139,12 @@ public class ManagementOperationsImpl implements ManagementOperations {
 		}
 	}
 
-	@Override
-	public CoreStateInfo getExecutionState() {
-		return coreFactory.getExecutionState();
+	public static CoreStateInfo getExecutionState() {
+		return CoreFactory.getExecutionState();
 	}
 
-	@Override
-	public void setExecutionState(CoreStateInfo coreStateInfo) {
-		coreFactory.setExecutionState(coreStateInfo);
+	public static void setExecutionState(CoreStateInfo coreStateInfo) {
+		CoreFactory.setExecutionState(coreStateInfo);
 	}
 
 	@Override
