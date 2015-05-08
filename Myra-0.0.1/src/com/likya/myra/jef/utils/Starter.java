@@ -10,6 +10,7 @@ import com.likya.myra.jef.OutputStrategy;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.CoreFactoryInterface;
 import com.likya.myra.jef.core.ManagementOperations;
+import com.likya.myra.jef.core.ManagementOperationsImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
 import com.likya.xsd.myra.model.joblist.JobListDocument;
 
@@ -59,7 +60,7 @@ public class Starter {
 		CoreFactoryInterface coreFactoryInterface = CoreFactory.getInstance(inputStrategy, outputStrategy);
 		
 		if(coreStateInfo != null) {
-			coreFactoryInterface.getManagementOperations().setExecutionState(coreStateInfo);
+			ManagementOperationsImpl.setExecutionState(coreStateInfo);
 		}
 
 		ManagementOperations managementOperations = coreFactoryInterface.getManagementOperations();
