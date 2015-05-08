@@ -47,7 +47,7 @@ public class CoreFactoryBase {
 
 	protected final static String localePath = "com.likya.myra.resources.messages";
 
-	private CoreStateInfo coreStateInfo = CoreStateInfo.STATE_STARTING;
+	private static CoreStateInfo coreStateInfo = CoreStateInfo.STATE_STARTING;
 
 	private static Logger logger = Logger.getLogger("Myra");
 
@@ -198,14 +198,6 @@ public class CoreFactoryBase {
 		return version;
 	}
 
-	public CoreStateInfo getExecutionState() {
-		return coreStateInfo;
-	}
-
-	public synchronized void setExecutionState(CoreStateInfo coreStateInfo) {
-		this.coreStateInfo = coreStateInfo;
-	}
-
 	protected int getNumOfSchedulerControllers() {
 		return numOfSchedulerControllers;
 	}
@@ -228,5 +220,13 @@ public class CoreFactoryBase {
 	
 	public JobListDocument getJobListDocument() {
 		return jobListDocument;
+	}
+
+	protected static CoreStateInfo getExecutionState() {
+		return coreStateInfo;
+	}
+
+	protected static void setExecutionState(CoreStateInfo coreStateInfo) {
+		CoreFactoryBase.coreStateInfo = coreStateInfo;
 	}
 }
