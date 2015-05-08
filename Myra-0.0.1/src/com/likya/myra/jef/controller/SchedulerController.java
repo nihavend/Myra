@@ -27,6 +27,7 @@ import com.likya.myra.commons.model.UnresolvedDependencyException;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.CoreFactoryInterface;
+import com.likya.myra.jef.core.ManagementOperationsImpl;
 import com.likya.myra.jef.jobs.JobHelper;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
@@ -84,7 +85,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 
 				while (indexIterator.hasNext()) {
 
-					if ((coreFactoryInterface.getManagementOperations().getExecutionState() == CoreStateInfo.STATE_SUSPENDED) || checkThresholdOverflow()) {
+					if ((ManagementOperationsImpl.getExecutionState() == CoreStateInfo.STATE_SUSPENDED) || checkThresholdOverflow()) {
 						// TlosServer.print(".");
 						break;
 					}
