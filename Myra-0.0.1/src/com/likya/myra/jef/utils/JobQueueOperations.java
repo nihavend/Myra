@@ -247,8 +247,10 @@ public class JobQueueOperations {
 		JobHelper.evaluateTriggerType(abstractJobType, false);
 
 		// remove the difference between borned and planned time 
-		management.getTimeManagement().getJsPlannedTime().setStartTime(management.getTimeManagement().getBornedPlannedTime().getStartTime());
-		management.getTimeManagement().getJsPlannedTime().setStopTime(management.getTimeManagement().getBornedPlannedTime().getStopTime());
+		if(management.getTimeManagement() != null) { // USER triggered job submitted
+			management.getTimeManagement().getJsPlannedTime().setStartTime(management.getTimeManagement().getBornedPlannedTime().getStartTime());
+			management.getTimeManagement().getJsPlannedTime().setStopTime(management.getTimeManagement().getBornedPlannedTime().getStopTime());
+		}
 		
 		JobRuntimeInterface jobRuntimeInterface = new JobRuntimeProperties();
 		JobImpl jobImpl = null;
