@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import com.likya.commons.utils.PrintVantil;
 import com.likya.myra.commons.model.UnresolvedDependencyException;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
+import com.likya.myra.commons.utils.NetTreeResolver.NetTree;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.CoreFactoryInterface;
 import com.likya.myra.jef.core.ManagementOperationsImpl;
@@ -95,6 +96,17 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 
 					AbstractJobType abstractJobType = scheduledJob.getAbstractJobType();
 
+					/**
+					 * if searching for depId takes so much time than 
+					 * a new field to hold the depGrpId should be added to abstractJobType
+					 * and may be used to directly for getting activity info of the Dep Group
+					 */
+					NetTree netTree = JobQueueOperations.getNetTree(abstractJobType.getId());
+					
+					if(netTree == null || !netTree.isActive()) {
+						continue;
+					}
+					
 					if (!abstractJobType.getBaseJobInfos().getJsIsActive()) {
 						continue;
 					}
