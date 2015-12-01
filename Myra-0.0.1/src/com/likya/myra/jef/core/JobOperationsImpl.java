@@ -26,6 +26,7 @@ import com.likya.commons.utils.SortUtils;
 import com.likya.myra.commons.utils.DependencyOperations;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.NetTreeResolver;
+import com.likya.myra.commons.utils.NetTreeResolver.NetTree;
 import com.likya.myra.jef.jobs.ChangeLSI;
 import com.likya.myra.jef.jobs.GenericInnerJob;
 import com.likya.myra.jef.jobs.JobHelper;
@@ -195,8 +196,12 @@ public class JobOperationsImpl implements JobOperations {
 		
 	}
 
-	@Override
 	public void disableJob(String jobName) {
+		disableJob(jobName, false);
+	}
+	
+	@Override
+	public void disableJob(String jobName, boolean isGroupCommand) {
 		
 		logger.info(CoreFactory.getMessage("Myra.319") + CoreFactory.getMessage("Myra.300") + jobName);
 
@@ -204,13 +209,14 @@ public class JobOperationsImpl implements JobOperations {
 
 			AbstractJobType abstractJobType = coreFactory.getMonitoringOperations().getJobQueue().get(jobName).getAbstractJobType();
 			
+			if (!isGroupCommand) {
+				if (!Commandability.isDisablableForFree(abstractJobType)) {
+					CoreFactory.getLogger().info(CoreFactory.getMessage("Myra.3191") + jobName + " : " + LiveStateInfoUtils.getLastStateInfo(abstractJobType));
+					return;
+				}
+			}
+			
 			ChangeLSI.forValue(abstractJobType, LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_DEACTIVATED));
-			
-//			TODO yeni yapıda bu iş nasıl olacak ?
-//			synchronized (TlosServer.getDisabledJobQueue()) {
-//				TlosServer.getDisabledJobQueue().put(jobName, jobName);
-//			}
-			
 			CoreFactory.getLogger().info(CoreFactory.getMessage("Myra.319") + CoreFactory.getMessage("Myra.301") + jobName + " : " + LiveStateInfoUtils.getLastStateInfo(abstractJobType));
 		}
 	}
@@ -220,13 +226,20 @@ public class JobOperationsImpl implements JobOperations {
 		return;
 	}
 	
-	public void enableJob(String jobId, boolean normalize) {
+	public void enableJob(String jobId, boolean normalize, boolean isGroupCommand) {
 		
 		logger.info(CoreFactory.getMessage("Myra.310") + CoreFactory.getMessage("Myra.300") + jobId);
 
 		if (coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 
 			AbstractJobType abstractJobType = coreFactory.getMonitoringOperations().getJobQueue().get(jobId).getAbstractJobType();
+			
+			if(!isGroupCommand) {
+				if(!Commandability.isEnablableForFree(abstractJobType)) {
+					CoreFactory.getLogger().info(CoreFactory.getMessage("Myra.3101") + jobId + " : " + LiveStateInfoUtils.getLastStateInfo(abstractJobType));
+					return;
+				}
+			}
 			
 			String logStr = "Enabling job >> " + abstractJobType.getId();
 			
@@ -252,6 +265,13 @@ public class JobOperationsImpl implements JobOperations {
 			
 			logger.info(CoreFactory.getMessage("Myra.310") + CoreFactory.getMessage("Myra.301") + jobId + " : " + LiveStateInfoUtils.getLastStateInfo(abstractJobType));
 		}
+	}
+	
+	/**
+	 * Preserved for backward compatibility
+	 */
+	public void enableJob(String jobId, boolean normalize) {
+		enableJob(jobId, normalize, false);
 	}
 
 	public String setJobInputParam(String jobId, String paramString) {
@@ -308,7 +328,7 @@ public class JobOperationsImpl implements JobOperations {
 		synchronized (coreFactory.getMonitoringOperations().getJobQueue()) {
 			
 			if(isNew) {
-				int maxId = 1;
+				int maxId = 0;
 				if(coreFactory.getMonitoringOperations().getJobQueue().size() > 0) {
 					String [] idArray = SortUtils.sortKeys(coreFactory.getMonitoringOperations().getJobQueue().keySet());
 					maxId = Integer.parseInt(idArray[idArray.length - 1]);
@@ -494,6 +514,49 @@ public class JobOperationsImpl implements JobOperations {
 //		}
 //		
 //	}
+	
+	public void enableGroup(String grpId) {
+		
+		HashMap<String, NetTree> netTreeMap = coreFactory.getNetTreeManagerInterface().getNetTreeMap();
+		
+		if(netTreeMap.containsKey(grpId)) {
+			NetTree netTree = netTreeMap.get(grpId);
+			synchronized (netTree) {
+				boolean isOk = Commandability.isNetTreeEnablable(grpId);
+				if(isOk) {
+					// All jobs are ok, so enable all
+					for (String jobId : netTree.getMembers()) {
+						System.err.println(jobId);
+						enableJob(jobId, false, true);
+					}
+					// All jobs are enabled, enable group at last
+					netTree.setActive(true);
+				}
+			}
+		}
+		
+	}
+	
+	public void disableGroup(String grpId) {
+		
+		HashMap<String, NetTree> netTreeMap = coreFactory.getNetTreeManagerInterface().getNetTreeMap();
+		
+		if(netTreeMap.containsKey(grpId)) {
+			NetTree netTree = netTreeMap.get(grpId);
+			synchronized (netTree) {
+				boolean isOk = Commandability.isNetTreeDisablable(grpId);
+				if (isOk) {
+					// First disable group
+					netTree.setActive(false);
+					// All jobs are ok, so disable all
+					for (String jobId : netTree.getMembers()) {
+						disableJob(jobId, true);
+					}
+				}
+			}
+		}
+		
+	}
 	
 	private void resetViewTree() {
 		HashMap<String, AbstractJobType> abstractJobTypeQueue = JobQueueOperations.toAbstractJobTypeList(coreFactory.getMonitoringOperations().getJobQueue());
