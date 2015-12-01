@@ -1,8 +1,12 @@
 package com.likya.myra.jef.core;
 
+import java.util.HashMap;
+
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
+import com.likya.myra.commons.utils.NetTreeResolver.NetTree;
 import com.likya.myra.jef.jobs.JobHelper;
 import com.likya.myra.jef.jobs.JobImpl;
+import com.likya.myra.jef.utils.JobQueueOperations;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
@@ -66,12 +70,83 @@ public class Commandability {
 		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING) && (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0);
 	}
 
-	public static boolean isDisablable(AbstractJobType abstractJobType) {
-		return !isEnablable(abstractJobType) && isStartable(abstractJobType);
+	/**
+	 * Rule of isDisablableForFree :
+	 * 1. Job must be free job
+	 * 2. Job StateName == StateName.PENDING 
+	 * 
+	 * @param abstractJobType
+	 * @return isDisablable
+	 */
+	public static boolean isDisablableForFree(AbstractJobType abstractJobType) {
+		boolean isMeFree = JobQueueOperations.isMeFree(abstractJobType);
+		return isMeFree && LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING);
 	}
 	
-	public static boolean isEnablable(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.DEACTIVATED);
+	/**
+	 * Rule of isEnablableForFree :
+	 * 1. Job must be free job
+	 * 2. Job StateName == StateName.PENDING  and SubStateName == SubStateName.DEACTIVATED
+	 * 
+	 * @param abstractJobType
+	 * @return isEnablable
+	 */
+	public static boolean isEnablableForFree(AbstractJobType abstractJobType) {
+		boolean isMeFree = JobQueueOperations.isMeFree(abstractJobType);
+		return isMeFree && LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.DEACTIVATED);
 	}
 
+	/**
+	 * Rule of isDisablableForGroup :
+	 * 1. Job StateName == StateName.PENDING 
+	 * 
+	 * @param abstractJobType
+	 * @return isDisablable
+	 */
+	public static boolean isDisablableForGroup(AbstractJobType abstractJobType) {
+		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING);
+	}
+	
+	/**
+	 * Rule of isEnablableForGroup :
+	 * 1. Job StateName == StateName.PENDING  and SubStateName == SubStateName.DEACTIVATED
+	 * 
+	 * @param abstractJobType
+	 * @return isEnablable
+	 */
+	public static boolean isEnablableForGroup(AbstractJobType abstractJobType) {
+		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.DEACTIVATED);
+	}
+	
+	public static boolean isNetTreeEnablable(String netTreeId) {
+		
+		HashMap<String, NetTree> netTreeMap = CoreFactory.getInstance().getNetTreeManagerInterface().getNetTreeMap();
+		HashMap<String, JobImpl> jobQueue = CoreFactory.getInstance().getMonitoringOperations().getJobQueue();
+		NetTree netTree = netTreeMap.get(netTreeId);
+		for (String jobId : netTree.getMembers()) {
+			AbstractJobType abstractJobType = jobQueue.get(jobId).getAbstractJobType();
+			if (!Commandability.isEnablableForGroup(abstractJobType)) {
+				// Group contains a job that is not available for EnablableForGroup 
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public static boolean isNetTreeDisablable(String netTreeId) {
+		
+		HashMap<String, NetTree> netTreeMap = CoreFactory.getInstance().getNetTreeManagerInterface().getNetTreeMap();
+		HashMap<String, JobImpl> jobQueue = CoreFactory.getInstance().getMonitoringOperations().getJobQueue();
+		NetTree netTree = netTreeMap.get(netTreeId);
+		for (String jobId : netTree.getMembers()) {
+			AbstractJobType abstractJobType = jobQueue.get(jobId).getAbstractJobType();
+			if (!Commandability.isDisablableForGroup(abstractJobType)) {
+				// Group contains a job that is not available for EnablableForGroup 
+				return false;
+			}
+		}
+		
+		return true;
+	}
 }
