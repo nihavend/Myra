@@ -22,6 +22,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -29,9 +30,11 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.iterators.ArrayIterator;
 
+import com.likya.myra.commons.utils.DependencyOperations;
 import com.likya.myra.commons.utils.JobListFilter;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.StateFilter;
+import com.likya.myra.commons.utils.NetTreeResolver.NetTree;
 import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.jobs.JobHelper;
@@ -300,13 +303,23 @@ public class JobQueueOperations {
 
 	public static HashMap<String, AbstractJobType> toAbstractJobTypeList(HashMap<String, JobImpl> jobQueue) {
 
-		HashMap<String, AbstractJobType> tmpList = new HashMap<String, AbstractJobType>();
+		HashMap<String, AbstractJobType> tmpList;
+		
+		while (true) {
 
-		Iterator<String> jobsIterator = jobQueue.keySet().iterator();
-
-		while (jobsIterator.hasNext()) {
-			String jobKey = jobsIterator.next();
-			tmpList.put(jobKey, jobQueue.get(jobKey).getAbstractJobType());
+			tmpList = new HashMap<String, AbstractJobType>();
+			
+			Iterator<String> jobsIterator = jobQueue.keySet().iterator();
+			
+			try {
+				while (jobsIterator.hasNext()) {
+					String jobKey = jobsIterator.next();
+					tmpList.put(jobKey, jobQueue.get(jobKey).getAbstractJobType());
+				}
+			} catch (ConcurrentModificationException c) {
+				continue;
+			}
+			break;
 		}
 
 		return tmpList;
@@ -429,5 +442,55 @@ public class JobQueueOperations {
 		}
 		
 		return abstractJobTypeList;
+	}
+	
+	public static boolean isMeFree(AbstractJobType me) {
+		
+		if(me.getDependencyList() != null && me.getDependencyList().sizeOfItemArray() != 0) {
+			return false;
+		}
+		
+		HashMap<String, JobImpl> jobQueue = CoreFactory.getInstance().getMonitoringOperations().getJobQueue();
+		HashMap<String, AbstractJobType> abstractJobTypeList = JobQueueOperations.toAbstractJobTypeList(jobQueue);
+		ArrayList<AbstractJobType> dependentList = DependencyOperations.getDependencyList(abstractJobTypeList, me.getId());
+		
+		if(dependentList != null && dependentList.size() != 0) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * 
+	 * @param jobId
+	 * @return null if free job
+	 */
+	public static NetTree getNetTree(String jobId) {
+		
+		if(CoreFactory.getInstance().getNetTreeManagerInterface().getFreeJobs().containsKey(jobId)) {
+			return null;
+		}
+		
+		HashMap<String, NetTree> netTreeMap = CoreFactory.getInstance().getNetTreeManagerInterface().getNetTreeMap();
+
+		/**
+		 * During the iteration, the content of the map may change. This change is not so important
+		 * for a small interval of time, so the copy of the object is used as snapshot of the map for the iteration
+		 */
+		
+		try {
+			for (NetTree netTree : netTreeMap.values()) {
+				for (String tmpId : netTree.getMembers()) {
+					if (tmpId.equals(jobId)) {
+						return netTree;
+					}
+				}
+			}
+		} catch (ConcurrentModificationException e) {
+			// DO NOTHING
+		}
+		
+		return null;
 	}
 }
