@@ -37,10 +37,14 @@ public interface JobOperations {
 	public void startJob(String jobId);
 
 	public void disableJob(String jobId);
+	
+	public void disableJob(String jobName, boolean isGroupCommand);
 
 	public void enableJob(String jobId);
 	
 	public void enableJob(String jobId, boolean normalize);
+	
+	public void enableJob(String jobId, boolean normalize, boolean isGroupCommand);
 
 	public String setJobInputParam(String jobId, String paramString) ;
 	
@@ -49,5 +53,10 @@ public interface JobOperations {
 	public void updateJob(AbstractJobType abstractJobType, boolean persist) throws Exception;
 	
 	public void deleteJob(String jobId, boolean persist) throws Exception;
+	
+	
+	public void enableGroup(String grpId);
+
+	public void disableGroup(String grpId);
 	
 }
