@@ -1,5 +1,6 @@
 package com.likya.myra.jef.utils;
 
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
@@ -107,6 +108,8 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 					
 				} catch (InterruptedException e) {
 					CoreFactory.getLogger().info(e.getMessage());
+				} catch (ConcurrentModificationException c) {
+					// DO NOTHING
 				}
 			}
 		}
