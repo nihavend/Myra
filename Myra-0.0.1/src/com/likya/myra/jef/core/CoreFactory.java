@@ -55,7 +55,7 @@ public class CoreFactory extends CoreFactoryBase implements CoreFactoryInterface
 			try {
 				throw new InstanceNotFoundException("Use getInstance with parameters !");
 			} catch (InstanceNotFoundException e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 				return null;
 			}
 		}
