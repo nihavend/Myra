@@ -80,7 +80,7 @@ public class Commandability {
 	 */
 	public static boolean isDisablableForFree(AbstractJobType abstractJobType) {
 		boolean isMeFree = JobQueueOperations.isMeFree(abstractJobType);
-		return isMeFree && LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING);
+		return isMeFree && LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING) && !LiveStateInfoUtils.equalStatesPD(abstractJobType);
 	}
 	
 	/**
