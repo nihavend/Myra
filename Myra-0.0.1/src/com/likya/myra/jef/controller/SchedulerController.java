@@ -103,7 +103,12 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 					 */
 					NetTree netTree = JobQueueOperations.getNetTree(abstractJobType.getId());
 					
-					if(netTree == null || !netTree.isActive()) {
+					/*
+					 * if nettree is null, it means that this job is not a member of any dependency list
+					 * and belongs to free jobs list.
+					 * 
+					 */
+					if(netTree != null && !netTree.isActive()) {
 						continue;
 					}
 					
