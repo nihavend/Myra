@@ -251,6 +251,7 @@ public class MyraPersistApi {
 			CoreFactory.getLogger().fatal(CoreFactory.getMessage("JobQueueOperations.11"));
 			return true;
 		}
+		
 		try {
 
 			File fileTemp = new File(configurationManager.getFileToPersist() + ".temp");
@@ -264,8 +265,10 @@ public class MyraPersistApi {
 			persistObject.setTlosVersion(CoreFactory.getVersion());
 			persistObject.setGroupList(configurationManager.getGroupList());
 
-			synchronized (jobQueue) {
+			try {
 				out.writeObject(persistObject);
+			} catch (Throwable tex) {
+				tex.printStackTrace();
 			}
 			
 			out.close();
