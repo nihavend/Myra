@@ -80,6 +80,10 @@ public class JobOperationsImpl implements JobOperations {
 				if(((GenericInnerJob) myJob).scheduleForNextExecution(myJob.getAbstractJobType())) {
 					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS);
 					logger.info(CoreFactory.getMessage("Myra.303") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+					if(JobQueueOperations.isMeFree(myJob.getAbstractJobType())) {
+						ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
+						logger.info(CoreFactory.getMessage("Myra.303") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
+					}
 				} else {
 					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, "set success yaparken bir hata oluştu !");
 				}
@@ -187,7 +191,21 @@ public class JobOperationsImpl implements JobOperations {
 			if(isStartable) {
 				Calendar nowDateTime = Calendar.getInstance();
 				updateStartConditionsOfDepChain(jobId,  nowDateTime);
+				if(myJob.getAbstractJobType().getManagement().getTimeManagement() == null) {
+					myJob.getAbstractJobType().getManagement().addNewTimeManagement().addNewJsPlannedTime();
+				}
 				myJob.getAbstractJobType().getManagement().getTimeManagement().getJsPlannedTime().setStartTime(nowDateTime);
+				
+				// İlk önce grup işlemini yapıp sonra job statu degisikligi yapıyoruz
+				// Aksi taktirde grup işlmleri job statuye takılıp gecersiz oluyor.
+				NetTree netTree = JobQueueOperations.getNetTree(jobId);
+				if(netTree != null) { // Member of dependency tree
+					if(!netTree.isActive()) {
+						enableGroup(netTree.getVirtualId());
+						netTree.setActive(true);
+					}
+				}
+
 				ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
 			}
 			
