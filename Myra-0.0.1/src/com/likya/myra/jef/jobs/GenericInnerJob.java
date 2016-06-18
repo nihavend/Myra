@@ -118,7 +118,7 @@ public abstract class GenericInnerJob extends JobImpl {
 
 				CascadingConditions cascadingConditions = abstractJobType.getManagement().getCascadingConditions();
 
-				if (cascadingConditions != null && cascadingConditions.getJobAutoRetryInfo().getJobAutoRetry()) {
+				if (cascadingConditions != null && cascadingConditions.getJobAutoRetryInfo() != null && cascadingConditions.getJobAutoRetryInfo().getJobAutoRetry()) {
 
 					boolean retryCondition = true;
 
