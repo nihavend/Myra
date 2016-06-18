@@ -74,6 +74,7 @@ public class Commandability {
 	 * Rule of isDisablableForFree :
 	 * 1. Job must be free job
 	 * 2. Job StateName == StateName.PENDING 
+	 * 3. !(Job StateName == StateName.PENDING && SubStateName == SubStateName.DEACTIVATED) zaten deactive olmayan bir job olmalı
 	 * 
 	 * @param abstractJobType
 	 * @return isDisablable
