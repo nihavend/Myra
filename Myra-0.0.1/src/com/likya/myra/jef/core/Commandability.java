@@ -23,7 +23,8 @@ public class Commandability {
 	}
 
 	public static boolean isSkipable(JobImpl myJob) {
-		return LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.PENDING, SubstateName.PAUSED) || LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED);
+		boolean isMeFree = JobQueueOperations.isMeFree(myJob.getAbstractJobType());
+		return !isMeFree && LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.PENDING, SubstateName.PAUSED) || LiveStateInfoUtils.equalStates(JobHelper.getLastStateInfo(myJob), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED);
 	}
 
 	public static boolean isStopable(JobImpl myJob) {
@@ -59,7 +60,7 @@ public class Commandability {
 	}
 
 	public static boolean isPausable(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING);
+		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING) && !LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING, SubstateName.PAUSED);
 	}
 
 	public static boolean isResumable(AbstractJobType abstractJobType) {
@@ -81,7 +82,7 @@ public class Commandability {
 	 */
 	public static boolean isDisablableForFree(AbstractJobType abstractJobType) {
 		boolean isMeFree = JobQueueOperations.isMeFree(abstractJobType);
-		return isMeFree && LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING) && !LiveStateInfoUtils.equalStatesPD(abstractJobType);
+		return isMeFree && (LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING) || LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED)) && !LiveStateInfoUtils.equalStatesPD(abstractJobType);
 	}
 	
 	/**
@@ -105,7 +106,7 @@ public class Commandability {
 	 * @return isDisablable
 	 */
 	public static boolean isDisablableForGroup(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING);
+		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING) || LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED);
 	}
 	
 	/**
