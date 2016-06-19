@@ -43,6 +43,8 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 
 		public void run() {
 
+			int normalFreq = 5000;
+			
 			Thread.currentThread().setName("NetTreeMonitor_" + System.currentTimeMillis()/*netTree.getVirtualId()*/);
 
 			HashMap<String, JobImpl> jobQueue = CoreFactory.getInstance().getMonitoringOperations().getJobQueue();
@@ -99,7 +101,7 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 									JobHelper.resetJob(abstractJobType);
 								}
 							}
-							freq = 60000;
+							freq = normalFreq;
 						}
 
 					}
