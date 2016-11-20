@@ -24,10 +24,9 @@ import org.apache.log4j.Logger;
 import com.likya.myra.commons.ValidPlatforms;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.MyraDateUtils;
-import com.likya.myra.commons.utils.PeriodCalculations;
 import com.likya.myra.commons.utils.StateUtils;
 import com.likya.myra.jef.core.CoreFactory;
-import com.likya.myra.jef.utils.Scheduler;
+import com.likya.myra.jef.utils.timeschedules.TimeScheduler;
 import com.likya.xsd.myra.model.generics.EntryDocument.Entry;
 import com.likya.xsd.myra.model.generics.EnvVariablesDocument.EnvVariables;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
@@ -67,10 +66,10 @@ public class JobHelper {
 		String endLog = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.14") + MyraDateUtils.getDate(endTime.getTime());
 		String duration = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.15") + durationList[0] + " saat " + durationList[1] + " dakika " + durationList[2] + " saniye";
 
-		if(abstractJobType.getManagement().getTimeManagement().getJsRealTime() == null) {
-			abstractJobType.getManagement().getTimeManagement().addNewJsRealTime();
+		if(abstractJobType.getManagement().getTimeManagement().getJsRecordedTime() == null) {
+			abstractJobType.getManagement().getTimeManagement().addNewJsRecordedTime();
 		}
-		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStopTime(endTime);
+		abstractJobType.getManagement().getTimeManagement().getJsRecordedTime().setStopTime(endTime);
 
 		jobClassName.getJobRuntimeProperties().setCompletionDate(endTime);
 		// getJobProperties().setCompletionDateTime(endTime);
@@ -85,26 +84,26 @@ public class JobHelper {
 
 	}
 
-	public static void setJsPlannedTimeForStart(AbstractJobType abstractJobType, long period) {
+	public static void setJsActualTimeForStart(AbstractJobType abstractJobType, long period) {
 		String timeZone = abstractJobType.getManagement().getTimeManagement().getTimeZone();
-		Calendar returnCal = PeriodCalculations.addPeriod(Calendar.getInstance(), period, timeZone);
-		abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(returnCal);
+		Calendar returnCal = TimeScheduler.addPeriod(Calendar.getInstance(), period, timeZone);
+		abstractJobType.getManagement().getTimeManagement().getJsActualTime().setStartTime(returnCal);
 	}
 
-	protected static void setJsRealTimeForStart(AbstractJobType abstractJobType, Calendar startTime) {
-		// System.err.println("Beofer : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime().getTime().getTime()));
-		if(abstractJobType.getManagement().getTimeManagement().getJsRealTime() == null) {
-			abstractJobType.getManagement().getTimeManagement().addNewJsRealTime();
+	protected static void setJsRecordedTimeForStart(AbstractJobType abstractJobType, Calendar startTime) {
+		// System.err.println("Before : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime().getTime().getTime()));
+		if(abstractJobType.getManagement().getTimeManagement().getJsRecordedTime() == null) {
+			abstractJobType.getManagement().getTimeManagement().addNewJsRecordedTime();
 		}
-		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStartTime(startTime);
+		abstractJobType.getManagement().getTimeManagement().getJsRecordedTime().setStartTime(startTime);
 		// System.err.println("Beofer : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime().getTime().getTime()));
 	}
 
-	public static void setJsRealTimeForStop(AbstractJobType abstractJobType, Calendar stopTime) {
-		if(abstractJobType.getManagement().getTimeManagement().getJsRealTime() == null) {
-			abstractJobType.getManagement().getTimeManagement().addNewJsRealTime();
+	public static void setJsRecordedTimeForStop(AbstractJobType abstractJobType, Calendar stopTime) {
+		if(abstractJobType.getManagement().getTimeManagement().getJsRecordedTime() == null) {
+			abstractJobType.getManagement().getTimeManagement().addNewJsRecordedTime();
 		}
-		abstractJobType.getManagement().getTimeManagement().getJsRealTime().setStopTime(stopTime);
+		abstractJobType.getManagement().getTimeManagement().getJsRecordedTime().setStopTime(stopTime);
 	}
 
 	public static String removeSlashAtTheEnd(SimplePropertiesType simpleProperties, String jobPath, String jobCommand) {
@@ -298,8 +297,8 @@ public class JobHelper {
 	}
 	
 	private static void doControlForNextTime(AbstractJobType abstractJobType) {
-		if (Scheduler.scheduleForNextExecution(abstractJobType)) {
-			String startTime = MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime());
+		if (TimeScheduler.scheduleForNextExecution(abstractJobType)) {
+			String startTime = MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsActualTime().getStartTime().getTime());
 			CoreFactory.getLogger().info("Job [" + abstractJobType.getId() + "] bir sonraki zamana kuruldu : " + startTime);
 			ChangeLSI.forValue(abstractJobType, StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
 		}
