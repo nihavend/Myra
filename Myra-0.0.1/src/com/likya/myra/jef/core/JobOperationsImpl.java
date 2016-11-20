@@ -192,9 +192,9 @@ public class JobOperationsImpl implements JobOperations {
 				Calendar nowDateTime = Calendar.getInstance();
 				updateStartConditionsOfDepChain(jobId,  nowDateTime);
 				if(myJob.getAbstractJobType().getManagement().getTimeManagement() == null) {
-					myJob.getAbstractJobType().getManagement().addNewTimeManagement().addNewJsPlannedTime();
+					myJob.getAbstractJobType().getManagement().addNewTimeManagement().addNewJsActualTime();
 				}
-				myJob.getAbstractJobType().getManagement().getTimeManagement().getJsPlannedTime().setStartTime(nowDateTime);
+				myJob.getAbstractJobType().getManagement().getTimeManagement().getJsActualTime().setStartTime(nowDateTime);
 				
 				// İlk önce grup işlemini yapıp sonra job statu degisikligi yapıyoruz
 				// Aksi taktirde grup işlmleri job statuye takılıp gecersiz oluyor.
@@ -336,7 +336,7 @@ public class JobOperationsImpl implements JobOperations {
 			if ((tempJobList != null) && (tempJobList.size() > 0)) {
 				updateStartConditionsOfDepChain(tmpJobId, myDate);
 			}
-			abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(myDate);
+			abstractJobType.getManagement().getTimeManagement().getJsActualTime().setStartTime(myDate);
 		}
 
 	}
