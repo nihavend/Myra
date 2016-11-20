@@ -24,7 +24,7 @@ import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
-import com.likya.myra.jef.utils.Scheduler;
+import com.likya.myra.jef.utils.timeschedules.TimeScheduler;
 import com.likya.xsd.myra.model.generics.UnitDocument.Unit;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
@@ -70,7 +70,7 @@ public abstract class GenericInnerJob extends JobImpl {
 	}
 
 	public boolean scheduleForNextExecution(AbstractJobType abstractJobType) {
-		return Scheduler.scheduleForNextExecution(abstractJobType);
+		return TimeScheduler.scheduleForNextExecution(abstractJobType);
 	}
 
 	private boolean isInDepenedencyChain(String jobId) {
@@ -135,7 +135,7 @@ public abstract class GenericInnerJob extends JobImpl {
 
 							long stepTime = MyraDateUtils.getDurationInMilliSecs(abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getStep());
 
-							JobHelper.setJsPlannedTimeForStart(abstractJobType, stepTime);
+							JobHelper.setJsActualTimeForStart(abstractJobType, stepTime);
 							setRenewByTime(abstractJobType);
 
 						} else {
