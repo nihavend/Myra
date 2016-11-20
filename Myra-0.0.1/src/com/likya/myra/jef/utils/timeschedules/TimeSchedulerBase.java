@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 
 import com.likya.myra.commons.utils.MyraDateUtils;
-import com.likya.myra.commons.utils.PeriodCalculations;
 import com.likya.myra.commons.utils.RestrictedDailyIterator;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
