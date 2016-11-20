@@ -143,10 +143,10 @@ public class OutputData implements Serializable {
 		outputData.setHandleUri(abstractJobType.getHandlerURI());
 		outputData.setJobId(abstractJobType.getId());
 		
-		if(abstractJobType.getManagement().getTimeManagement().getJsRealTime() != null) {
+		if(abstractJobType.getManagement().getTimeManagement().getJsRecordedTime() != null) {
 			outputData.setOutputType(OutputData.types.DEFAULT);
-	 		outputData.setStartTime(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStartTime());
-			outputData.setStopTime(abstractJobType.getManagement().getTimeManagement().getJsRealTime().getStopTime());
+	 		outputData.setStartTime(abstractJobType.getManagement().getTimeManagement().getJsRecordedTime().getStartTime());
+			outputData.setStopTime(abstractJobType.getManagement().getTimeManagement().getJsRecordedTime().getStopTime());
 		} else {
 			outputData.setOutputType(OutputData.types.JOSTATECHANGE);
 		}
