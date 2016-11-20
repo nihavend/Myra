@@ -130,7 +130,7 @@ public class ExecuteSchComponent extends CommonShell {
 			int processExitValue = channel.getExitStatus();
 			
 			Calendar endTime = Calendar.getInstance();
-			JobHelper.setJsRealTimeForStop(abstractJobType, endTime);
+			JobHelper.setJsRecordedTimeForStop(abstractJobType, endTime);
 
 			myLogger.info(" >>" + logLabel + jobId + " islemi sonlandi, islem bitis degeri : " + processExitValue);
 
