@@ -105,8 +105,8 @@ public abstract class JobImpl implements Runnable, Serializable {
 	public String toString() {
 		// return "[JobId:" + getAbstractJobType().getId() + "][" + JobHelper.getLastStateInfo(getAbstractJobType()) + "]";
 		LiveStateInfo liveStateInfo = LiveStateInfoUtils.getLastStateInfo(getAbstractJobType());
-		String startTime = MyraDateUtils.getDate(getAbstractJobType().getManagement().getTimeManagement().getJsPlannedTime().getStartTime());
-		String stopTime = MyraDateUtils.getDate(getAbstractJobType().getManagement().getTimeManagement().getJsPlannedTime().getStopTime());
+		String startTime = MyraDateUtils.getDate(getAbstractJobType().getManagement().getTimeManagement().getJsActualTime().getStartTime());
+		//String stopTime = "NOT DEFINED CONTACT TO DEVELOPER !"; // MyraDateUtils.getDate(getAbstractJobType().getManagement().getTimeManagement().getJsPlannedTime().getStopTime());
 		
 		String toString = "";
 		if(liveStateInfo.getStateName() != null) {
@@ -121,7 +121,8 @@ public abstract class JobImpl implements Runnable, Serializable {
 			toString = toString + ":" + liveStateInfo.getStatusName().toString();
 		}	
 		
-		return "[JobId:" + getAbstractJobType().getId() + "][start:" + startTime + "|stop:" + stopTime + "][LSIDT:" + liveStateInfo.getLSIDateTime() + "][" + toString + "]";
+		// return "[JobId:" + getAbstractJobType().getId() + "][start:" + startTime + "|stop:" + stopTime + "][LSIDT:" + liveStateInfo.getLSIDateTime() + "][" + toString + "]";
+		return "[JobId:" + getAbstractJobType().getId() + "][start:" + startTime + "][LSIDT:" + liveStateInfo.getLSIDateTime() + "][" + toString + "]";
 	}
 
 }
