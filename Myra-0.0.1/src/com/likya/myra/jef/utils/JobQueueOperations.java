@@ -251,8 +251,7 @@ public class JobQueueOperations {
 
 		// remove the difference between borned and planned time 
 		if(management.getTimeManagement() != null) { // USER triggered job submitted
-			management.getTimeManagement().getJsPlannedTime().setStartTime(management.getTimeManagement().getBornedPlannedTime().getStartTime());
-			management.getTimeManagement().getJsPlannedTime().setStopTime(management.getTimeManagement().getBornedPlannedTime().getStopTime());
+			management.getTimeManagement().getJsActualTime().setStartTime(management.getTimeManagement().getJsScheduledTime().getStartTime());
 		}
 		
 		JobRuntimeInterface jobRuntimeInterface = new JobRuntimeProperties();
