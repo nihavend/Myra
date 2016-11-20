@@ -18,7 +18,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
 import org.joda.time.format.DateTimeParser;
 
-import com.likya.myra.commons.utils.ExecutionTimeFrameValidator;
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.xsd.myra.model.generics.TypeOfTimeType;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
@@ -29,10 +28,6 @@ import com.likya.xsd.myra.model.wlagen.TimeManagementDocument.TimeManagement;
 public class PeriodCalculations {
 
 	protected static Calendar forward(AbstractJobType abstractJobType, ArrayList<String> messages) {
-		
-		if(!ExecutionTimeFrameValidator.validateEndTime(abstractJobType, messages)) {
-			return null;
-		}
 		
 		PeriodInfo periodInfo = abstractJobType.getManagement().getPeriodInfo();
 		
