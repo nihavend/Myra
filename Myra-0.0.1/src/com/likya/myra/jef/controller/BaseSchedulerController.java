@@ -26,13 +26,13 @@ import org.apache.commons.collections.CollectionUtils;
 import com.likya.myra.commons.model.UnresolvedDependencyException;
 import com.likya.myra.commons.utils.JobDependencyResolver;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
-import com.likya.myra.commons.utils.PeriodCalculations;
 import com.likya.myra.commons.utils.StateFilter;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.CoreFactoryInterface;
 import com.likya.myra.jef.jobs.ChangeLSI;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.utils.JobQueueOperations;
+import com.likya.myra.jef.utils.timeschedules.TimeScheduler;
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.jobprops.DependencyListDocument.DependencyList;
@@ -70,7 +70,7 @@ public class BaseSchedulerController {
 
 	protected boolean hasTimeCome(AbstractJobType abstractJobType) {
 
-		Date scheduledTime = abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime();
+		Date scheduledTime = abstractJobType.getManagement().getTimeManagement().getJsActualTime().getStartTime().getTime();
 		Date currentTime = Calendar.getInstance().getTime();
 
 		if (scheduledTime.before(currentTime)) {
@@ -148,12 +148,12 @@ public class BaseSchedulerController {
 	 */
 	protected Calendar getMaxBaseDate(Item[] dependencyArray) {
 
-		Calendar maxBaseDate = jobQueue.get(dependencyArray[0].getJsId()).getAbstractJobType().getManagement().getTimeManagement().getJsRealTime().getStopTime();
+		Calendar maxBaseDate = jobQueue.get(dependencyArray[0].getJsId()).getAbstractJobType().getManagement().getTimeManagement().getJsRecordedTime().getStopTime();
 
 		// System.err.println("Current : " + MyraDateUtils.getDate(maxBaseDate.getTime()));
 		for (Item item : dependencyArray) {
 			AbstractJobType depJob = jobQueue.get(item.getJsId()).getAbstractJobType();
-			Calendar stopTime = depJob.getManagement().getTimeManagement().getJsRealTime().getStopTime();
+			Calendar stopTime = depJob.getManagement().getTimeManagement().getJsRecordedTime().getStopTime();
 			// System.err.println("Dep Job : " + item.getJsId() + " Time " + MyraDateUtils.getDate(maxBaseDate.getTime()));
 			if (stopTime.after(maxBaseDate)) {
 				maxBaseDate = stopTime;
@@ -178,8 +178,8 @@ public class BaseSchedulerController {
 		SensInfo sensInfo = dependencyList.getSensInfo();
 		// System.err.println("Before : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime()));
 		String timeZone = abstractJobType.getManagement().getTimeManagement().getTimeZone();
-		Calendar returnCal = PeriodCalculations.addPeriod(newTime, PeriodCalculations.getDurationInMilliSecs(sensInfo.getSensTime().getDelay()), timeZone);
-		abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(returnCal);
+		Calendar returnCal = TimeScheduler.addPeriod(newTime, TimeScheduler.getDurationInMilliSecs(sensInfo.getSensTime().getDelay()), timeZone);
+		abstractJobType.getManagement().getTimeManagement().getJsActualTime().setStartTime(returnCal);
 		// System.err.println("After : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime()));
 	}
 
