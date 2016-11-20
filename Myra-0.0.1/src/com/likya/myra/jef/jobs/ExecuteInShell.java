@@ -75,7 +75,7 @@ public class ExecuteInShell extends CommonShell {
 
 		String startLog = abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.0") + MyraDateUtils.getDate(startTime.getTime());
 
-		JobHelper.setJsRealTimeForStart(abstractJobType, startTime);
+		JobHelper.setJsRecordedTimeForStart(abstractJobType, startTime);
 
 		CoreFactory.getLogger().info(startLog);
 
@@ -132,7 +132,7 @@ public class ExecuteInShell extends CommonShell {
 			int processExitValue = process.exitValue();
 			
 			Calendar endTime = Calendar.getInstance();
-			JobHelper.setJsRealTimeForStop(abstractJobType, endTime);
+			JobHelper.setJsRecordedTimeForStop(abstractJobType, endTime);
 			
 			CoreFactory.getLogger().info(jobId + CoreFactory.getMessage("ExternalProgram.6") + processExitValue);
 
