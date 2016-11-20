@@ -27,23 +27,41 @@ public class TimeScheduler extends TimeSchedulerBase implements TimeSchedulerInt
 
 	public static boolean scheduleForNextExecution(AbstractJobType abstractJobType) {
 
-		boolean retValue = true;
-
+		if(!ExecutionTimeFrameValidator.validateEndTime(abstractJobType)) {
+			return false;
+		}
+		
 		PeriodInfo periodInfo = abstractJobType.getManagement().getPeriodInfo();
 		// TODO Special care for daily jobs, may be done compatible with general periodicity
 		if (periodInfo == null || periodInfo.getStep() == null || periodInfo.getStep().equals(new GDuration("P1D"))) {
 			Calendar selectedSchedule = regularSchedule(abstractJobType);
 			if (selectedSchedule != null /*&& selectedSchedule.after(Calendar.getInstance())*/) {
 				abstractJobType.getManagement().getTimeManagement().getJsActualTime().setStartTime(selectedSchedule);
+				if(!ExecutionTimeFrameValidator.validateEndTime(abstractJobType)) {
+					abstractJobType.getManagement().getTimeManagement().getJsActualTime().setStartTime(null);
+					return false;
+				}
 			} else {
 				// yeni zamana kurulmadı, artık çalışmayacak
-				retValue = false;
+				return false;
 			}
 		} else {
-			retValue = periodicSchedule(abstractJobType);
+			if(periodicSchedule(abstractJobType)) {
+				if(!ExecutionTimeFrameValidator.validateEndTime(abstractJobType)) {
+					abstractJobType.getManagement().getTimeManagement().getJsActualTime().setStartTime(null);
+					return false;
+				}
+			}
 		}
 
-		return retValue;
+		return true;
 	}
 
+	public static Calendar addPeriod(Calendar startDateTime, long period, String selectedTZone) {
+		return PeriodCalculations.addPeriod(startDateTime, period, selectedTZone);
+	}
+	
+	public static long getDurationInMilliSecs(GDuration gDuration) {
+		return PeriodCalculations.getDurationInMilliSecs(gDuration);
+	}
 }
