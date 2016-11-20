@@ -2,3 +2,6 @@
 /target
 /.DS_Store
 /myra-0.0.1.jar
+/.umlproject
+/.euml2
+/.gitignore
