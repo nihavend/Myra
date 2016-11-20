@@ -139,7 +139,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 												}
 											}
 										} else { // Relative Time Sensitive
-											if(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime() == null) { 
+											if(abstractJobType.getManagement().getTimeManagement().getJsActualTime().getStartTime() == null) { 
 												handleTimeSensitivity(abstractJobType, dependencyList);
 											}
 											if (hasTimeCome(abstractJobType)) {
@@ -157,7 +157,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 								} else {
 									if (!LiveStateInfoUtils.equalStatesPRW(liveStateInfo)) {
 										if (isTimeSensitive(dependencyList) && dependencyList.getSensInfo().getSensTime().getRelativeStart()) {
-											abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().setStartTime(null);
+											abstractJobType.getManagement().getTimeManagement().getJsActualTime().setStartTime(null);
 										}
 										liveStateInfo.setSubstateName(SubstateName.READY);
 										liveStateInfo.setStatusName(StatusName.WAITING);
