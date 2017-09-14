@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.likya.myra.jef.jobs;
 
-import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
@@ -70,7 +69,7 @@ public class WatchDogTimer extends Thread {
 			Thread.sleep(timeout);
 			CascadingConditions cascadingConditions = jobImpl.getAbstractJobType().getManagement().getCascadingConditions();
 			if (cascadingConditions == null || cascadingConditions.getJobAutoRetryInfo() == null || cascadingConditions.getJobAutoRetryInfo().getJobAutoRetry() != true) {
-				LiveStateInfoUtils.insertNewLiveStateInfo(jobImpl.getAbstractJobType(), StateName.INT_RUNNING, SubstateName.INT_ON_RESOURCE, StatusName.INT_TIME_OUT);
+				ChangeLSI.forValue(jobImpl.getAbstractJobType(), StateName.RUNNING, SubstateName.ON_RESOURCE, StatusName.TIME_OUT);
 				CoreFactory.getLogger().info(CoreFactory.getMessage("WatchDogTimer.0"));
 			} else {
 				CoreFactory.getLogger().info(CoreFactory.getMessage("WatchDogTimer.1") + jobImpl.getAbstractJobType().getId());
