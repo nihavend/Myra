@@ -45,6 +45,8 @@ public class OutputData implements Serializable {
 	private types outputType;
 	
 	private String jobId;
+	private String jobName;
+	
 	private String handleUri;
 	private String treeId;
 	private String groupName;
@@ -91,6 +93,14 @@ public class OutputData implements Serializable {
 		return handleUri;
 	}
 
+	public String getJobName() {
+		return jobName;
+	}
+
+	public void setJobName(String jobName) {
+		this.jobName = jobName;
+	}
+	
 	public void setHandleUri(String handleUri) {
 		this.handleUri = handleUri;
 	}
@@ -142,6 +152,7 @@ public class OutputData implements Serializable {
 		outputData.setGroupName("");
 		outputData.setHandleUri(abstractJobType.getHandlerURI());
 		outputData.setJobId(abstractJobType.getId());
+		outputData.setJobName(abstractJobType.getBaseJobInfos().getJsName());
 		
 		if(abstractJobType.getManagement().getTimeManagement().getJsRecordedTime() != null) {
 			outputData.setOutputType(OutputData.types.DEFAULT);
