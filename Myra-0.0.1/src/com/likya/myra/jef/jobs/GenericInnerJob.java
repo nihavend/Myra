@@ -83,6 +83,8 @@ public abstract class GenericInnerJob extends JobImpl {
 
 		String jobId = abstractJobType.getId();
 
+		JobHelper.setWorkDurations(this, startTime);
+		
 		if (isInDepenedencyChain(jobId)) {
 			// Do not touch, leave it to its master !
 			return;
@@ -102,7 +104,7 @@ public abstract class GenericInnerJob extends JobImpl {
 
 		if (isSuccess || (goOnError && isFailed)) {
 
-			JobHelper.setWorkDurations(this, startTime);
+			// JobHelper.setWorkDurations(this, startTime);
 
 			JobHelper.evaluateTriggerType(abstractJobType, true);
 
@@ -110,7 +112,7 @@ public abstract class GenericInnerJob extends JobImpl {
 
 		} else {
 
-			JobHelper.setWorkDurations(this, startTime);
+			// JobHelper.setWorkDurations(this, startTime);
 
 			boolean manuelStop = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.STOPPED, StatusName.BYUSER);
 
