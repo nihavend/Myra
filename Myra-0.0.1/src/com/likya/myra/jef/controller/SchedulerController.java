@@ -29,6 +29,7 @@ import com.likya.myra.commons.utils.NetTreeResolver.NetTree;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.core.CoreFactoryInterface;
 import com.likya.myra.jef.core.ManagementOperationsImpl;
+import com.likya.myra.jef.jobs.ChangeLSI;
 import com.likya.myra.jef.jobs.JobHelper;
 import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.CoreStateInfo;
@@ -167,7 +168,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 						}
 
 					} catch (UnresolvedDependencyException ude) {
-						LiveStateInfoUtils.insertNewLiveStateInfo(scheduledJob.getAbstractJobType(), StateName.INT_CANCELLED, SubstateName.INT_STOPPED, StatusName.INT_BYEVENT);
+						ChangeLSI.forValue(scheduledJob.getAbstractJobType(), StateName.CANCELLED, SubstateName.STOPPED, StatusName.BYEVENT);
 						logger.fatal("Job " + scheduledJob.getAbstractJobType().getId() + " disabled due to invalid dependency definiton !");
 						ude.printStackTrace();
 					}
