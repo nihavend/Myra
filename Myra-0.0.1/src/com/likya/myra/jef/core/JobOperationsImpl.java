@@ -482,7 +482,8 @@ public class JobOperationsImpl implements JobOperations {
 		if(coreFactory.getMonitoringOperations().getJobQueue().containsKey(jobId)) {
 			
 			JobImpl jobImpl = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
-			if ((jobImpl.getAbstractJobType().getDependencyList() != null && jobImpl.getAbstractJobType().getDependencyList().sizeOfItemArray() != 0) || NetTreeResolver.findMeInDeps(jobImpl.getAbstractJobType(), toMap())) { // No dependency free job
+			// if ((jobImpl.getAbstractJobType().getDependencyList() != null && jobImpl.getAbstractJobType().getDependencyList().sizeOfItemArray() != 0) || 
+			if(NetTreeResolver.findMeInDeps(jobImpl.getAbstractJobType(), toMap())) { // No dependency to me
 				throw new Exception("Can not delete job with dependencies :" + jobId);
 			}
 			
