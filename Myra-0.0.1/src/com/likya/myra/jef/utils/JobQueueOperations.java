@@ -492,4 +492,11 @@ public class JobQueueOperations {
 		
 		return null;
 	}
+	
+	public static String getNetTreeId(String jobId) {
+		
+		NetTree netTreeId = getNetTree(jobId);
+		
+		return netTreeId == null ? null : netTreeId.getVirtualId();
+	}
 }
