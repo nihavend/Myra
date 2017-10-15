@@ -26,15 +26,15 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.iterators.ArrayIterator;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.iterators.ArrayIterator;
 
 import com.likya.myra.commons.utils.DependencyOperations;
 import com.likya.myra.commons.utils.JobListFilter;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
-import com.likya.myra.commons.utils.StateFilter;
 import com.likya.myra.commons.utils.NetTreeResolver.NetTree;
+import com.likya.myra.commons.utils.StateFilter;
 import com.likya.myra.jef.ConfigurationManager;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.jobs.JobHelper;
