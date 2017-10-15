@@ -46,7 +46,7 @@
 
 	<developers>
 		<developer>
-			<id>hulagu</id>
+			<id>nihavend</id>
 			<name>Serkan Taş</name>
 			<email>serkan.tas@likyateknoloji.com</email>
 		</developer>
@@ -187,11 +187,11 @@
 			<artifactId>xmlbeans</artifactId>
 			<version>2.6.0</version>
 		</dependency>
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.2.1</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>commons-collections</groupId> -->
+<!-- 			<artifactId>commons-collections</artifactId> -->
+<!-- 			<version>3.2.1</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>net.java.dev.eval</groupId>
 			<artifactId>eval</artifactId>
@@ -202,10 +202,10 @@
 			<artifactId>jsch</artifactId>
 			<version>0.1.50</version>
 		</dependency>
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-			<version>2.9.5</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>joda-time</groupId> -->
+<!-- 			<artifactId>joda-time</artifactId> -->
+<!-- 			<version>2.9.5</version> -->
+<!-- 		</dependency> -->
 	</dependencies>
 </project>
