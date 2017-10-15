@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.Predicate;
 
 import com.likya.myra.jef.controller.ControllerInterface;
 import com.likya.myra.jef.jobs.JobImpl;
