@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import com.likya.myra.commons.model.UnresolvedDependencyException;
 import com.likya.myra.commons.utils.JobDependencyResolver;
