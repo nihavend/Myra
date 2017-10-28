@@ -28,7 +28,7 @@ public class OutputData implements Serializable {
 	private static final long serialVersionUID = -6075964245318352700L;
 
 	public static enum types {
-		DEFAULT(0), JOSTATECHANGE(10), LOGANALYZER(20);
+		DEFAULT(0), JOBSTATECHANGE(10), LOGANALYZER(20);
 		
 		private int value;
 
@@ -159,7 +159,7 @@ public class OutputData implements Serializable {
 	 		outputData.setStartTime(abstractJobType.getManagement().getTimeManagement().getJsRecordedTime().getStartTime());
 			outputData.setStopTime(abstractJobType.getManagement().getTimeManagement().getJsRecordedTime().getStopTime());
 		} else {
-			outputData.setOutputType(OutputData.types.JOSTATECHANGE);
+			outputData.setOutputType(OutputData.types.JOBSTATECHANGE);
 		}
 
 		outputData.setTreeId("treeId");
