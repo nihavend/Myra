@@ -71,10 +71,11 @@ public class JobHelper {
 		}
 		abstractJobType.getManagement().getTimeManagement().getJsRecordedTime().setStopTime(endTime);
 
-		jobClassName.getJobRuntimeProperties().setCompletionDate(endTime);
+		// NOT-USED
+		// jobClassName.getJobRuntimeProperties().setCompletionDate(endTime);
 		// getJobProperties().setCompletionDateTime(endTime);
 
-		jobClassName.getJobRuntimeProperties().setWorkDuration(MyraDateUtils.getUnFormattedElapsedTime((int) timeDiff / 1000));
+		abstractJobType.getManagement().getTimeManagement().setPrevWorkDuration(MyraDateUtils.getUnFormattedElapsedTime((int) timeDiff / 1000));
 		// getJobProperties().setWorkDurationNumeric(timeDiff);
 
 		CoreFactory.getLogger().info(endLog);

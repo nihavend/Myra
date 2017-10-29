@@ -16,9 +16,6 @@
 package com.likya.myra.jef.model;
 
 import java.io.Serializable;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Calendar;
 
 public class JobRuntimeProperties implements JobRuntimeInterface, Serializable {
 	
@@ -29,11 +26,13 @@ public class JobRuntimeProperties implements JobRuntimeInterface, Serializable {
 	 */
 	private String memberIdOfNetTree = null; 
 	
-	private ArrayList<Integer> previousStatusList = new ArrayList<Integer>();
+	// NOT-USED
+	//private ArrayList<Integer> previousStatusList = new ArrayList<Integer>();
 	
-	private Calendar completionDate = null;
+	// NOT-USED
+	// private Calendar recentCompletionDate = null;
 	
-	private String workDuration = "-";
+//	private String workDuration = "-";
 	public long workDurationNumeric = 0;
 	
 	public String recentWorkDuration = "-";
@@ -48,54 +47,54 @@ public class JobRuntimeProperties implements JobRuntimeInterface, Serializable {
 		// jobSimpleProperties = SimpleProperties.Factory.newInstance();
 	}
 	
-	public String getPreviousStatusListString() {
-		
-		String statusListStr = "("; //$NON-NLS-1$
-		if (previousStatusList != null) {
-			int i = 0;
-			while (i < previousStatusList.size()) {
-				// int jobStatus = previousStatusList.get(i).intValue();
+//	public String getPreviousStatusListString() {
+//		
+//		String statusListStr = "("; //$NON-NLS-1$
+//		if (previousStatusList != null) {
+//			int i = 0;
+//			while (i < previousStatusList.size()) {
+//				// int jobStatus = previousStatusList.get(i).intValue();
+//
+//				BigInteger checkValue = BigInteger.valueOf(i + 1).mod(BigInteger.valueOf(3));
+//				if ((checkValue.intValue() == 0) && (i > 0 && i + 1 < previousStatusList.size())) {
+//					// statusListStr += ObjectUtils.getStatusAsString(jobStatus) + ",<br> "; //$NON-NLS-1$
+//				} else {
+//					// statusListStr += ObjectUtils.getStatusAsString(jobStatus) + ","; //$NON-NLS-1$
+//				}
+//
+//				i++;
+//			}
+//		}
+//
+//		char lastChar = statusListStr.charAt(statusListStr.length() - 1);
+//		if (lastChar == ',') {
+//			statusListStr = statusListStr.substring(0, statusListStr.length() - 1);
+//		}
+//
+//		statusListStr += ")"; //$NON-NLS-1$
+//
+//		return statusListStr;
+//	}
 
-				BigInteger checkValue = BigInteger.valueOf(i + 1).mod(BigInteger.valueOf(3));
-				if ((checkValue.intValue() == 0) && (i > 0 && i + 1 < previousStatusList.size())) {
-					// statusListStr += ObjectUtils.getStatusAsString(jobStatus) + ",<br> "; //$NON-NLS-1$
-				} else {
-					// statusListStr += ObjectUtils.getStatusAsString(jobStatus) + ","; //$NON-NLS-1$
-				}
+//	public ArrayList<Integer> getPreviousStatusList() {
+//		return previousStatusList;
+//	}
 
-				i++;
-			}
-		}
+//	public Calendar getCompletionDate() {
+//		return recentCompletionDate;
+//	}
 
-		char lastChar = statusListStr.charAt(statusListStr.length() - 1);
-		if (lastChar == ',') {
-			statusListStr = statusListStr.substring(0, statusListStr.length() - 1);
-		}
+//	public void setCompletionDate(Calendar completionDate) {
+//		this.recentCompletionDate = completionDate;
+//	}
 
-		statusListStr += ")"; //$NON-NLS-1$
-
-		return statusListStr;
-	}
-
-	public ArrayList<Integer> getPreviousStatusList() {
-		return previousStatusList;
-	}
-
-	public Calendar getCompletionDate() {
-		return completionDate;
-	}
-
-	public void setCompletionDate(Calendar completionDate) {
-		this.completionDate = completionDate;
-	}
-
-	public String getWorkDuration() {
-		return workDuration;
-	}
-
-	public void setWorkDuration(String workDuration) {
-		this.workDuration = workDuration;
-	}
+//	public String getWorkDuration() {
+//		return workDuration;
+//	}
+//
+//	public void setWorkDuration(String workDuration) {
+//		this.workDuration = workDuration;
+//	}
 
 	public String getRecentWorkDuration() {
 		return recentWorkDuration;

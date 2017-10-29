@@ -15,18 +15,16 @@
  ******************************************************************************/
 package com.likya.myra.jef.model;
 
-import java.util.Calendar;
-
 public interface JobRuntimeInterface {
 	
-	public Calendar getCompletionDate();
-	public void setCompletionDate(Calendar completionDate);
+//	public Calendar getCompletionDate();
+//	public void setCompletionDate(Calendar completionDate);
 
-	public String getWorkDuration();
-	public void setWorkDuration(String workDuration);
+//	public String getWorkDuration();
+//	public void setWorkDuration(String workDuration);
 
-	public long getWorkDurationNumeric();
-	public void setWorkDurationNumeric(long workDurationNumeric);
+// 	public long getWorkDurationNumeric();
+//	public void setWorkDurationNumeric(long workDurationNumeric);
 
 	public String getRecentWorkDuration() ;
 	public void setRecentWorkDuration(String recentWorkDuration);

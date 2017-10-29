@@ -86,8 +86,8 @@ public class ExecuteInShell extends CommonShell {
 		StringBuilder stringBufferForERROR = new StringBuilder();
 		StringBuilder stringBufferForOUTPUT = new StringBuilder();
 
-		jobRuntimeInterface.setRecentWorkDuration(jobRuntimeInterface.getWorkDuration());
-		jobRuntimeInterface.setRecentWorkDurationNumeric(jobRuntimeInterface.getWorkDurationNumeric());
+//		jobRuntimeInterface.setRecentWorkDuration(abstractJobType.getManagement().getTimeManagement().getPrevWorkDuration());
+//		jobRuntimeInterface.setRecentWorkDurationNumeric(jobRuntimeInterface.getWorkDurationNumeric());
 
 		startWathcDogTimer();
 
