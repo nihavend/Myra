@@ -15,14 +15,6 @@ import java.util.TimeZone;
 
 import org.apache.xmlbeans.GDate;
 import org.apache.xmlbeans.GDuration;
-//import org.joda.time.DateTime;
-//import org.joda.time.DateTimeZone;
-//import org.joda.time.LocalTime;
-//import org.joda.time.Period;
-//import org.joda.time.format.DateTimeFormat;
-//import org.joda.time.format.DateTimeFormatter;
-//import org.joda.time.format.DateTimeFormatterBuilder;
-//import org.joda.time.format.DateTimeParser;
 
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.xsd.myra.model.generics.TypeOfTimeType;
@@ -33,7 +25,7 @@ import com.likya.xsd.myra.model.wlagen.TimeManagementDocument.TimeManagement;
 
 public class PeriodCalculations {
 
-	protected static Calendar forward(AbstractJobType abstractJobType, ArrayList<String> messages) {
+	public static Calendar forward(AbstractJobType abstractJobType, ArrayList<String> messages) {
 		
 		PeriodInfo periodInfo = abstractJobType.getManagement().getPeriodInfo();
 		
