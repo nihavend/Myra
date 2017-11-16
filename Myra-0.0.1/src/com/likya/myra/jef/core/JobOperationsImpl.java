@@ -55,7 +55,7 @@ public class JobOperationsImpl implements JobOperations {
 
 			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
 			
-			boolean isRetryable = Commandability.isRetryable(myJob);
+			boolean isRetryable = Commandability.isRetryable(myJob.getAbstractJobType());
 			
 			if(isRetryable) {
 				((GenericInnerJob) myJob).setRenewByTime(myJob.getAbstractJobType());
@@ -74,7 +74,7 @@ public class JobOperationsImpl implements JobOperations {
 			
 			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
 			
-			boolean isSuccessable = Commandability.isSuccessable(myJob);
+			boolean isSuccessable = Commandability.isSuccessable(myJob.getAbstractJobType());
 			
 			if(isSuccessable) {
 				if(((GenericInnerJob) myJob).scheduleForNextExecution(myJob.getAbstractJobType())) {
@@ -100,7 +100,7 @@ public class JobOperationsImpl implements JobOperations {
 			
 			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
 			
-			boolean isSkipable = Commandability.isSkipable(myJob);
+			boolean isSkipable = Commandability.isSkipable(myJob.getAbstractJobType());
 
 			if(isSkipable) {
 				if(((GenericInnerJob) myJob).scheduleForNextExecution(myJob.getAbstractJobType())) {
@@ -123,7 +123,7 @@ public class JobOperationsImpl implements JobOperations {
 			
 			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobName);
 			
-			boolean isStopable = Commandability.isStopable(myJob);
+			boolean isStopable = Commandability.isStopable(myJob.getAbstractJobType());
 
 			if(isStopable) {
 				myJob.stopMyDogBarking();
@@ -148,7 +148,7 @@ public class JobOperationsImpl implements JobOperations {
 			
 			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
 			
-			boolean isPausable = Commandability.isPausable(myJob);
+			boolean isPausable = Commandability.isPausable(myJob.getAbstractJobType());
 			
 			if(isPausable) {
 				ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.PENDING, SubstateName.PAUSED);
@@ -167,7 +167,7 @@ public class JobOperationsImpl implements JobOperations {
 			
 			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
 			
-			boolean isResumable = Commandability.isResumable(myJob);
+			boolean isResumable = Commandability.isResumable(myJob.getAbstractJobType());
 			
 			if(isResumable) {
 				ChangeLSI.forValue(myJob.getAbstractJobType(), JobHelper.getStateInfo(myJob, 1));
@@ -186,7 +186,7 @@ public class JobOperationsImpl implements JobOperations {
 			JobImpl myJob = coreFactory.getMonitoringOperations().getJobQueue().get(jobId);
 			
 			
-			boolean isStartable = Commandability.isStartable(myJob);
+			boolean isStartable = Commandability.isStartable(myJob.getAbstractJobType());
 			
 			if(isStartable) {
 				Calendar nowDateTime = Calendar.getInstance();
