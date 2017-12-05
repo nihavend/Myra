@@ -9,6 +9,7 @@ import com.likya.myra.commons.utils.NetTreeResolver.NetTree;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.jobs.JobHelper;
 import com.likya.myra.jef.jobs.JobImpl;
+import com.likya.myra.jef.model.OutputData;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
@@ -102,6 +103,8 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 								}
 							}
 							freq = normalFreq;
+							CoreFactory.getInstance().getOutputStrategy().sendDataObject(new OutputData(OutputData.types.ENDOFCYCLE, netTree));
+
 						}
 
 					}
