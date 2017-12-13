@@ -15,7 +15,11 @@
  ******************************************************************************/
 package com.likya.myra.jef.jobs;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.log4j.Logger;
 
@@ -166,6 +170,16 @@ public abstract class CommonShell extends GenericInnerJob {
 	}
 
 	protected LiveStateInfo performLogAnalyze(AbstractJobType abstractJobType) {
+		
+		String fileP = abstractJobType.getBaseJobInfos().getJobLogPath();
+		String fileName = abstractJobType.getBaseJobInfos().getJobLogFile();
+		
+		Path filePath = Paths.get(fileP + File.separator + fileName);
+
+		if(fileP == null || fileP.length() == 0 || fileName == null || fileName.length() == 0 || !Files.exists(filePath)) {
+			CoreFactory.getLogger().debug("  > CommonShell -> performLogAnalyze -> Log file does not exist, skipping log analyze ! \"" + filePath.toString() + "\"");
+			return null;
+		}
 		
 		LiveStateInfo liveStateInfo = null;
 		LogAnalysis logAnalysis = abstractJobType.getLogAnalysis();
