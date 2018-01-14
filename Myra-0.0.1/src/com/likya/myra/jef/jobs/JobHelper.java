@@ -44,11 +44,11 @@ public class JobHelper {
 	public static void updateDescStr(StringBuffer descStr, StringBuilder stringBufferForOUTPUT, StringBuilder stringBufferForERROR) {
 
 		if (stringBufferForOUTPUT != null && stringBufferForOUTPUT.length() > 1) {
-			descStr.append("OUTPUT : " + stringBufferForOUTPUT);
+			descStr.append("STREAM ID[OUTPUT] : " + stringBufferForOUTPUT);
 		}
 
 		if (stringBufferForERROR != null && stringBufferForERROR.length() > 1) {
-			descStr.append("\nERROR : " + stringBufferForERROR);
+			descStr.append("\nSTREAM ID[ERROR} : " + stringBufferForERROR);
 		}
 
 		return;
