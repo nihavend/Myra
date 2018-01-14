@@ -32,7 +32,6 @@ import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.model.OutputData;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.LiveStateInfoDocument.LiveStateInfo;
-import com.likya.xsd.myra.model.wlagen.LogAnalysisDocument.LogAnalysis;
 
 public abstract class CommonShell extends GenericInnerJob {
 
@@ -182,15 +181,12 @@ public abstract class CommonShell extends GenericInnerJob {
 		}
 		
 		LiveStateInfo liveStateInfo = null;
-		LogAnalysis logAnalysis = abstractJobType.getLogAnalysis();
 
-		if (logAnalysis != null && logAnalysis.getActive()) {
-			StringBuffer logContent = new StringBuffer();
-			liveStateInfo = new LogAnalyser().evaluate(abstractJobType, logContent);
-			setFailedOfLog(abstractJobType);
-			outputStrategy.sendDataObject(new OutputData(OutputData.types.LOGANALYZER, logContent));
-		}
-		
+		StringBuffer logContent = new StringBuffer();
+		liveStateInfo = new LogAnalyser().evaluate(abstractJobType, logContent);
+		setFailedOfLog(abstractJobType);
+		outputStrategy.sendDataObject(new OutputData(OutputData.types.LOGANALYZER, logContent));
+				
 		return liveStateInfo;
 	}
 }

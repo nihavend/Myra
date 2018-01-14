@@ -31,6 +31,7 @@ import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.xsd.myra.model.generics.JobTypeDetailsDocument.JobTypeDetails;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
+import com.likya.xsd.myra.model.wlagen.LogAnalysisDocument.LogAnalysis;
 
 public class ExecuteInShell extends CommonShell {
 
@@ -136,8 +137,6 @@ public class ExecuteInShell extends CommonShell {
 			
 			CoreFactory.getLogger().info(jobId + CoreFactory.getMessage("ExternalProgram.6") + processExitValue);
 
-			boolean hasErrorInLog = (performLogAnalyze(abstractJobType) != null);
-
 			stopMyDogBarking();
 
 			cleanUpFastEndings(errorGobbler, outputGobbler);
@@ -151,10 +150,17 @@ public class ExecuteInShell extends CommonShell {
 
 			JobHelper.writeErrorLogFromOutputs(CoreFactory.getLogger(), this.getClass().getName(), stringBufferForOUTPUT, stringBufferForERROR);
 
+			boolean hasErrorInLog = false;
+			LogAnalysis logAnalysis = abstractJobType.getLogAnalysis();
+			if (logAnalysis != null && logAnalysis.getActive()) {
+				hasErrorInLog = (performLogAnalyze(abstractJobType) != null);
+			}
+
 			if (!hasErrorInLog) {
 				setOfCodeMessage(abstractJobType, statusName, processExitValue, jobRuntimeInterface.getMessageBuffer().toString());
 			}
 
+			
 		} catch (Throwable e) {
 
 			errorGobbler.interrupt();
