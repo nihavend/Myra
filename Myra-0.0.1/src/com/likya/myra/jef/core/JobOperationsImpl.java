@@ -78,7 +78,7 @@ public class JobOperationsImpl implements JobOperations {
 			
 			if(isSuccessable) {
 				if(((GenericInnerJob) myJob).scheduleForNextExecution(myJob.getAbstractJobType())) {
-					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS);
+					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS, "Reason : SetSucces Command Received");
 					logger.info(CoreFactory.getMessage("Myra.303") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 					if(JobQueueOperations.isMeFree(myJob.getAbstractJobType())) {
 						ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
