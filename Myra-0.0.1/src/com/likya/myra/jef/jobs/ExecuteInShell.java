@@ -150,13 +150,20 @@ public class ExecuteInShell extends CommonShell {
 
 			JobHelper.writeErrorLogFromOutputs(CoreFactory.getLogger(), this.getClass().getName(), stringBufferForOUTPUT, stringBufferForERROR);
 
-			boolean hasErrorInLog = false;
-			LogAnalysis logAnalysis = abstractJobType.getLogAnalysis();
-			if (logAnalysis != null && logAnalysis.getActive()) {
-				hasErrorInLog = (performLogAnalyze(abstractJobType) != null);
+			boolean noErrorInLog = true;
+			
+			try {
+				LogAnalysis logAnalysis = abstractJobType.getLogAnalysis();
+				if (logAnalysis != null && logAnalysis.getActive()) {
+					if(performLogAnalyze(abstractJobType) != null) {
+						noErrorInLog = false;
+					}
+				}
+			} catch (Throwable t) {
+				t.printStackTrace();
 			}
 
-			if (!hasErrorInLog) {
+			if (noErrorInLog) {
 				setOfCodeMessage(abstractJobType, statusName, processExitValue, jobRuntimeInterface.getMessageBuffer().toString());
 			}
 
