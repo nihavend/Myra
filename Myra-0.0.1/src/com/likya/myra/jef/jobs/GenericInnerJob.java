@@ -53,8 +53,8 @@ public abstract class GenericInnerJob extends JobImpl {
 		ChangeLSI.forValue(abstractJobType, StateName.FINISHED, SubstateName.COMPLETED, statusName, resultCode, message);
 	}
 
-	protected void setFailedOfLog(AbstractJobType abstractJobType) {
-		ChangeLSI.forValue(abstractJobType, StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, "Log da bulunan kelime yüzünden !");
+	protected void setFailedOfLog(AbstractJobType abstractJobType, LiveStateInfo liveStateInfo) {
+		ChangeLSI.forValue(abstractJobType, liveStateInfo);
 	}
 
 	protected void setFailedOfMessage(AbstractJobType abstractJobType, String message) {
