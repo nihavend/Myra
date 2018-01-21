@@ -184,9 +184,11 @@ public abstract class CommonShell extends GenericInnerJob {
 
 		StringBuffer logContent = new StringBuffer();
 		liveStateInfo = new LogAnalyser().evaluate(abstractJobType, logContent);
-		setFailedOfLog(abstractJobType);
-		outputStrategy.sendDataObject(new OutputData(OutputData.types.LOGANALYZER, logContent));
-				
+		if(liveStateInfo != null) {
+			setFailedOfLog(abstractJobType, liveStateInfo);
+			outputStrategy.sendDataObject(new OutputData(OutputData.types.LOGANALYZER, logContent));
+		}
+		
 		return liveStateInfo;
 	}
 }
