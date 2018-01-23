@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.TimeZone;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -178,6 +179,9 @@ public class BaseSchedulerController {
 		SensInfo sensInfo = dependencyList.getSensInfo();
 		// System.err.println("Before : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime()));
 		String timeZone = abstractJobType.getManagement().getTimeManagement().getTimeZone();
+		if(timeZone == null) {
+			timeZone= TimeZone.getDefault().getID();
+		}
 		Calendar returnCal = TimeScheduler.addPeriod(newTime, TimeScheduler.getDurationInMilliSecs(sensInfo.getSensTime().getDelay()), timeZone);
 		abstractJobType.getManagement().getTimeManagement().getJsActualTime().setStartTime(returnCal);
 		// System.err.println("After : " + MyraDateUtils.getDate(abstractJobType.getManagement().getTimeManagement().getJsPlannedTime().getStartTime().getTime()));

@@ -18,6 +18,7 @@ package com.likya.myra.jef.jobs;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 
@@ -87,6 +88,9 @@ public class JobHelper {
 
 	public static void setJsActualTimeForStart(AbstractJobType abstractJobType, long period) {
 		String timeZone = abstractJobType.getManagement().getTimeManagement().getTimeZone();
+		if(timeZone == null) {
+			timeZone = TimeZone.getDefault().getID();
+		}
 		Calendar returnCal = TimeScheduler.addPeriod(Calendar.getInstance(), period, timeZone);
 		abstractJobType.getManagement().getTimeManagement().getJsActualTime().setStartTime(returnCal);
 	}
