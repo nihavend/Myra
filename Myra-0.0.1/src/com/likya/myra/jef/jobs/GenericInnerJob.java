@@ -32,6 +32,7 @@ import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 import com.likya.xsd.myra.model.wlagen.CascadingConditionsDocument.CascadingConditions;
+import com.likya.xsd.myra.model.wlagen.JsTimeOutDocument.JsTimeOut;
 
 public abstract class GenericInnerJob extends JobImpl {
 
@@ -156,38 +157,32 @@ public abstract class GenericInnerJob extends JobImpl {
 	}
 	
 	final protected void startWathcDogTimer() {
-		// TL deki 
-
+		Long timeOut = null;
 		AbstractJobType abstractJobType = getAbstractJobType();
-		
-		Long timeOut = abstractJobType.getManagement().getTimeManagement().getJsTimeOut().getValueInteger().longValue();
+		JsTimeOut jsTimeOut = abstractJobType.getManagement().getTimeManagement().getJsTimeOut();
+		CascadingConditions cascadingConditions = abstractJobType.getManagement().getCascadingConditions();
 
-		if (abstractJobType.getManagement().getTimeManagement().getJsTimeOut().getUnit() == Unit.HOURS) {
-			timeOut = timeOut * 3600;
-		} else if (abstractJobType.getManagement().getTimeManagement().getJsTimeOut().getUnit() == Unit.MINUTES) {
-			timeOut = timeOut * 60;
+		if(jsTimeOut != null && jsTimeOut.getValueInteger().longValue() > 0) {
+			
+		    timeOut = jsTimeOut.getValueInteger().longValue();
+			if (jsTimeOut.getUnit() == Unit.HOURS) {
+				timeOut = timeOut * 3600;
+			} else if (jsTimeOut.getUnit() == Unit.MINUTES) {
+				timeOut = timeOut * 60;
+			}
+			
+			if (!(cascadingConditions != null && cascadingConditions.getJobAutoRetryInfo() != null && cascadingConditions.getJobAutoRetryInfo().getJobAutoRetry() == true && wdtCounter > 0)) {
+				watchDogTimer = new WatchDogTimer(this, abstractJobType.getId(), Thread.currentThread(), timeOut * 1000);
+				watchDogTimer.setName(abstractJobType.getId() + ".WatchDogTimer.id." + watchDogTimer.getId());
+				watchDogTimer.start();
+
+				wdtCounter++;
+			}
+			
+		} else {
+			CoreFactory.getLogger().info(abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.16"));
+			return;
 		}
-
-		if (!(abstractJobType.getManagement().getCascadingConditions() != null && abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo() != null && abstractJobType.getManagement().getCascadingConditions().getJobAutoRetryInfo().getJobAutoRetry() == true && wdtCounter > 0)) {
-			watchDogTimer = new WatchDogTimer(this, abstractJobType.getId(), Thread.currentThread(), timeOut * 1000);
-			watchDogTimer.setName(abstractJobType.getId() + ".WatchDogTimer.id." + watchDogTimer.getId());
-			watchDogTimer.start();
-
-			wdtCounter++;
-		}
-
-		// sw deki
-
-		//		if (simpleProperties.getTimeManagement().getJsTimeOut().getUnit() == Unit.HOURS) {
-		//			timeOut = timeOut * 3600;
-		//		} else if (simpleProperties.getTimeManagement().getJsTimeOut().getUnit() == Unit.MINUTES) {
-		//			timeOut = timeOut * 60;
-		//		}
-		//
-		//		watchDogTimer = new WatchDogTimer(this, simpleProperties.getId(), Thread.currentThread(), timeOut * 1000, globalLogger);
-		//		watchDogTimer.setName(simpleProperties.getId() + ".WatchDogTimer.id." + watchDogTimer.getId());
-		//		watchDogTimer.start();
-
 	}
 	
 	final public void stopMyDogBarking() {
