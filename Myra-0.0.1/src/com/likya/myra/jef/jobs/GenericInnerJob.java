@@ -157,14 +157,14 @@ public abstract class GenericInnerJob extends JobImpl {
 	}
 	
 	final protected void startWathcDogTimer() {
-		Long timeOut = null;
+		
 		AbstractJobType abstractJobType = getAbstractJobType();
 		JsTimeOut jsTimeOut = abstractJobType.getManagement().getTimeManagement().getJsTimeOut();
 		CascadingConditions cascadingConditions = abstractJobType.getManagement().getCascadingConditions();
 
 		if(jsTimeOut != null && jsTimeOut.getValueInteger().longValue() > 0) {
 			
-		    timeOut = jsTimeOut.getValueInteger().longValue();
+		    Long timeOut = jsTimeOut.getValueInteger().longValue();
 			if (jsTimeOut.getUnit() == Unit.HOURS) {
 				timeOut = timeOut * 3600;
 			} else if (jsTimeOut.getUnit() == Unit.MINUTES) {
@@ -181,8 +181,9 @@ public abstract class GenericInnerJob extends JobImpl {
 			
 		} else {
 			CoreFactory.getLogger().info(abstractJobType.getId() + CoreFactory.getMessage("ExternalProgram.16"));
-			return;
 		}
+	
+		return;
 	}
 	
 	final public void stopMyDogBarking() {
