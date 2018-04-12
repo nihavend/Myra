@@ -35,7 +35,7 @@ public class Commandability {
 	}
 
 	public static boolean isStartable(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING) && (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0);
+		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING) && !(LiveStateInfoUtils.equalStatesPD(abstractJobType) && !JobQueueOperations.isMeFree(abstractJobType)) && (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0);
 	}
 
 	public static boolean isStopable(AbstractJobType abstractJobType) {
