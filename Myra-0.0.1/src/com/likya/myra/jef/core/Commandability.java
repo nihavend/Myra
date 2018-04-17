@@ -34,9 +34,29 @@ public class Commandability {
 		return !isMeFree && (LiveStateInfoUtils.eq_PENDING_PAUSED(abstractJobType) || LiveStateInfoUtils.eq_FINISHED_COMPLETED_FAILED(abstractJobType) || LiveStateInfoUtils.eq_FINISHED_STOPPED(abstractJobType));
 	}
 
+	/**
+	 * Rule of isStartable :
+	 * 1. Job must be free job and Job StateName == StateName.PENDING
+	 * 2. Job not free and !(Job StateName == StateName.PENDING && SubStateName == SubStateName.DEACTIVATED) and (first Job In Dependecy Chain)
+	 * 3. All others false
+	 * 
+	 * @param abstractJobType
+	 * @return isStartable
+	 */
 	public static boolean isStartable(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING) && (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0);
-	}
+        
+        boolean retValue = false;
+        
+        boolean isMeFree = JobQueueOperations.isMeFree(abstractJobType);
+        
+        if (isMeFree) {
+            retValue = LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING);
+        } else if (!LiveStateInfoUtils.equalStatesPD(abstractJobType) && (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0)) {
+            retValue = true;
+        }
+        
+        return retValue;
+    }
 
 	public static boolean isStopable(AbstractJobType abstractJobType) {
 		return LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.RUNNING);
