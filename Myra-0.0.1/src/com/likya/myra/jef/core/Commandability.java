@@ -2,6 +2,8 @@ package com.likya.myra.jef.core;
 
 import java.util.HashMap;
 
+import com.likya.myra.commons.model.UnresolvedDependencyException;
+import com.likya.myra.commons.utils.JobDependencyResolver;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.NetTreeResolver.NetTree;
 import com.likya.myra.jef.jobs.JobImpl;
@@ -37,8 +39,9 @@ public class Commandability {
 	/**
 	 * Rule of isStartable :
 	 * 1. Job must be free job and Job StateName == StateName.PENDING
-	 * 2. Job not free and !(Job StateName == StateName.PENDING && SubStateName == SubStateName.DEACTIVATED) and (first Job In Dependecy Chain)
-	 * 3. All others false
+	 * 2. !(Job StateName == StateName.PENDING && SubStateName == SubStateName.DEACTIVATED) and (first Job In Dependecy Chain)
+	 * 3. (Job StateName == StateName.PENDING && SubStateName == SubStateName.IDLED && StatusName == StatusName.BYUSER) and Job's all dependencies resolved
+	 * 4. All others false
 	 * 
 	 * @param abstractJobType
 	 * @return isStartable
@@ -53,6 +56,8 @@ public class Commandability {
             retValue = LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING);
         } else if (!LiveStateInfoUtils.equalStatesPD(abstractJobType) && (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0)) {
             retValue = true;
+        } else if(LiveStateInfoUtils.equalStatesPIU(abstractJobType)) {
+        		retValue = isDependecyResolved(abstractJobType);
         }
         
         return retValue;
@@ -145,5 +150,17 @@ public class Commandability {
 		}
 		
 		return true;
+	}
+	
+	public static boolean isDependecyResolved(AbstractJobType abstractJobType) {
+		
+   		boolean depIsResolved = false;
+		try {
+			depIsResolved = JobDependencyResolver.isResolved(CoreFactory.getLogger(), abstractJobType, JobQueueOperations.toAbstractJobTypeList(CoreFactory.getInstance().getMonitoringOperations().getJobQueue()));
+		} catch (UnresolvedDependencyException e) {
+			e.printStackTrace();
+		}
+		
+		return depIsResolved;
 	}
 }
