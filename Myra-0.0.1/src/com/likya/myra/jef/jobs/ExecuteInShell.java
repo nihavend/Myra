@@ -28,6 +28,8 @@ import com.likya.myra.commons.grabber.StreamGrabber;
 import com.likya.myra.commons.utils.MyraDateUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
+import com.likya.xsd.myra.model.generics.JobCommandTypeDocument.JobCommandType;
+import com.likya.xsd.myra.model.generics.JobCommandTypeDocument.JobCommandType.Enum;
 import com.likya.xsd.myra.model.generics.JobTypeDetailsDocument.JobTypeDetails;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
@@ -95,6 +97,8 @@ public class ExecuteInShell extends CommonShell {
 		ProcessBuilder processBuilder = null;
 
 		JobTypeDetails jobTypeDetails =  abstractJobType.getBaseJobInfos().getJobTypeDetails();
+		Enum jobCommandType = jobTypeDetails.getJobCommandType();
+		isShell = (jobCommandType.equals(JobCommandType.SHELL_SCRIPT) || jobCommandType.equals(JobCommandType.BATCH_PROCESS)) ? true : false;
 		String jobCommand = jobTypeDetails.getJobCommand();
 
 		CoreFactory.getLogger().info(" >>" + this.getClass().getSimpleName() + jobId + " Çalıştırılacak komut : " + jobCommand);
