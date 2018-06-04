@@ -16,6 +16,7 @@
 package com.likya.myra.jef.core;
 
 import java.net.UnknownServiceException;
+import java.util.ArrayList;
 
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 
@@ -58,5 +59,7 @@ public interface JobOperations {
 	public void enableGroup(String grpId);
 
 	public void disableGroup(String grpId);
+	
+	public ArrayList<AbstractJobType> changeGrpName(ArrayList<String> jobIdList, String newGrpName);
 	
 }

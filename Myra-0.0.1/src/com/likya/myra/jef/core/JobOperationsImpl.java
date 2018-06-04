@@ -593,5 +593,20 @@ public class JobOperationsImpl implements JobOperations {
 
 		return tmpMap;
 	}
-
+	
+	public ArrayList<AbstractJobType> changeGrpName(ArrayList<String> jobIdList, String newGrpName) {
+		ArrayList<AbstractJobType> jobList = new ArrayList<>();
+		AbstractJobType abstractJob = null;
+		
+		for(String jobId : jobIdList) {
+			abstractJob = ((JobImpl) coreFactory.getMonitoringOperations().getJobQueue().get(jobId)).getAbstractJobType();
+			abstractJob.setScenarioId(newGrpName);
+			jobList.add(abstractJob);
+		}
+		
+		resetViewTree();
+		
+		return jobList;
+	}
+	
 }

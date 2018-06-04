@@ -148,32 +148,39 @@ public class JobHelper {
 		ProcessBuilder processBuilder;
 
 		String realCommand = "";
-		String[] inlineArgs = null;
+//		String[] inlineArgs = null;
+//
+//		int indexOfSpace = jobCommand.indexOf(" ");
 
-		int indexOfSpace = jobCommand.indexOf(" ");
-
-		if (indexOfSpace > 0) {
-			realCommand = jobCommand.substring(0, indexOfSpace).trim();
-			inlineArgs = jobCommand.substring(jobCommand.indexOf(" ")).trim().split(" ");
-		} else {
-			realCommand = jobCommand.trim();
-		}
+//		if (indexOfSpace > 0) {
+//			realCommand = jobCommand.substring(0, indexOfSpace).trim();
+//			inlineArgs = jobCommand.substring(jobCommand.indexOf(" ")).trim().split(" ");
+//		} else {
+//			realCommand = jobCommand.trim();
+//		}
 
 		String[] commandArr;
-
-		if (isShell) {
-			commandArr = ValidPlatforms.getCommand(realCommand);
-		} else {
-			commandArr = new String[] { realCommand };
-		}
-
-		if (inlineArgs != null && inlineArgs.length > 0) {
-			commandArr = concat(commandArr, inlineArgs);
-		}
-
-		if (extArgValues != null && extArgValues.length() > 0) {
+		realCommand = jobCommand.trim();
+		
+		commandArr = ValidPlatforms.getCommand(realCommand, isShell);
+		
+		if (isShell && extArgValues != null && extArgValues.length() > 0) {
 			commandArr = concat(commandArr, extArgValues.trim().split(" "));
 		}
+
+//		if (isShell) {
+//			commandArr = ValidPlatforms.getCommand(realCommand);
+//		} else {
+//			commandArr = new String[] { realCommand };
+//		}
+
+//		if (inlineArgs != null && inlineArgs.length > 0) {
+//			commandArr = concat(commandArr, inlineArgs);
+//		}
+
+//		if (extArgValues != null && extArgValues.length() > 0) {
+//			commandArr = concat(commandArr, extArgValues.trim().split(" "));
+//		}
 
 		processBuilder = new ProcessBuilder(commandArr);
 
