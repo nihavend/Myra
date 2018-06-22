@@ -39,7 +39,7 @@ public class Commandability {
 	/**
 	 * Rule of isStartable :
 	 * 1. Job must be free job and Job StateName == StateName.PENDING
-	 * 2. !(Job StateName == StateName.PENDING && SubStateName == SubStateName.DEACTIVATED) and (first Job In Dependecy Chain)
+	 * 2. !(Job StateName == StateName.PENDING && SubStateName == SubStateName.DEACTIVATED) and Job StateName == StateName.PENDING and (first Job In Dependecy Chain)
 	 * 3. (Job StateName == StateName.PENDING && SubStateName == SubStateName.IDLED && StatusName == StatusName.BYUSER) and Job's all dependencies resolved
 	 * 4. All others false
 	 * 
@@ -54,8 +54,8 @@ public class Commandability {
         
         if (isMeFree) {
             retValue = LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING);
-        } else if (!LiveStateInfoUtils.equalStatesPD(abstractJobType) && (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0)) {
-            retValue = true;
+        } else if (!LiveStateInfoUtils.equalStatesPD(abstractJobType) && LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.PENDING) && (abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0)) {
+        			retValue = true;
         } else if(LiveStateInfoUtils.equalStatesPIU(abstractJobType)) {
         		retValue = isDependecyResolved(abstractJobType);
         }
