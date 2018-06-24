@@ -28,7 +28,7 @@ public class Commandability {
 	}
 
 	public static boolean isRetryable(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.eq_FINISHED_COMPLETED_FAILED(abstractJobType) || LiveStateInfoUtils.eq_FINISHED_STOPPED(abstractJobType);
+		return LiveStateInfoUtils.eq_FINISHED_COMPLETED_FAILED(abstractJobType) || LiveStateInfoUtils.eq_FINISHED_STOPPED(abstractJobType)|| LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.CANCELLED, SubstateName.STOPPED, StatusName.BYEVENT);
 	}
 
 	public static boolean isSkipable(AbstractJobType abstractJobType) {
@@ -68,7 +68,7 @@ public class Commandability {
 	}
 
 	public static boolean isSuccessable(AbstractJobType abstractJobType) {
-		return LiveStateInfoUtils.eq_FINISHED_COMPLETED_FAILED(abstractJobType) || LiveStateInfoUtils.eq_PENDING_PAUSED(abstractJobType) || LiveStateInfoUtils.eq_FINISHED_STOPPED(abstractJobType);
+		return LiveStateInfoUtils.eq_FINISHED_COMPLETED_FAILED(abstractJobType) || LiveStateInfoUtils.eq_PENDING_PAUSED(abstractJobType) || LiveStateInfoUtils.eq_FINISHED_STOPPED(abstractJobType) || LiveStateInfoUtils.equalStates(LiveStateInfoUtils.getLastStateInfo(abstractJobType), StateName.CANCELLED, SubstateName.STOPPED, StatusName.BYEVENT);
 	}
 
 	/**
