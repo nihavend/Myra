@@ -75,6 +75,8 @@ public class ExecuteSchComponent extends CommonShell {
 		// JobRuntimeInterface jobRuntimeInterface = getJobRuntimeProperties();
 
 		AbstractJobType abstractJobType = getAbstractJobType();
+		
+		JobHelper.setJsRecordedTimeForStart(abstractJobType, startTime);
 
 		String jobId = abstractJobType.getId();
 
