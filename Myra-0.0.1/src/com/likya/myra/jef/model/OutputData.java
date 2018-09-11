@@ -28,7 +28,7 @@ public class OutputData implements Serializable {
 	private static final long serialVersionUID = -6075964245318352700L;
 
 	public static enum types {
-		BASIC(0), JOBSTATECHANGE(10), LOGANALYZER(20), ENDOFCYCLE(30);
+		BASIC(0), JOBSTATECHANGE(10), LOGANALYZER(20), ENDOFCYCLE(30), BEGINOFCYCLE(40);
 		
 		private int value;
 
