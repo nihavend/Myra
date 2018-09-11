@@ -95,7 +95,6 @@ public abstract class GenericInnerJob extends JobImpl {
 
 		boolean isSuccess = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS);
 		boolean isFailed = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED);
-		boolean isWarning = LiveStateInfoUtils.equalStates(liveStateInfo, StateName.FINISHED, SubstateName.COMPLETED, StatusName.WARNING);
 
 		/**
 		 * if a job fails; Two parameters; autoRetry and runEvenIfFailed conflicts. In this is case,
@@ -104,7 +103,7 @@ public abstract class GenericInnerJob extends JobImpl {
 
 		boolean goOnError = (abstractJobType.getManagement().getCascadingConditions() != null && abstractJobType.getManagement().getCascadingConditions().getRunEvenIfFailed());
 
-		if (isSuccess || isWarning || (goOnError && isFailed)) {
+		if (isSuccess || (goOnError && isFailed)) {
 
 			// JobHelper.setWorkDurations(this, startTime);
 
