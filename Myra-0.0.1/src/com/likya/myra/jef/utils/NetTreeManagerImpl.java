@@ -50,6 +50,8 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 
 			HashMap<String, JobImpl> jobQueue = CoreFactory.getInstance().getMonitoringOperations().getJobQueue();
 			
+			HashMap<String, Boolean> mailSendingMemo = new HashMap<>();
+			
 			int freq = 1000;
 			while (loop) {
 				
@@ -58,6 +60,8 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 					for (NetTreeResolver.NetTree netTree : netTreeMap.values()) {
 
 						boolean confirmForReset = true;
+						boolean firstLevelJobStarted = false;
+						mailSendingMemo.putIfAbsent(netTree.getVirtualId(), false);
 
 						for (String jobId : netTree.getMembers()) {
 
@@ -80,7 +84,9 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 								// check interval
 								freq = 1000;
 							}
-
+							
+							firstLevelJobStarted = ((abstractJobType.getDependencyList() == null || abstractJobType.getDependencyList().sizeOfItemArray() == 0) && LiveStateInfoUtils.equalStates(lastLiveStateInfo, StateName.RUNNING)) ? true : false;
+							
 							boolean isFinished = LiveStateInfoUtils.equalStates(lastLiveStateInfo, StateName.FINISHED);
 							boolean isLastJobOfBranch = abstractJobType.getGraphInfo().getLastNodeOfBranch();
 							boolean isBlockBranchOnFail = abstractJobType.getGraphInfo().getBlockBranchOnFail();
@@ -91,9 +97,14 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 								confirmForReset = false;
 								break;
 							}
-
+							
 						}
-
+						
+						if(!mailSendingMemo.get(netTree.getVirtualId()) && firstLevelJobStarted) {
+							CoreFactory.getInstance().getOutputStrategy().sendDataObject(new OutputData(OutputData.types.BEGINOFCYCLE, netTree));
+							mailSendingMemo.put(netTree.getVirtualId(), true);
+						}
+						
 						if (confirmForReset) {
 							for (String jobId : netTree.getMembers()) {
 								// System.err.println("Reset all NetTree members functionality not implemented yet !");
@@ -104,6 +115,7 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 							}
 							freq = normalFreq;
 							CoreFactory.getInstance().getOutputStrategy().sendDataObject(new OutputData(OutputData.types.ENDOFCYCLE, netTree));
+							mailSendingMemo.put(netTree.getVirtualId(), false);
 
 						}
 
