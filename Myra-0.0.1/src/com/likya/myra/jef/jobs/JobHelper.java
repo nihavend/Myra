@@ -22,6 +22,7 @@ import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 
+import com.likya.commons.utils.DateUtils;
 import com.likya.myra.commons.ValidPlatforms;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.MyraDateUtils;
@@ -59,7 +60,7 @@ public class JobHelper {
 
 		AbstractJobType abstractJobType = jobClassName.getAbstractJobType();
 
-		Calendar endTime = Calendar.getInstance();
+		Calendar endTime = DateUtils.getCalendarInstance();
 		long timeDiff = endTime.getTime().getTime() - startTime.getTime().getTime();
 
 		int durationList[] = MyraDateUtils.getFormattedElapsedTime((int) timeDiff / 1000);
@@ -92,7 +93,7 @@ public class JobHelper {
 		if(timeZone == null) {
 			timeZone = TimeZone.getDefault().getID();
 		}
-		Calendar returnCal = TimeScheduler.addPeriod(Calendar.getInstance(), period, timeZone);
+		Calendar returnCal = TimeScheduler.addPeriod(DateUtils.getCalendarInstance(), period, timeZone);
 		abstractJobType.getManagement().getTimeManagement().getJsActualTime().setStartTime(returnCal);
 	}
 

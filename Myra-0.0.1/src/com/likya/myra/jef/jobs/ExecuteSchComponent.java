@@ -24,6 +24,7 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import com.likya.commons.utils.DateUtils;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.jef.core.CoreFactory;
 import com.likya.myra.jef.model.JobRuntimeInterface;
@@ -48,7 +49,7 @@ public class ExecuteSchComponent extends CommonShell {
 	@Override
 	public void localRun() {
 
-		startTime = Calendar.getInstance();
+		startTime = DateUtils.getCalendarInstance();
 		
 		//initStartUp(myLogger);
 
@@ -131,7 +132,7 @@ public class ExecuteSchComponent extends CommonShell {
 
 			int processExitValue = channel.getExitStatus();
 			
-			Calendar endTime = Calendar.getInstance();
+			Calendar endTime = DateUtils.getCalendarInstance();
 			JobHelper.setJsRecordedTimeForStop(abstractJobType, endTime);
 
 			myLogger.info(" >>" + logLabel + jobId + " islemi sonlandi, islem bitis degeri : " + processExitValue);

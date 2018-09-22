@@ -51,7 +51,11 @@ public class ChangeLSI {
 	
 	private static void sendOutputData(AbstractJobType abstractJobType) {
 		OutputData outputData = OutputData.generateDefault(abstractJobType);
-		OutputStrategy outputStrategy = CoreFactory.getInstance().getOutputStrategy();
-		outputStrategy.sendDataObject(outputData);
+		if(CoreFactory.getInstance() != null) {
+			OutputStrategy outputStrategy = CoreFactory.getInstance().getOutputStrategy();
+			outputStrategy.sendDataObject(outputData);
+		} else {
+			System.err.println("Ya test modülü içinde çalıştık ya da korkarım BOMBA VARRRR !!!!!");
+		}
 	}
 }

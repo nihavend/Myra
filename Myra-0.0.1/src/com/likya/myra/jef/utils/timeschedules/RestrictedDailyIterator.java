@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.likya.commons.utils.DateUtils;
+
 /**
  * A <code>RestrictedDailyIterator</code> returns a sequence of dates on
  * subsequent days (restricted to a set of days, e.g. weekdays only)
@@ -12,7 +14,7 @@ import java.util.Date;
 public class RestrictedDailyIterator {
 
 	private final int[] days;
-	private final Calendar calendar = Calendar.getInstance();
+	private final Calendar calendar = DateUtils.getCalendarInstance();
 
 	public RestrictedDailyIterator(int hourOfDay, int minute, int second, int[] days) {
 		this(hourOfDay, minute, second, days, new Date());

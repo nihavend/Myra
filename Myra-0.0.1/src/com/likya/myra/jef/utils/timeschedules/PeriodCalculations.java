@@ -16,7 +16,9 @@ import java.util.TimeZone;
 import org.apache.xmlbeans.GDate;
 import org.apache.xmlbeans.GDuration;
 
+import com.likya.commons.utils.DateUtils;
 import com.likya.myra.commons.utils.MyraDateUtils;
+import com.likya.myra.jef.model.Forwarder;
 import com.likya.xsd.myra.model.generics.TypeOfTimeType;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.jobprops.PeriodInfoDocument.PeriodInfo;
@@ -25,12 +27,12 @@ import com.likya.xsd.myra.model.wlagen.TimeManagementDocument.TimeManagement;
 
 public class PeriodCalculations {
 
-	public static Calendar forward(AbstractJobType abstractJobType, ArrayList<String> messages) {
+	public static Forwarder forward(AbstractJobType abstractJobType, ArrayList<String> messages) {
 		
 		PeriodInfo periodInfo = abstractJobType.getManagement().getPeriodInfo();
 		
-		if(!checkMaxCount(periodInfo)) {
-			return null;
+		if(isMaxCountExceeded(periodInfo)) {
+			return Forwarder.MAX_COUNT_EXCEEDED;
 		}
 		
 		TimeManagement timeManagement = abstractJobType.getManagement().getTimeManagement();
@@ -67,10 +69,13 @@ public class PeriodCalculations {
 		if (jsExecutionTimeFrame != null && jsExecutionTimeFrame.getStartTime() != null) {
 			Calendar jsExecutionTimeFrameStartTime = jsExecutionTimeFrame.getStartTime();
 			if (newDateTime.before(jsExecutionTimeFrameStartTime)) {
-				if(messages != null) {
-					messages.add("Calculated schedule >> " + MyraDateUtils.getDate(newDateTime) + " is before Execution Time Frame Start Time : " + MyraDateUtils.getDate(jsExecutionTimeFrameStartTime));
+				String msgTxt = "Calculated schedule >> " + MyraDateUtils.getDate(newDateTime) + " is before Execution Time Frame Start Time : " + MyraDateUtils.getDate(jsExecutionTimeFrameStartTime);
+				if(messages != null) {					
+					messages.add(msgTxt);
 				}
-				return null;
+				Forwarder forwarder = Forwarder.CALENDAR_NOT_CALCULATED;
+				forwarder.setObject(msgTxt);
+				return forwarder;
 			}
 		}
 		
@@ -87,12 +92,15 @@ public class PeriodCalculations {
 		// System.err.println("real : " + MyraDateUtils.getDate(newDateTime.getTime()));
 		// System.err.println("after : " + MyraDateUtils.getDate(timeManagement.getJsPlannedTime().getStartTime().getTime()));
 		
-		return newDateTime;
+		Forwarder forwarder = Forwarder.CALENDAR_CALCULATED;
+		forwarder.setObject(newDateTime);
+		
+		return forwarder;
 	}
 
 	private static Calendar findNextPeriod(Calendar startDateTime, long period, String selectedTZone, boolean isRelativeStart) {
 
-		Date currentTime = Calendar.getInstance().getTime();
+		Date currentTime = DateUtils.getCalendarInstance().getTime();
 
 		if (isRelativeStart) {
 			startDateTime.setTime(currentTime);
@@ -161,10 +169,10 @@ public class PeriodCalculations {
 
 	protected static Date changeYMDPart(Date firstDate, Date secondDate) {
 
-		Calendar calendarFirst = Calendar.getInstance();
+		Calendar calendarFirst = DateUtils.getCalendarInstance();
 		calendarFirst.setTime(firstDate);
 
-		Calendar calendarSecond = Calendar.getInstance();
+		Calendar calendarSecond = DateUtils.getCalendarInstance();
 		calendarSecond.setTime(secondDate);
 
 		calendarSecond.set(Calendar.YEAR, calendarFirst.get(Calendar.YEAR));
@@ -176,10 +184,10 @@ public class PeriodCalculations {
 
 //	private static boolean checkStayInDay(Calendar date) {
 //
-//		Calendar cal = Calendar.getInstance();
+//		Calendar cal = DateUtils.getCalendarInstance();
 //		cal.setTime(date.getTime());
 //
-//		if (cal.get(Calendar.DAY_OF_MONTH) != Calendar.getInstance().get(Calendar.DAY_OF_MONTH)) {
+//		if (cal.get(Calendar.DAY_OF_MONTH) != DateUtils.getCalendarInstance().get(Calendar.DAY_OF_MONTH)) {
 //			return false;
 //		}
 //
@@ -190,7 +198,7 @@ public class PeriodCalculations {
 
 		// GDuration gDuration = new GDuration(durationString);
 
-		Calendar cal = Calendar.getInstance();
+		Calendar cal = DateUtils.getCalendarInstance();
 		cal.setTimeInMillis(0);
 
 		GDate base = new GDate(cal);
@@ -247,15 +255,15 @@ public class PeriodCalculations {
 //		return timeString;
 //	}
 	
-	protected static boolean checkMaxCount(PeriodInfo periodInfo) {
+	protected static boolean isMaxCountExceeded(PeriodInfo periodInfo) {
 		
-		if (periodInfo != null && periodInfo.getMaxCount() != null && periodInfo.getMaxCount().intValue() > 0 && (periodInfo.getCounter().intValue() + 1) > periodInfo.getMaxCount().intValue()) {
+		if (periodInfo != null && periodInfo.getMaxCount() != null && periodInfo.getMaxCount().intValue() > 0 && (periodInfo.getCounter().intValue() + 1) >= periodInfo.getMaxCount().intValue()) {
 			periodInfo.setCounter(BigInteger.valueOf(0));
-			return false;
-			
+
+			return true;
 		}
 		
-		return true;
+		return false;
 	}
 
 }

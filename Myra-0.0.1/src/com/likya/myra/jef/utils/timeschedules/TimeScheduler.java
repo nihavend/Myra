@@ -20,8 +20,13 @@ import java.util.Calendar;
 
 import org.apache.xmlbeans.GDuration;
 
+import com.likya.myra.commons.utils.LiveStateInfoUtils;
+import com.likya.myra.jef.jobs.ChangeLSI;
+import com.likya.myra.jef.model.Forwarder;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.jobprops.PeriodInfoDocument.PeriodInfo;
+import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
+import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
 
 public class TimeScheduler extends TimeSchedulerBase implements TimeSchedulerInterface {
 
@@ -34,8 +39,13 @@ public class TimeScheduler extends TimeSchedulerBase implements TimeSchedulerInt
 		PeriodInfo periodInfo = abstractJobType.getManagement().getPeriodInfo();
 		// TODO Special care for daily jobs, may be done compatible with general periodicity
 		if (periodInfo == null || periodInfo.getStep() == null || periodInfo.getStep().equals(new GDuration("P1D"))) {
-			Calendar selectedSchedule = regularSchedule(abstractJobType);
-			if (selectedSchedule != null /*&& selectedSchedule.after(Calendar.getInstance())*/) {
+			
+			// Calendar selectedSchedule = regularSchedule(abstractJobType);
+			Forwarder regularForwarder = regularSchedule(abstractJobType);
+			
+			// if (selectedSchedule != null /*&& selectedSchedule.after(DateUtils.getCalendarInstance())*/) {
+			if (regularForwarder.equals(Forwarder.CALENDAR_CALCULATED)) {
+				Calendar selectedSchedule = (Calendar) regularForwarder.getObject();
 				abstractJobType.getManagement().getTimeManagement().getJsActualTime().setStartTime(selectedSchedule);
 				if(!ExecutionTimeFrameValidator.validateEndTime(abstractJobType)) {
 					abstractJobType.getManagement().getTimeManagement().getJsActualTime().setStartTime(null);
@@ -43,6 +53,7 @@ public class TimeScheduler extends TimeSchedulerBase implements TimeSchedulerInt
 				}
 			} else {
 				// yeni zamana kurulmadı, artık çalışmayacak
+				ChangeLSI.forValue(abstractJobType, LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_DEACTIVATED));
 				return false;
 			}
 		} else {
@@ -51,6 +62,10 @@ public class TimeScheduler extends TimeSchedulerBase implements TimeSchedulerInt
 					abstractJobType.getManagement().getTimeManagement().getJsActualTime().setStartTime(null);
 					return false;
 				}
+			} else {
+				// yeni zamana kurulmadı, artık çalışmayacak
+				ChangeLSI.forValue(abstractJobType, LiveStateInfoUtils.generateLiveStateInfo(StateName.INT_PENDING, SubstateName.INT_DEACTIVATED));
+				return false;
 			}
 		}
 

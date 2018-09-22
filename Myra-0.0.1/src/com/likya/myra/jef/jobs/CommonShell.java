@@ -75,7 +75,7 @@ public abstract class CommonShell extends GenericInnerJob {
 		CoreFactory.getLogger().debug(" >>" + logLabel + ">> " + "Terminating Output for " + abstractJobType.getId());
 		stopOutputGobbler(CoreFactory.getLogger());
 //
-//		Calendar endTime = Calendar.getInstance();
+//		Calendar endTime = DateUtils.getCalendarInstance();
 //
 //		long timeDiff = endTime.getTime().getTime() - startTime.getTime().getTime();
 //

@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.jvnet.winp.WinProcess;
 
+import com.likya.commons.utils.DateUtils;
 import com.likya.myra.commons.ValidPlatforms;
 import com.likya.myra.commons.grabber.StreamGrabber;
 import com.likya.myra.commons.utils.MyraDateUtils;
@@ -48,7 +49,7 @@ public class ExecuteInShell extends CommonShell {
 	@Override
 	protected void localRun() {
 
-		startTime = Calendar.getInstance();
+		startTime = DateUtils.getCalendarInstance();
 
 		try {
 			startProcess(startTime);
@@ -136,7 +137,7 @@ public class ExecuteInShell extends CommonShell {
 
 			int processExitValue = process.exitValue();
 			
-			Calendar endTime = Calendar.getInstance();
+			Calendar endTime = DateUtils.getCalendarInstance();
 			JobHelper.setJsRecordedTimeForStop(abstractJobType, endTime);
 			
 			CoreFactory.getLogger().info(jobId + CoreFactory.getMessage("ExternalProgram.6") + processExitValue);

@@ -24,6 +24,7 @@ import java.util.TimeZone;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import com.likya.commons.utils.DateUtils;
 import com.likya.myra.commons.model.UnresolvedDependencyException;
 import com.likya.myra.commons.utils.JobDependencyResolver;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
@@ -72,7 +73,7 @@ public class BaseSchedulerController {
 	protected boolean hasTimeCome(AbstractJobType abstractJobType) {
 
 		Date scheduledTime = abstractJobType.getManagement().getTimeManagement().getJsActualTime().getStartTime().getTime();
-		Date currentTime = Calendar.getInstance().getTime();
+		Date currentTime = DateUtils.getCalendarInstance().getTime();
 
 		if (scheduledTime.before(currentTime)) {
 			return true;
@@ -204,7 +205,7 @@ public class BaseSchedulerController {
 
 		//		if (getScenarioRuntimeProperties().getCurrentState() == ScenarioRuntimeProperties.STATE_WAITING) {
 		//			getScenarioRuntimeProperties().setCurrentState(ScenarioRuntimeProperties.STATE_RUNNING);
-		//			getScenarioRuntimeProperties().setStartTime(Calendar.getInstance().getTime());
+		//			getScenarioRuntimeProperties().setStartTime(DateUtils.getCalendarInstance().getTime());
 		//		}
 
 		ChangeLSI.forValue(scheduledJob.getAbstractJobType(), StateName.RUNNING, SubstateName.STAGE_IN);

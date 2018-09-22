@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
+import com.likya.commons.utils.DateUtils;
 import com.likya.commons.utils.SortUtils;
 import com.likya.myra.commons.utils.DependencyOperations;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
@@ -85,7 +86,12 @@ public class JobOperationsImpl implements JobOperations {
 						logger.info(CoreFactory.getMessage("Myra.303") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 					}
 				} else {
-					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, "set success yaparken bir hata oluştu !");
+					// ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, "set success yaparken bir hata oluştu !");
+					/**
+					 * TODO Buraya girmemesi lazım artık yeni forwarder yapısı ile !!!!!
+					 * 15.09.2018 Serkan Taş 
+					 */
+					logger.info("set success yaparken bir hata oluştu !");
 				}
 			}
 		}
@@ -107,7 +113,12 @@ public class JobOperationsImpl implements JobOperations {
 					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.SKIPPED);
 					logger.info(CoreFactory.getMessage("Myra.304") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 				} else {
-					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, "set success yaparken bir hata oluştu !");
+					// ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.FAILED, "set success yaparken bir hata oluştu !");
+					/**
+					 * TODO Buraya girmemesi lazım artık yeni forwarder yapısı ile !!!!!
+					 * 15.09.2018 Serkan Taş 
+					 */
+					logger.info("set success yaparken bir hata oluştu !");
 				}
 			}
 
@@ -189,7 +200,7 @@ public class JobOperationsImpl implements JobOperations {
 			boolean isStartable = Commandability.isStartable(myJob.getAbstractJobType());
 			
 			if(isStartable) {
-				Calendar nowDateTime = Calendar.getInstance();
+				Calendar nowDateTime = DateUtils.getCalendarInstance();
 				updateStartConditionsOfDepChain(jobId,  nowDateTime);
 				if(myJob.getAbstractJobType().getManagement().getTimeManagement() == null) {
 					myJob.getAbstractJobType().getManagement().addNewTimeManagement().addNewJsActualTime();
