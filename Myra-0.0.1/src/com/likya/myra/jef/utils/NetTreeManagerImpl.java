@@ -3,6 +3,7 @@ package com.likya.myra.jef.utils;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 
+import com.likya.commons.utils.DateUtils;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
 import com.likya.myra.commons.utils.NetTreeResolver;
 import com.likya.myra.commons.utils.NetTreeResolver.NetTree;
@@ -46,7 +47,7 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 
 			int normalFreq = 5000;
 			
-			Thread.currentThread().setName("NetTreeMonitor_" + System.currentTimeMillis()/*netTree.getVirtualId()*/);
+			Thread.currentThread().setName("NetTreeMonitor_" + DateUtils.getCurrentTimeMilliseconds()/*netTree.getVirtualId()*/);
 
 			HashMap<String, JobImpl> jobQueue = CoreFactory.getInstance().getMonitoringOperations().getJobQueue();
 			
@@ -164,7 +165,7 @@ public class NetTreeManagerImpl implements NetTreeManagerInterface, Runnable {
 
 	public void run() {
 
-		Thread.currentThread().setName("NetTreeManagerImp" + System.currentTimeMillis());
+		Thread.currentThread().setName("NetTreeManagerImp" + DateUtils.getCurrentTimeMilliseconds());
 		
 		//for (NetTreeResolver.NetTree netTree : netTreeMap.values()) {
 			NetTreeMonitor netTreeMonitor = new NetTreeMonitor(/*netTree*/);

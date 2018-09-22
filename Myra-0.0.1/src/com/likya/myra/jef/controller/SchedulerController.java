@@ -22,6 +22,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
+import com.likya.commons.utils.DateUtils;
 import com.likya.commons.utils.PrintVantil;
 import com.likya.myra.commons.model.UnresolvedDependencyException;
 import com.likya.myra.commons.utils.LiveStateInfoUtils;
@@ -52,7 +53,7 @@ public class SchedulerController extends BaseSchedulerController implements Cont
 	@Override
 	public void run() {
 		
-		Thread.currentThread().setName("SchedulerController_" + System.currentTimeMillis());
+		Thread.currentThread().setName("SchedulerController_" + DateUtils.getCurrentTimeMilliseconds());
 		
 		Logger logger = CoreFactory.getLogger();
 
