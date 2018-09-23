@@ -17,7 +17,7 @@ public class RestrictedDailyIterator {
 	private final Calendar calendar = DateUtils.getCalendarInstance();
 
 	public RestrictedDailyIterator(int hourOfDay, int minute, int second, int[] days) {
-		this(hourOfDay, minute, second, days, new Date());
+		this(hourOfDay, minute, second, days, DateUtils.getDate());
 	}
 
 	public RestrictedDailyIterator(int hourOfDay, int minute, int second, int[] days, Date date) {
