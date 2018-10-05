@@ -39,6 +39,7 @@ import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.Status;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
+import com.likya.xsd.myra.model.wlagen.JsRecordedTimeDocument.JsRecordedTime;
 import com.likya.xsd.myra.model.wlagen.TriggerDocument.Trigger;
 
 public class JobHelper {
@@ -77,8 +78,7 @@ public class JobHelper {
 		// jobClassName.getJobRuntimeProperties().setCompletionDate(endTime);
 		// getJobProperties().setCompletionDateTime(endTime);
 
-		//abstractJobType.getManagement().getTimeManagement().setPrevWorkDuration(MyraDateUtils.getUnFormattedElapsedTime((int) timeDiff / 1000));
-		abstractJobType.getManagement().getTimeManagement().setPrevWorkDuration(MyraDateUtils.getUnFormattedElapsedTimeInMilliSec(timeDiff));
+		//abstractJobType.getManagement().getTimeManagement().setPrevWorkDuration(MyraDateUtils.getUnFormattedElapsedTimeInMilliSec(timeDiff));
 		// getJobProperties().setWorkDurationNumeric(timeDiff);
 
 		CoreFactory.getLogger().info(endLog);
@@ -86,6 +86,17 @@ public class JobHelper {
 
 		// reportLog(jobClassName, startTime, endTime);
 
+	}
+	
+	public static void setPrevWorkDuration(AbstractJobType abstractJobType) {
+		long timeDiff;
+		JsRecordedTime jsRecordedTime = abstractJobType.getManagement().getTimeManagement().getJsRecordedTime();
+		if(jsRecordedTime != null && jsRecordedTime.getStopTime() != null && jsRecordedTime.getStartTime() != null) {
+			timeDiff = jsRecordedTime.getStopTime().getTime().getTime() - jsRecordedTime.getStartTime().getTime().getTime();
+			abstractJobType.getManagement().getTimeManagement().setPrevWorkDuration(MyraDateUtils.getUnFormattedElapsedTimeInMilliSec(timeDiff));
+     	} else {
+     		abstractJobType.getManagement().getTimeManagement().setPrevWorkDuration("-");
+     	}
 	}
 
 	public static void setJsActualTimeForStart(AbstractJobType abstractJobType, long period) {
