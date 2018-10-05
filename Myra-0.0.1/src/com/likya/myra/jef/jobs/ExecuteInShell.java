@@ -48,8 +48,10 @@ public class ExecuteInShell extends CommonShell {
 
 	@Override
 	protected void localRun() {
-
+		
 		startTime = DateUtils.getCalendarInstance();
+		
+		JobHelper.setPrevWorkDuration(getAbstractJobType());
 
 		try {
 			startProcess(startTime);

@@ -51,6 +51,8 @@ public class ExecuteSchComponent extends CommonShell {
 
 		startTime = DateUtils.getCalendarInstance();
 		
+		JobHelper.setPrevWorkDuration(getAbstractJobType());
+		
 		//initStartUp(myLogger);
 
 		AbstractJobType abstractJobType = getAbstractJobType();
