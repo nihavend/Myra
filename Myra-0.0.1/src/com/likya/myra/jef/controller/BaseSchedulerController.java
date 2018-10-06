@@ -36,6 +36,9 @@ import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.utils.JobQueueOperations;
 import com.likya.myra.jef.utils.timeschedules.TimeScheduler;
 import com.likya.xsd.myra.model.config.MyraConfigDocument.MyraConfig;
+import com.likya.xsd.myra.model.generics.DangerZone;
+import com.likya.xsd.myra.model.generics.DangerZoneTypeDocument.DangerZoneType;
+import com.likya.xsd.myra.model.generics.JobDangerZoneListDocument.JobDangerZoneList;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.jobprops.DependencyListDocument.DependencyList;
 import com.likya.xsd.myra.model.jobprops.SensInfoDocument.SensInfo;
@@ -328,31 +331,40 @@ public class BaseSchedulerController {
 	}
 
 	public boolean inDangerGroupZoneIntrusion(JobImpl currentJob) {
-
+		
 		AbstractJobType myAbstractJobType = currentJob.getAbstractJobType();
 
-		String dangerZoneGroupId = myAbstractJobType.getDangerZoneGroupId();
-
-		if (dangerZoneGroupId == null) {
+//		String dangerZoneGroupId = myAbstractJobType.getDangerZoneGroupId();
+		JobDangerZoneList jobDangerZoneList = myAbstractJobType.getBaseJobInfos().getJobDangerZoneList();
+		
+		if(jobDangerZoneList == null || jobDangerZoneList.getJobDangerZoneArray().length == 0) {
 			return false;
 		}
 
-		for (JobImpl tmpJobImpl : jobQueue.values()) {
+//		if (dangerZoneGroupId == null) {
+//			return false;
+//		}
 
-			AbstractJobType tmpAbstractJobType = tmpJobImpl.getAbstractJobType();
+		for(DangerZone dangerZone : jobDangerZoneList.getJobDangerZoneArray()) {
+			for (JobImpl tmpJobImpl : jobQueue.values()) {
 
-			if (tmpAbstractJobType.getId().equals(myAbstractJobType.getId())) {
-				// self intrusion, discarding
-				continue;
-			}
+				AbstractJobType tmpAbstractJobType = tmpJobImpl.getAbstractJobType();
 
-			if (dangerZoneGroupId.equals(tmpAbstractJobType.getDangerZoneGroupId())) {
-				// System.err.println("Job " + myAbstractJobType.getId() + " and " + tmpAbstractJobType.getId() + " are in same group >> " + tmpAbstractJobType.getDangerZoneGroupId());
-				// System.err.println("Job " + myAbstractJobType.getId() + " statu : " + myAbstractJobType.getStateInfos());
-				// System.err.println("Job " +  tmpAbstractJobType.getId() + " statu : " + tmpAbstractJobType.getStateInfos());
-				if (StateName.RUNNING.equals(LiveStateInfoUtils.getLastStateInfo(tmpAbstractJobType).getStateName())) {
-					// System.err.println("Can not execute !!!!!!!!!!!");
-					return true;
+				if (tmpAbstractJobType.getId().equals(myAbstractJobType.getId())) {
+					// self intrusion, discarding
+					continue;
+				}
+				
+				if((dangerZone.getDangerZoneType().equals(DangerZoneType.GROUP) && dangerZone.getDangerZoneId().equals(tmpAbstractJobType.getGroupId()))
+						|| (dangerZone.getDangerZoneType().equals(DangerZoneType.JOB) && dangerZone.getDangerZoneId().equals(tmpAbstractJobType.getId()))) {
+//				if (dangerZoneGroupId.equals(tmpAbstractJobType.getDangerZoneGroupId())) {
+					// System.err.println("Job " + myAbstractJobType.getId() + " and " + tmpAbstractJobType.getId() + " are in same group >> " + tmpAbstractJobType.getDangerZoneGroupId());
+					// System.err.println("Job " + myAbstractJobType.getId() + " statu : " + myAbstractJobType.getStateInfos());
+					// System.err.println("Job " +  tmpAbstractJobType.getId() + " statu : " + tmpAbstractJobType.getStateInfos());
+					if (StateName.RUNNING.equals(LiveStateInfoUtils.getLastStateInfo(tmpAbstractJobType).getStateName())) {
+						// System.err.println("Can not execute !!!!!!!!!!!");
+						return true;
+					}
 				}
 			}
 		}

@@ -42,6 +42,8 @@ import com.likya.myra.jef.jobs.JobImpl;
 import com.likya.myra.jef.model.JobRuntimeInterface;
 import com.likya.myra.jef.model.JobRuntimeProperties;
 import com.likya.myra.jef.model.SortType;
+import com.likya.xsd.myra.model.generics.DangerZone;
+import com.likya.xsd.myra.model.generics.DangerZoneTypeDocument.DangerZoneType;
 import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.joblist.JobListDocument;
 import com.likya.xsd.myra.model.joblist.JobListDocument.JobList;
@@ -499,4 +501,42 @@ public class JobQueueOperations {
 		
 		return netTreeId == null ? null : netTreeId.getVirtualId();
 	}
+	
+	public static HashMap<String, DangerZone> fetchListForDangerZone(HashMap<String, JobImpl> jobQueue) {
+
+		HashMap<String, DangerZone> dzList;
+		String groupId;
+		
+		while (true) {
+
+			dzList = new HashMap<String, DangerZone>();
+			
+			Iterator<String> jobsIterator = jobQueue.keySet().iterator();
+			
+			try {
+				while (jobsIterator.hasNext()) {
+					String jobKey = jobsIterator.next();
+					
+					DangerZone dzJob = DangerZone.Factory.newInstance();
+					dzJob.setDangerZoneType(DangerZoneType.JOB);
+					dzJob.setDangerZoneId(jobKey);
+					dzList.put(jobKey, dzJob);
+					
+					groupId = jobQueue.get(jobKey).getAbstractJobType().getGroupId();
+					if(groupId != null && !"".equals(groupId)) {
+						DangerZone dzGrp = DangerZone.Factory.newInstance();
+						dzGrp.setDangerZoneType(DangerZoneType.GROUP);
+						dzGrp.setDangerZoneId(groupId);
+						dzList.put(groupId, dzGrp);
+					}
+				}
+			} catch (ConcurrentModificationException c) {
+				continue;
+			}
+			break;
+		}
+
+		return dzList;
+	}
+
 }
