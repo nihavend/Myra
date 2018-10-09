@@ -350,7 +350,7 @@ public class BaseSchedulerController {
 
 				AbstractJobType tmpAbstractJobType = tmpJobImpl.getAbstractJobType();
 
-				if (tmpAbstractJobType.getId().equals(myAbstractJobType.getId())) {
+				if (tmpAbstractJobType.getId().equals(myAbstractJobType.getId()) || myAbstractJobType.getGroupId().equals(tmpAbstractJobType.getGroupId())) {
 					// self intrusion, discarding
 					continue;
 				}
