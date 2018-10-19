@@ -257,7 +257,7 @@ public class PeriodCalculations {
 	
 	protected static boolean isMaxCountExceeded(PeriodInfo periodInfo) {
 		
-		if (periodInfo != null && periodInfo.getMaxCount() != null && periodInfo.getMaxCount().intValue() > 0 && (periodInfo.getCounter().intValue() + 1) >= periodInfo.getMaxCount().intValue()) {
+		if (periodInfo != null && periodInfo.getMaxCount() != null && periodInfo.getMaxCount().intValue() > 0 && (periodInfo.getCounter().intValue() + 1) > periodInfo.getMaxCount().intValue()) {
 			periodInfo.setCounter(BigInteger.valueOf(0));
 
 			return true;
