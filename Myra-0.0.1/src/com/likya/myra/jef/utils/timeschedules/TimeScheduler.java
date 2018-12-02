@@ -27,7 +27,6 @@ import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.jobprops.PeriodInfoDocument.PeriodInfo;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
-import com.likya.xsd.myra.model.wlagen.TriggerDocument.Trigger;
 
 public class TimeScheduler extends TimeSchedulerBase implements TimeSchedulerInterface {
 
@@ -35,11 +34,6 @@ public class TimeScheduler extends TimeSchedulerBase implements TimeSchedulerInt
 
 		if(!ExecutionTimeFrameValidator.validateEndTime(abstractJobType)) {
 			return false;
-		}
-		
-		//UserTrigger job fail durumunda setSuccess ve skip edilirken sonraki çalışma zamanına kurulMAMALI!
-		if(abstractJobType.getManagement().getTrigger().intValue() == Trigger.INT_USER) {
-			return true;
 		}
 		
 		PeriodInfo periodInfo = abstractJobType.getManagement().getPeriodInfo();

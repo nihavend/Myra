@@ -37,6 +37,7 @@ import com.likya.xsd.myra.model.joblist.AbstractJobType;
 import com.likya.xsd.myra.model.stateinfo.StateNameDocument.StateName;
 import com.likya.xsd.myra.model.stateinfo.StatusNameDocument.StatusName;
 import com.likya.xsd.myra.model.stateinfo.SubstateNameDocument.SubstateName;
+import com.likya.xsd.myra.model.wlagen.TriggerDocument.Trigger;
 
 public class JobOperationsImpl implements JobOperations {
 	
@@ -82,7 +83,11 @@ public class JobOperationsImpl implements JobOperations {
 					ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.FINISHED, SubstateName.COMPLETED, StatusName.SUCCESS, "Reason : SetSucces Command Received");
 					logger.info(CoreFactory.getMessage("Myra.303") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 					if(JobQueueOperations.isMeFree(myJob.getAbstractJobType())) {
-						ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
+						if(myJob.getAbstractJobType().getManagement().getTrigger().intValue() == Trigger.INT_USER) {
+							ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.PENDING, SubstateName.IDLED, StatusName.BYUSER);
+						} else {
+							ChangeLSI.forValue(myJob.getAbstractJobType(), StateName.PENDING, SubstateName.IDLED, StatusName.BYTIME);
+						}
 						logger.info(CoreFactory.getMessage("Myra.303") + CoreFactory.getMessage("Myra.301") + jobId + " : " + JobHelper.getLastStateInfo(myJob));
 					}
 				} else {
